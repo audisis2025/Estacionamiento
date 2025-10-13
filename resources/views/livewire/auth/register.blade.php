@@ -14,6 +14,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
     public string $email = '';
     public string $password = '';
     public string $password_confirmation = '';
+    public string $phone_number = '';
 
     /**
      * Handle an incoming registration request.
@@ -21,21 +22,25 @@ new #[Layout('components.layouts.auth')] class extends Component {
     public function register(): void
     {
         $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+            'name' => ['required','string','max:255'],
+            'email' => ['required','string','lowercase','email','max:255','unique:users,email'],
+            'password' => ['required','string','confirmed', Rules\Password::defaults()],
+            'phone_number' => ['required','string','size:10','unique:users,phone_number'],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
+        $validated['amount'] = 0;
 
-        event(new Registered(($user = User::create($validated))));
+        event(new Registered($user = User::create($validated)));
 
         Auth::login($user);
-
         Session::regenerate();
 
+        // ¡Importante! salir del método después de redirigir
         $this->redirectIntended(route('dashboard', absolute: false), navigate: true);
+        return;
     }
+
 }; ?>
 
 <div class="flex flex-col gap-6">
@@ -64,6 +69,15 @@ new #[Layout('components.layouts.auth')] class extends Component {
             required
             autocomplete="email"
             placeholder="email@example.com"
+        />
+
+        <flux:input
+            wire:model="phone_number"
+            :label="__('Phone number')"
+            type="text"
+            required
+            autocomplete="tel"
+            placeholder="5551234567"
         />
 
         <!-- Password -->

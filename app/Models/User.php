@@ -15,48 +15,64 @@ class User extends Authenticatable
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
+     * Atributos que se pueden asignar masivamente
      */
     protected $fillable = [
         'name',
         'email',
         'password',
+        'phone_number',
+        'id_plan',
+        'id_role',
+        'end_date',
+        'amount',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
+     * Atributos que deben ocultarse al serializar
      */
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Atributos con casteo automático
      */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
+            'end_date' => 'datetime',
+            'amount' => 'integer',
             'password' => 'hashed',
         ];
     }
 
     /**
-     * Get the user's initials
+     * Relaciones
+     */
+    // public function plan()
+    // {
+    //     return $this->belongsTo(Plan::class, 'id_plan');
+    // }
+
+    // public function role()
+    // {
+    //     return $this->belongsTo(Role::class, 'id_role');
+    // }
+
+    /**
+     * Iniciales del usuario
      */
     public function initials(): string
     {
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->map(fn($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
 }
