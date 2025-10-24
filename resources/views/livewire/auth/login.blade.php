@@ -49,7 +49,14 @@ new #[Layout('components.layouts.auth')] class extends Component {
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        if($user->phone_number == "7777777777")
+        {
+            $this->redirectIntended(default: route('admin', absolute: false), navigate: true);
+        }
+        else
+        {
+            $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        }
     }
 
     /**
