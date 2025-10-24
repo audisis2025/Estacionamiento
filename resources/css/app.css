@@ -26,6 +26,8 @@
     --color-accent: var(--color-neutral-800);
     --color-accent-content: var(--color-neutral-800);
     --color-accent-foreground: var(--color-white);
+    --color-custom-blue: #241178;
+    --color-custom-blue-dark: #1a0d5a;
 }
 
 @layer theme {
