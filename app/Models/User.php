@@ -8,11 +8,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use HasFactory, Notifiable, TwoFactorAuthenticatable, HasApiTokens;
 
     /**
      * Atributos que se pueden asignar masivamente
@@ -26,6 +27,7 @@ class User extends Authenticatable
         'id_role',
         'end_date',
         'amount',
+        'id_role',
     ];
 
     /**
@@ -46,23 +48,10 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'end_date' => 'datetime',
-            'amount' => 'integer',
+            'amount' => 'decimal:2',
             'password' => 'hashed',
         ];
     }
-
-    /**
-     * Relaciones
-     */
-    // public function plan()
-    // {
-    //     return $this->belongsTo(Plan::class, 'id_plan');
-    // }
-
-    // public function role()
-    // {
-    //     return $this->belongsTo(Role::class, 'id_role');
-    // }
 
     /**
      * Iniciales del usuario
@@ -74,5 +63,41 @@ class User extends Authenticatable
             ->take(2)
             ->map(fn($word) => Str::substr($word, 0, 1))
             ->implode('');
+    }
+
+    public function plan()
+    {
+        return $this->belongsTo(\App\Models\Plan::class, 'id_plan');
+    }
+
+    public function hasActivePlan(): bool
+    {
+        if (!$this->id_plan || !$this->end_date) return false;
+        return now()->lessThanOrEqualTo(\Carbon\Carbon::parse($this->end_date));
+    }
+
+    public function parking()
+    {
+        return $this->hasOne(Parking::class, 'id_user', 'id');
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'id_role');
+    }
+
+    public function isAdmin(): bool
+    {
+        return (int) $this->id_role === 1;
+    }
+
+    public function isParkingAdmin(): bool
+    {
+        return (int) $this->id_role === 2;
+    }
+
+    public function isUser(): bool
+    {
+        return (int) $this->id_role === 3;
     }
 }

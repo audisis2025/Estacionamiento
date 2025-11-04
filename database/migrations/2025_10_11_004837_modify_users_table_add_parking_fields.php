@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             // Tus columnas
             $table->dateTime('end_date')->nullable()->after('password');
-            $table->bigInteger('amount')->default(0)->after('end_date');
+            $table->float('amount')->default(0)->after('end_date');
             $table->string('phone_number', 10)->unique()->after('amount');
 
             // Foreign keys (tipos compatibles con INT en roles/plans)
-            $table->unsignedInteger('id_plan')->nullable()->after('phone_number');
+            $table->unsignedBigInteger('id_plan')->nullable()->after('phone_number');
             $table->unsignedInteger('id_role')->nullable()->after('id_plan');
 
             $table->foreign('id_plan')->references('id')->on('plans');
