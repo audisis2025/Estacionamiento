@@ -11,12 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('plans', function (Blueprint $table) {
-            $table->increments('id');           // INT auto_increment
-            $table->string('name', 40);
-            $table->integer('price');
-            $table->integer('duration');
+        Schema::create('plans', function (Blueprint $table) 
+        {
+            $table->id();
+            $table->string('type', 20);
+            $table->string('name', 60);
+            $table->decimal('price', 10, 2)->default(0);
+            $table->unsignedSmallInteger('duration_days');
             $table->string('description', 255);
+
+            $table->unique(['type', 'name']);
+            $table->index('type');
         });
     }
 

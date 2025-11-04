@@ -14,6 +14,7 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @fluxAppearance
 
@@ -27,21 +28,16 @@
             </a>
 
             <flux:navlist variant="outline">
-                <flux:navlist.group :heading="__('Platform')" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+                <flux:navlist.group :heading="__('Menu')" class="grid">
+                    <flux:navlist.item icon="home" :href="route('admin.dashboard')" :current="request()->routeIs('admin.dashboard')" wire:navigate>{{ __('Inicio') }}</flux:navlist.item>
+
+                    <flux:navlist.item icon="eye" :href="route('admin.plans.index')" :current="request()->routeIs('admin.plans.index')" wire:navigate>{{ __('Planes') }}</flux:navlist.item>
+
+                    <flux:navlist.item icon="plus" :href="route('admin.plans.create')" :current="request()->routeIs('admin.plans.create')" wire:navigate>{{ __('Agregar plan') }}</flux:navlist.item>
                 </flux:navlist.group>
+
             </flux:navlist>
             <flux:spacer />
-
-            <flux:navlist variant="outline">
-                <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                {{ __('Repository') }}
-                </flux:navlist.item>
-
-                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                {{ __('Documentation') }}
-                </flux:navlist.item>
-            </flux:navlist>
 
             <!-- Desktop User Menu -->
             <flux:dropdown class="hidden lg:block" position="bottom" align="start">
@@ -75,7 +71,7 @@
                     <flux:menu.separator />
 
                     <flux:menu.radio.group>
-                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>Configuración</flux:menu.item>
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />
@@ -83,7 +79,7 @@
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
                         <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full" data-test="logout-button">
-                            {{ __('Log Out') }}
+                            Cerrar sesión
                         </flux:menu.item>
                     </form>
                 </flux:menu>
@@ -125,7 +121,7 @@
                     <flux:menu.separator />
 
                     <flux:menu.radio.group>
-                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>Configuración</flux:menu.item>
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />
@@ -133,7 +129,7 @@
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
                         <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full" data-test="logout-button">
-                            {{ __('Log Out') }}
+                            Cerrar sesión
                         </flux:menu.item>
                     </form>
                 </flux:menu>
@@ -141,22 +137,32 @@
         </flux:header>
 
         <flux:main>
-            <!-- Botones con iconos estándar -->
-            <button class="btn btn-primary">
-                <x-heroicon-o-plus class="w-5 h-5" />
-                Crear Usuario
-            </button>
-
-            <button class="btn btn-warning">
-                <x-heroicon-o-pencil-square class="w-5 h-5" />
-                Editar
-            </button>
-
-            <button class="btn btn-danger">
-                <x-heroicon-o-trash class="w-5 h-5" />
-                Eliminar
-            </button>
+            {{ $slot }}
         </flux:main>
+
         @fluxScripts
+        
+        @if (session('swal'))
+            <script>
+                Swal.fire(@json(session('swal')));
+            </script>
+        @endif
+
+        {{-- @if ($errors->any())
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    html: 
+                    `<ul> 
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>`,
+                });
+            </script>
+        @endif --}}
+
+        @stack('js')
     </body>
 </html>

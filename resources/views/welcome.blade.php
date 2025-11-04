@@ -8,15 +8,12 @@
 </head>
 
 <body class="bg-gray-100 dark:bg-zinc-900 text-gray-800 dark:text-gray-100 flex flex-col min-h-screen">
-    
-
-    {{-- Encabezado --}}
     <header class="bg-white dark:bg-zinc-800 shadow-md py-4">
         <div class="container mx-auto px-6 flex justify-between items-center">
             <h1 class="text-2xl font-bold text-custom-blue">Parking+</h1>
             <nav class="space-x-4">
                 <flux:button 
-                    variant="ghost" 
+                    variant="filled" 
                     :href="route('login')" 
                     class="px-4 py-2 text-custom-blue hover:underline font-semibold">
                     Iniciar sesión
@@ -41,56 +38,42 @@
 
         <h3 class="text-2xl font-semibold mb-8">Elige el plan que mejor se adapte a ti</h3>
 
-        {{-- Tarjetas de planes --}}
+        {{-- Tarjetas de planes dinámicas --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {{-- Plan Básico --}}
-            <div class="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 flex flex-col">
-                <h4 class="text-xl font-bold mb-2 text-custom-blue">Plan Básico</h4>
-                <p class="text-gray-600 dark:text-gray-400 flex-grow">
-                    Ideal para estacionamientos pequeños.  
-                    Incluye hasta 2 lectores QR y gestión básica de usuarios.
-                </p>
-                <p class="mt-4 text-3xl font-bold text-custom-blue">$99 <span class="text-base text-gray-500">/mes</span></p>
-                <flux:button 
-                    variant="primary" 
-                    :href="route('register')"
-                    class="mt-6 inline-block bg-custom-blue hover:bg-custom-blue-dark text-white font-semibold py-2 px-4 rounded-lg">
-                    Comenzar
-                </flux:button>
-            </div>
 
-            {{-- Plan Profesional --}}
-            <div class="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 flex flex-col border-2 border-custom-blue">
-                <h4 class="text-xl font-bold mb-2 text-custom-blue">Plan Profesional</h4>
-                <p class="text-gray-600 dark:text-gray-400 flex-grow">
-                    Perfecto para medianas empresas.  
-                    Hasta 5 lectores QR, estadísticas y administración avanzada.
-                </p>
-                <p class="mt-4 text-3xl font-bold text-custom-blue">$249 <span class="text-base text-gray-500">/mes</span></p>
-                <flux:button 
-                    variant="primary" 
-                    :href="route('register')"
-                    class="mt-6 inline-block bg-custom-blue hover:bg-custom-blue-dark text-white font-semibold py-2 px-4 rounded-lg">
-                    Comenzar
-                </flux:button>
-            </div>
+            @forelse ($plans as $plan)
+                @php
+                    $isFeatured = str_contains(Str::lower($plan->name), 'pro') || $loop->index === 1;
+                    $periodLabel = $plan->duration_days === 30 ? 'mes' : $plan->duration_days . ' días';
+                @endphp
 
-            {{-- Plan Empresarial --}}
-            <div class="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 flex flex-col">
-                <h4 class="text-xl font-bold mb-2 text-custom-blue">Plan Empresarial</h4>
-                <p class="text-gray-600 dark:text-gray-400 flex-grow">
-                    Diseñado para corporativos o cadenas de estacionamientos.  
-                    Integraciones ilimitadas, soporte prioritario y control multi-sucursal.
-                </p>
-                <p class="mt-4 text-3xl font-bold text-custom-blue">$499 <span class="text-base text-gray-500">/mes</span></p>
-                <flux:button 
-                    variant="primary" 
-                    :href="route('register')"
-                    class="mt-6 inline-block bg-custom-blue hover:bg-custom-blue-dark text-white font-semibold py-2 px-4 rounded-lg">
-                    Comenzar
-                </flux:button>
-            </div>
+                <div class="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 flex flex-col {{ $isFeatured ? 'border-2 border-custom-blue' : '' }}">
+                    {{-- Nombre --}}
+                    <h4 class="text-xl font-bold mb-2 text-custom-blue">{{ $plan->name }}</h4>
+
+                    {{-- Descripción --}}
+                    <p class="text-gray-600 dark:text-gray-400 flex-grow">
+                        {{ $plan->description ?: 'Plan de estacionamiento.' }}
+                    </p>
+
+                    {{-- Precio/Periodo --}}
+                    <p class="mt-4 text-3xl font-bold text-custom-blue">
+                        ${{ number_format($plan->price, 2) }}
+                        <span class="text-base text-gray-500">/{{ $periodLabel }}</span>
+                    </p>
+                </div>
+
+            @empty
+                {{-- Placeholder si no hay planes --}}
+                <div class="col-span-1 md:col-span-3">
+                    <div class="text-center text-zinc-500 dark:text-zinc-400 py-8">
+                        Próximamente planes de estacionamiento disponibles.
+                    </div>
+                </div>
+            @endforelse
+
         </div>
+
     </main>
 
     {{-- Pie de página --}}
