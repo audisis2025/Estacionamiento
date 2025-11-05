@@ -3,70 +3,141 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Plan;
 use App\Models\User;
+use App\Services\PayPalService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
-class BalanceApiController extends Controller
+class PayPalApiController extends Controller
 {
-    public function index()
-    {
-        $userId = Auth::id();
+    public function __construct(private PayPalService $paypal) {}
 
-        if (!$userId) {
+    /**
+     * Crear una orden PayPal desde Flutter
+     */
+    public function create(Request $request)
+    {
+        $data = $request->validate([
+            'plan_id' => ['required', 'integer', 'exists:plans,id'],
+        ]);
+
+        $plan = Plan::where('id', $data['plan_id'])
+            ->where('type', 'user') // ✅ Cambiado a tipo usuario
+            ->firstOrFail();
+
+        $reference = 'plan-' . $plan->id . '-user-' . $request->user()->id;
+        $order = $this->paypal->createOrder((float)$plan->price, $reference);
+
+        if (($order['status'] ?? 500) !== 201) {
+            Log::error('PayPal CREATE error', [
+                'plan_id' => $plan->id,
+                'status' => $order['status'] ?? 500,
+                'response' => $order['body'] ?? null
+            ]);
+
             return response()->json([
-                'icon'  => 'error',
-                'title' => 'No autorizado',
-                'text'  => 'Debes iniciar sesión para consultar tu saldo.',
-            ], 401);
+                'message' => 'Error al crear la orden en PayPal',
+                'details' => $order['body']['message'] ?? 'Error desconocido'
+            ], 422);
         }
 
-        $amount = User::whereKey($userId)->value('amount') ?? 0;
-
         return response()->json([
-            'icon'    => 'success',
-            'title'   => 'Saldo actual',
-            'balance' => (float) $amount,
-        ], 200);
+            'status' => 'success',
+            'order_id' => $order['body']['id']
+        ]);
     }
 
-    public function store(Request $request)
+    /**
+     * Capturar y validar pago de PayPal
+     */
+    public function capture(Request $request, string $orderId)
     {
-        $validated = $request->validate(
-            [
-                'amount' => ['required', 'numeric', 'min:1'],
-            ],
-            [
-                'required' => 'El campo :attribute es obligatorio.',
-                'numeric'  => 'El campo :attribute debe ser numérico.',
-                'min'      => 'El campo :attribute debe ser al menos :min.',
-            ],
-            [
-                'amount' => 'monto',
-            ]
-        );
+        $user = $request->user();
 
-        $userId = Auth::id();
-
-        if (!$userId) {
+        // 1️⃣ Obtener información de la orden
+        $orderInfo = $this->paypal->getOrder($orderId);
+        if (($orderInfo['status'] ?? 500) !== 200) {
             return response()->json([
-                'icon'  => 'error',
-                'title' => 'No autorizado',
-                'text'  => 'Debes iniciar sesión para realizar una recarga.',
-            ], 401);
+                'message' => 'No se pudo verificar la orden PayPal',
+                'status' => $orderInfo['status'] ?? 500
+            ], 422);
         }
 
-        // ✅ Incrementa en BD sin usar save() ni update() de instancia
-        User::whereKey($userId)->increment('amount', $validated['amount']);
+        $status = $orderInfo['body']['status'] ?? 'UNKNOWN';
+        if ($status !== 'APPROVED') {
+            return response()->json([
+                'message' => "La orden no está aprobada. Estado actual: $status",
+                'status' => $status
+            ], 422);
+        }
 
-        // ✅ Obtiene el nuevo saldo desde BD
-        $newBalance = (float) (User::whereKey($userId)->value('amount') ?? 0);
+        // 2️⃣ Capturar orden
+        $capture = $this->paypal->captureOrder($orderId);
+        if (($capture['status'] ?? 500) !== 201) {
+            return response()->json([
+                'message' => 'Error al capturar el pago',
+                'details' => $capture['body'] ?? []
+            ], 422);
+        }
+
+        $captureBody = $capture['body'];
+        if (($captureBody['status'] ?? '') !== 'COMPLETED') {
+            return response()->json([
+                'message' => 'El pago no se completó correctamente',
+                'status' => $captureBody['status'] ?? null
+            ], 422);
+        }
+
+        // 3️⃣ Extraer referencia y validar
+        $reference = data_get($captureBody, 'purchase_units.0.reference_id', '');
+        if (!preg_match('/^plan-(\d+)-user-(\d+)$/', $reference, $matches)) {
+            return response()->json([
+                'message' => 'Referencia de pago inválida'
+            ], 422);
+        }
+
+        [, $planId, $userId] = $matches;
+        if ($userId != $user->id) {
+            return response()->json([
+                'message' => 'Usuario no autorizado para esta orden'
+            ], 403);
+        }
+
+        // 4️⃣ Asignar plan al usuario
+        $plan = Plan::find($planId);
+        if (!$plan) {
+            return response()->json(['message' => 'Plan no encontrado'], 404);
+        }
+
+        DB::transaction(function () use ($user, $plan) {
+            $user->id_plan = $plan->id;
+            $user->end_date = now()->addDays($plan->duration_days);
+            $user->save();
+
+            $admin = User::where('phone_number', '7777777777')->first();
+            if ($admin) {
+                $admin->amount = (float)($admin->amount ?? 0) + (float)$plan->price;
+                $admin->save();
+            }
+        });
+
+        Log::info('Plan activado via API', [
+            'user' => $user->id,
+            'plan' => $plan->id,
+            'order' => $orderId,
+        ]);
 
         return response()->json([
-            'icon'        => 'success',
-            'title'       => '¡Recarga exitosa!',
-            'text'        => 'Tu saldo se ha actualizado correctamente.',
-            'new_balance' => $newBalance,
-        ], 200);
+            'status' => 'success',
+            'message' => 'Pago completado exitosamente',
+            'plan' => $plan,
+            'user' => [
+                'id' => $user->id,
+                'plan_id' => $user->id_plan,
+                'end_date' => $user->end_date,
+            ]
+        ]);
     }
 }
