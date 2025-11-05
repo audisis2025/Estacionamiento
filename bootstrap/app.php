@@ -17,10 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->group(base_path('routes/admin.php'));
         }
     )
-    ->withMiddleware(function (Middleware $middleware) {
+    ->withMiddleware(function (Middleware $middleware) 
+    {
         $middleware->alias([
         'ensure.active.plan' => \App\Http\Middleware\EnsureActivePlan::class,
         'ensure.parking.configured'=> \App\Http\Middleware\EnsureParkingConfigured::class,
+        'ensure.billing.access' => \App\Http\Middleware\EnsureBillingAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

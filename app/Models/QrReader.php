@@ -12,6 +12,10 @@ class QrReader extends Model
 
     public function parking()
     {
-        return $this->belongsTo(\App\Models\Parking::class, 'id_parking');
+        return $this->belongsTo(Parking::class, 'id_parking');
+    }
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'id_qr_reader');
     }
 }

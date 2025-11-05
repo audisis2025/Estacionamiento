@@ -48,6 +48,33 @@ class Parking extends Model
     }
     public function qrReaders()
     {
-        return $this->hasMany(\App\Models\QrReader::class, 'id_parking');
+        return $this->hasMany(QrReader::class, 'id_parking');
+    }
+    public function clientTypes()
+    {
+        return $this->hasMany(ClientType::class, 'id_parking', 'id');
+    }
+
+    public function userClientTypes()
+    {
+        return $this->hasManyThrough(
+            UserClientType::class,
+            ClientType::class,
+            'id_parking',
+            'id_client_type',
+            'id',
+            'id'
+        );
+    }
+    public function transactions()
+    {
+        return $this->hasManyThrough(
+            \App\Models\Transaction::class,
+            \App\Models\QrReader::class,
+            'id_parking',     // FK en qr_readers hacia parkings
+            'id_qr_reader',   // FK en transactions hacia qr_readers
+            'id',             // PK en parkings
+            'id'              // PK en qr_readers
+        );
     }
 }

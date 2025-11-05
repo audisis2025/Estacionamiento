@@ -64,6 +64,11 @@
                                             Editar
                                         </flux:button>
 
+                                        <flux:button size="sm" icon="qr-code" variant="primary"
+                                            :href="route('parking.qr-readers.scan', $reader)">
+                                            Escanear
+                                        </flux:button>
+
                                         <form method="POST" action="{{ route('parking.qr-readers.destroy', $reader) }}"
                                             class="delete-form">
                                             @csrf

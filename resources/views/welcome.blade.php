@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,16 +13,12 @@
         <div class="container mx-auto px-6 flex justify-between items-center">
             <h1 class="text-2xl font-bold text-custom-blue">Parking+</h1>
             <nav class="space-x-4">
-                <flux:button 
-                    variant="filled" 
-                    :href="route('login')" 
+                <flux:button variant="filled" :href="route('login')"
                     class="px-4 py-2 text-custom-blue hover:underline font-semibold">
                     Iniciar sesión
                 </flux:button>
-                
-                <flux:button 
-                    variant="primary" 
-                    :href="route('register')"
+
+                <flux:button variant="primary" :href="route('register')"
                     class="px-4 py-2 bg-custom-blue text-white rounded-lg hover:bg-custom-blue-dark">
                     Registrarse
                 </flux:button>
@@ -47,7 +44,8 @@
                     $periodLabel = $plan->duration_days === 30 ? 'mes' : $plan->duration_days . ' días';
                 @endphp
 
-                <div class="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 flex flex-col {{ $isFeatured ? 'border-2 border-custom-blue' : '' }}">
+                <div
+                    class="bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 flex flex-col {{ $isFeatured ? 'border-2 border-custom-blue' : '' }}">
                     {{-- Nombre --}}
                     <h4 class="text-xl font-bold mb-2 text-custom-blue">{{ $plan->name }}</h4>
 
@@ -78,9 +76,18 @@
 
     {{-- Pie de página --}}
     <footer class="bg-white dark:bg-zinc-800 text-center py-6 mt-auto border-t border-gray-200 dark:border-zinc-700">
-        <p class="text-gray-600 dark:text-gray-400">
+        <p class="text-gray-600 dark:text-gray-400 text-sm">
             © {{ date('Y') }} Parking+. Todos los derechos reservados.
         </p>
+
+        <p class="mt-2">
+            <a href="{{ route('terms') }}" target="_blank" rel="noopener noreferrer"
+                class="text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-700 dark:hover:text-blue-300 text-sm">
+                Términos y Condiciones
+            </a>
+        </p>
     </footer>
+
 </body>
+
 </html>

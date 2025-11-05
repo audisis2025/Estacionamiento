@@ -100,4 +100,12 @@ class User extends Authenticatable
     {
         return (int) $this->id_role === 3;
     }
+    public function userClientTypes()
+    {
+        return $this->hasMany(UserClientType::class, 'id_user', 'id');
+    }
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'id_user');
+    }
 }

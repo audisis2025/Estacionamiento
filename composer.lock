@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "57b1dd9c27b31e585d33868606cfcaed",
+    "content-hash": "5fcaafbf2ca2043022bc2cbfa8e70988",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2394,16 +2394,16 @@
         },
         {
             "name": "livewire/flux",
-            "version": "v2.5.0",
+            "version": "v2.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/livewire/flux.git",
-                "reference": "7d236c6caa6a8fa8604caa08abf2ae630be12c24"
+                "reference": "227b88db0a02db91666af2303ea6727a3af78c51"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/flux/zipball/7d236c6caa6a8fa8604caa08abf2ae630be12c24",
-                "reference": "7d236c6caa6a8fa8604caa08abf2ae630be12c24",
+                "url": "https://api.github.com/repos/livewire/flux/zipball/227b88db0a02db91666af2303ea6727a3af78c51",
+                "reference": "227b88db0a02db91666af2303ea6727a3af78c51",
                 "shasum": ""
             },
             "require": {
@@ -2411,7 +2411,7 @@
                 "illuminate/support": "^10.0|^11.0|^12.0",
                 "illuminate/view": "^10.0|^11.0|^12.0",
                 "laravel/prompts": "^0.1|^0.2|^0.3",
-                "livewire/livewire": "^3.5.19",
+                "livewire/livewire": "^3.5.19|^4.0",
                 "php": "^8.1",
                 "symfony/console": "^6.0|^7.0"
             },
@@ -2454,9 +2454,9 @@
             ],
             "support": {
                 "issues": "https://github.com/livewire/flux/issues",
-                "source": "https://github.com/livewire/flux/tree/v2.5.0"
+                "source": "https://github.com/livewire/flux/tree/v2.6.1"
             },
-            "time": "2025-09-29T21:36:00+00:00"
+            "time": "2025-10-28T21:12:05+00:00"
         },
         {
             "name": "livewire/livewire",

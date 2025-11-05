@@ -41,7 +41,7 @@
                 </flux:navlist.item>
 
                 <flux:navlist.item icon="plus" :href="route('parking.edit')"
-                    :current="request()->routeIs('parking.create')" wire:navigate>
+                    :current="request()->routeIs('parking.create')">
                     Mi estacionamiento
                 </flux:navlist.item>
 
@@ -49,6 +49,33 @@
                     :current="request()->routeIs('parking.qr-readers.*')" wire:navigate>
                     Lectores QR
                 </flux:navlist.item>
+
+                <flux:navlist.item icon="users" :href="route('parking.client-types.index')"
+                    :current="request()->routeIs('parking.client-types.*')" wire:navigate>
+                    Tipos de cliente
+                </flux:navlist.item>
+
+                <flux:navlist.item icon="envelope" :href="route('parking.client-approvals.index')"
+                    :current="request()->routeIs('parking.client-approvals.*')" wire:navigate>
+                    Solicitudes de clientes
+                </flux:navlist.item>
+
+                <flux:navlist.item icon="lock-open" :href="route('parking.entries.index')"
+                    :current="request()->routeIs('parking.entries.*')" wire:navigate>
+                    Liberar entradas
+                </flux:navlist.item>
+
+                @php
+                    $u = auth()->user();
+                @endphp
+
+                @if ($u && (int) ($u->id_role ?? 0) === 2 && (int) ($u->id_plan ?? 0) === 3)
+                    <flux:navlist.item icon="document-text" :href="route('billing.index')"
+                        :current="request()->routeIs('billing.*')" wire:navigate>
+                        Facturación
+                    </flux:navlist.item>
+                @endif
+
             </flux:navlist.group>
         </flux:navlist>
 
@@ -152,7 +179,6 @@
 
     @fluxScripts
 
-    {{-- 1) Mostrar alert enviado por middleware/controladores y consumirlo (no se repite) --}}
     @php($swal = session()->pull('swal'))
     @if ($swal)
         <script>
@@ -160,11 +186,8 @@
         </script>
     @endif
 
-    {{-- 2) Errores de validación: muestra un SweetAlert con lista, 
-      pero NO elimines tus @error(...) inline del form --}}
     @if ($errors->any())
         <script>
-            // Prepara una lista HTML con los errores (máx. 5 visibles para no saturar)
             const errs = @json($errors->all());
             const list = '<ul style="text-align:left;margin:0;padding-left:18px;">' +
                 errs.slice(0, 5).map(e => `<li>${e}</li>`).join('') +
