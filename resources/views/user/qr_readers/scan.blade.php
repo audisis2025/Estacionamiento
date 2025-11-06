@@ -45,7 +45,7 @@
         </form>
 
         <!-- Logs de actividad (manteniendo tu funcionalidad) -->
-        <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4">
+        <div class="hidden rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4">
             <h3 class="text-sm font-semibold text-zinc-700 dark:text-zinc-200 mb-3">Log de actividad</h3>
             <pre id="result" class="text-xs bg-zinc-900 text-zinc-100 p-3 rounded min-h-[120px] overflow-x-auto">{}</pre>
         </div>

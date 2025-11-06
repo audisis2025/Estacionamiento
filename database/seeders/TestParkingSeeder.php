@@ -68,7 +68,7 @@ class TestParkingSeeder extends Seeder
             'email'        => 'juan@correo.com',
             'phone_number' => '5550001111',
             'password'     => Hash::make('12345678'),
-            'amount'       => 0,
+            'amount'       => 50,
         ]);
 
         $user2 = DB::table('users')->insertGetId([
@@ -84,14 +84,14 @@ class TestParkingSeeder extends Seeder
             [
                 'approval'        => 0, // pendiente
                 'expiration_date' => null,
-                'id_user'         => $user1,
-                'id_client_type'  => $taxistaId,
+                'id_user'         => $user2,
+                'id_client_type'  => $proveedorId,
             ],
             [
                 'approval'        => 1, // ya aprobado
                 'expiration_date' => Carbon::now()->addDays(30),
                 'id_user'         => $user1,
-                'id_client_type'  => $proveedorId,
+                'id_client_type'  => $taxistaId,
             ],
         ]);
     }

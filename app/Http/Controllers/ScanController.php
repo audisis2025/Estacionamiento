@@ -7,6 +7,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ScanController extends Controller
 {
@@ -103,7 +104,6 @@ class ScanController extends Controller
         }
 
         // ===== SALIDA =====
-        // Rebote (estancia <5s) -> SILENCIAR en lugar de error visible
         if ($openTx->entry_date->diffInSeconds(now()) < 5) {
             return $this->silent('too_soon_after_entry');
         }
@@ -111,20 +111,35 @@ class ScanController extends Controller
         $minutes = max(1, $openTx->entry_date->diffInMinutes(now()));
         $charge  = $this->computeCharge($user, $parking, $minutes);
 
-        // Dinámicos (rol != 3) pagan con wallet
-        if ($this->paysWithWallet($user)) {
-            if ($user->amount < $charge) {
+        // 1) Validar saldo suficiente
+        if (!$user->hasEnoughBalance($charge)) {
+            return $this->fail('Saldo insuficiente para completar el pago.');
+        }
+        // 2) Cobrar y cerrar transacción de forma atómica
+        try {
+            DB::transaction(function () use ($user, $charge, $openTx, $reader) {
+                // Evitar carreras: solo descuenta si alcanza el saldo
+                $affected = User::whereKey($user->id)
+                    ->where('amount', '>=', $charge)
+                    ->decrement('amount', $charge);
+
+                if ($affected !== 1) {
+                    // Marca de control interna
+                    throw new \RuntimeException('NO_FUNDS');
+                }
+                $openTx->update([
+                    'amount'         => (int) round($charge),
+                    'departure_date' => now(),
+                    'id_qr_reader'   => $reader->id,
+                ]);
+            });
+        } catch (\RuntimeException $e) {
+            if ($e->getMessage() === 'NO_FUNDS') {
+                // Mensaje visible en SweetAlert (res.ok === false)
                 return $this->fail('Saldo insuficiente para completar el pago.');
             }
-            $user->decrement('amount', $charge);
+            throw $e; // otros errores siguen siendo 500
         }
-
-        $openTx->update([
-            'amount'         => (int) round($charge),
-            'departure_date' => now(),
-            'id_qr_reader'   => $reader->id,
-        ]);
-
         return $this->ok('Salida registrada', [
             'event'          => 'exit',
             'transaction_id' => $openTx->id,
@@ -136,36 +151,53 @@ class ScanController extends Controller
     private function ensureOwnership(QrReader $reader): void
     {
         $parking = auth()->user()->parking;
-        abort_unless($parking && $reader->id_parking === $parking->id, 403, 'No autorizado.');
-    }
+        $authorized = $parking && $reader->id_parking === $parking->id;
 
-    private function computeCharge($user, $parking, int $minutes): int
-    {
-        $base = (int) ($parking->price ?? 0);
-        $raw  = ((int)$parking->type === 0) ? $base : $base * max(1, (int)ceil($minutes / 60));
-
-        if ((int)($user->id_role ?? 3) === 3) return max(0, $raw);
-
-        $clientTypeRel = $user->clientTypes()
-            ->where('approval', 1)
-            ->whereDate('expiration_date', '>=', now()->toDateString())
-            ->whereHas('clientType', fn($q) => $q->where('id_parking', $parking->id))
-            ->latest('id')
-            ->first();
-
-        if (!$clientTypeRel || !$clientTypeRel->clientType) return max(0, $raw);
-
-        $ct = $clientTypeRel->clientType; // 0=% 1=$
-        if ((int)$ct->discount_type === 0) {
-            $discount = round($raw * (floatval($ct->amount) / 100), 2);
-            return (int) max(0, $raw - $discount);
+        if (!$authorized) 
+        {
+            if (request()->expectsJson()) 
+            {
+                abort(response()->json(['ok' => false, 'message' => 'No autorizado.'], 403));
+            }
+            abort(403, 'No autorizado.');
         }
-        return (int) max(0, $raw - (float) $ct->amount);
     }
 
-    private function paysWithWallet($user): bool
+
+    private function computeCharge(User $user, $parking, int $minutes): int
     {
-        return (int)($user->id_role ?? 3) !== 3;
+        $base = max(0, (int) ($parking->price ?? 0));         // nunca negativo
+        $minutes = max(1, $minutes);                          // por si llega 0/negativo
+
+        // type 0 = tarifa fija por estancia, !=0 = por hora (redondeo hacia arriba, mínimo 1h)
+        $raw  = ((int)$parking->type === 0)
+            ? $base
+            : $base * (int) ceil($minutes / 60);
+
+        // Sin relación aprobada+vigente para este parking => cobra normal
+        $uct = $user->activeUserClientTypeForParking((int)$parking->id);
+        if (!$uct || !$uct->clientType) {
+            return (int) $raw; // ya es ≥ 0
+        }
+
+        $ct = $uct->clientType; // 0=%  |  1=$
+        $discounted = $raw;
+
+        if ((int)$ct->discount_type === 0) {
+            // Porcentaje (cap opcional a 100 para evitar “descuentos” >100%)
+            $pct = min(100.0, max(0.0, (float) $ct->amount));
+            $discounted = $raw - round($raw * ($pct / 100), 2);
+        } elseif ((int)$ct->discount_type === 1) {
+            // Cantidad fija
+            $fixed = max(0.0, (float) $ct->amount);
+            $discounted = $raw - $fixed;
+        } else {
+            // Tipo de descuento inválido => cobra normal
+            $discounted = $raw;
+        }
+
+        // Nunca negativo y regresa entero (tu columna es int)
+        return (int) max(0, $discounted);
     }
 
     private function ok(string $msg, array $data = [])

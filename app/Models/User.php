@@ -108,4 +108,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(Transaction::class, 'id_user');
     }
+    public function hasEnoughBalance(int|float $amount): bool
+    {
+        return (float)$this->amount >= (float)$amount;
+    }
+    public function activeUserClientTypeForParking(int $parkingId): ?UserClientType
+    {
+        return $this->userClientTypes()
+            ->where('approval', 1)
+            ->whereDate('expiration_date', '>=', now()->toDateString())
+            ->whereHas('clientType', fn($q) => $q->where('id_parking', $parkingId))
+            ->latest('id')
+            ->first();
+    }
 }
