@@ -27,5 +27,18 @@ class PlanSeeder extends Seeder
             ['type' => 'parking', 'name' => 'Plan Empresarial'],
             ['price' => 499.00, 'duration_days' => 30, 'description' => 'Soporte prioritario e integraciones avanzadas.']
         );
+
+        Plan::updateOrCreate(
+            ['type' => 'user', 'name' => 'Plan Básico'],
+            ['price' => 0, 'duration_days' => 30, 'description' => 'Acciones limitadas para usuarios gratuitos.']
+        );
+        Plan::updateOrCreate(
+            ['type' => 'user', 'name' => 'Plan Profesional'],
+            ['price' => 49.00, 'duration_days' => 30, 'description' => 'Acceso completo por un mes.']
+        );
+        Plan::updateOrCreate(
+            ['type' => 'user', 'name' => 'Plan Empresarial'],
+            ['price' => 129.00, 'duration_days' => 30, 'description' => 'Ahorra con acceso completo por tres meses.']
+        );  
     }
 }

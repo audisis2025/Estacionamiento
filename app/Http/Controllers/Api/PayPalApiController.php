@@ -3,141 +3,99 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Plan;
-use App\Models\User;
-use App\Services\PayPalService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Plan;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class PayPalApiController extends Controller
 {
-    public function __construct(private PayPalService $paypal) {}
-
     /**
-     * Crear una orden PayPal desde Flutter
+     * 🔹 Registrar un pago exitoso desde Flutter (PayPal)
+     * Endpoint: POST /api/paypal/success
      */
-    public function create(Request $request)
+    public function store(Request $request)
     {
-        $data = $request->validate([
-            'plan_id' => ['required', 'integer', 'exists:plans,id'],
+        // ✅ Usuario autenticado
+        $user = Auth::user();
+
+        // ✅ Validar datos
+        $request->validate([
+            'plan_id' => 'required|exists:plans,id',
+            'amount'  => 'required|numeric|min:0',
         ]);
 
-        $plan = Plan::where('id', $data['plan_id'])
-            ->where('type', 'user') // ✅ Cambiado a tipo usuario
-            ->firstOrFail();
+        $plan = Plan::find($request->plan_id);
 
-        $reference = 'plan-' . $plan->id . '-user-' . $request->user()->id;
-        $order = $this->paypal->createOrder((float)$plan->price, $reference);
+        if (!$plan) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Plan no encontrado'
+            ], 404);
+        }
 
-        if (($order['status'] ?? 500) !== 201) {
-            Log::error('PayPal CREATE error', [
-                'plan_id' => $plan->id,
-                'status' => $order['status'] ?? 500,
-                'response' => $order['body'] ?? null
+        try {
+            DB::transaction(function () use ($user, $plan, $request) {
+
+                // 🔹 Actualizar el plan y fecha de expiración del usuario que paga
+                DB::table('users')
+                    ->where('id', $user->id)
+                    ->update([
+                        'id_plan'  => $plan->id,
+                        'end_date' => Carbon::now()->addDays($plan->duration_days),
+                        'updated_at' => now(),
+                    ]);
+
+                // 🔹 Obtener al administrador que recibe los fondos
+                $admin = DB::table('users')->where('phone_number', '7777777777')->first();
+
+                if ($admin) {
+                    $saldoActual = (float) ($admin->amount ?? 0);
+                    $nuevoSaldo = $saldoActual + (float) $request->amount;
+
+                    DB::table('users')
+                        ->where('id', $admin->id)
+                        ->update([
+                            'amount' => $nuevoSaldo,
+                            'updated_at' => now(),
+                        ]);
+
+                    Log::info('💰 Saldo del admin actualizado', [
+                        'admin_id' => $admin->id,
+                        'saldo_anterior' => $saldoActual,
+                        'monto_agregado' => $request->amount,
+                        'nuevo_saldo' => $nuevoSaldo,
+                    ]);
+                } else {
+                    Log::warning('⚠️ No se encontró el administrador con phone_number=7777777777');
+                }
+            });
+
+            // ✅ Confirmación al cliente Flutter
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Pago PayPal registrado correctamente.',
+                'data'    => [
+                    'user_id' => $user->id,
+                    'plan_id' => $plan->id,
+                    'plan_name' => $plan->name,
+                    'amount_added' => $request->amount,
+                    'end_date' => Carbon::now()->addDays($plan->duration_days)->toDateString(),
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('❌ Error en PayPalApiController', [
+                'user_id' => $user->id ?? null,
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
-                'message' => 'Error al crear la orden en PayPal',
-                'details' => $order['body']['message'] ?? 'Error desconocido'
-            ], 422);
+                'status' => 'error',
+                'message' => 'Ocurrió un error al registrar el pago.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        return response()->json([
-            'status' => 'success',
-            'order_id' => $order['body']['id']
-        ]);
-    }
-
-    /**
-     * Capturar y validar pago de PayPal
-     */
-    public function capture(Request $request, string $orderId)
-    {
-        $user = $request->user();
-
-        // 1️⃣ Obtener información de la orden
-        $orderInfo = $this->paypal->getOrder($orderId);
-        if (($orderInfo['status'] ?? 500) !== 200) {
-            return response()->json([
-                'message' => 'No se pudo verificar la orden PayPal',
-                'status' => $orderInfo['status'] ?? 500
-            ], 422);
-        }
-
-        $status = $orderInfo['body']['status'] ?? 'UNKNOWN';
-        if ($status !== 'APPROVED') {
-            return response()->json([
-                'message' => "La orden no está aprobada. Estado actual: $status",
-                'status' => $status
-            ], 422);
-        }
-
-        // 2️⃣ Capturar orden
-        $capture = $this->paypal->captureOrder($orderId);
-        if (($capture['status'] ?? 500) !== 201) {
-            return response()->json([
-                'message' => 'Error al capturar el pago',
-                'details' => $capture['body'] ?? []
-            ], 422);
-        }
-
-        $captureBody = $capture['body'];
-        if (($captureBody['status'] ?? '') !== 'COMPLETED') {
-            return response()->json([
-                'message' => 'El pago no se completó correctamente',
-                'status' => $captureBody['status'] ?? null
-            ], 422);
-        }
-
-        // 3️⃣ Extraer referencia y validar
-        $reference = data_get($captureBody, 'purchase_units.0.reference_id', '');
-        if (!preg_match('/^plan-(\d+)-user-(\d+)$/', $reference, $matches)) {
-            return response()->json([
-                'message' => 'Referencia de pago inválida'
-            ], 422);
-        }
-
-        [, $planId, $userId] = $matches;
-        if ($userId != $user->id) {
-            return response()->json([
-                'message' => 'Usuario no autorizado para esta orden'
-            ], 403);
-        }
-
-        // 4️⃣ Asignar plan al usuario
-        $plan = Plan::find($planId);
-        if (!$plan) {
-            return response()->json(['message' => 'Plan no encontrado'], 404);
-        }
-
-        DB::transaction(function () use ($user, $plan) {
-            $user->id_plan = $plan->id;
-            $user->end_date = now()->addDays($plan->duration_days);
-            $user->save();
-
-            $admin = User::where('phone_number', '7777777777')->first();
-            if ($admin) {
-                $admin->amount = (float)($admin->amount ?? 0) + (float)$plan->price;
-                $admin->save();
-            }
-        });
-
-        Log::info('Plan activado via API', [
-            'user' => $user->id,
-            'plan' => $plan->id,
-            'order' => $orderId,
-        ]);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Pago completado exitosamente',
-            'plan' => $plan,
-            'user' => [
-                'id' => $user->id,
-                'plan_id' => $user->id_plan,
-                'end_date' => $user->end_date,
-            ]
-        ]);
     }
 }

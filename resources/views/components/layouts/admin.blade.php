@@ -23,7 +23,7 @@
         <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-            <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
+            <a href="{{ route('admin.dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
                 <x-app-logo />
             </a>
 
@@ -33,7 +33,6 @@
 
                     <flux:navlist.item icon="eye" :href="route('admin.plans.index')" :current="request()->routeIs('admin.plans.index')" wire:navigate>{{ __('Planes') }}</flux:navlist.item>
 
-                    <flux:navlist.item icon="plus" :href="route('admin.plans.create')" :current="request()->routeIs('admin.plans.create')" wire:navigate>{{ __('Agregar plan') }}</flux:navlist.item>
                 </flux:navlist.group>
 
             </flux:navlist>

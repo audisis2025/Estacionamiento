@@ -7,7 +7,7 @@
             @method('PUT')
 
             <div class="space-y-1">
-                <flux:select name="type" label="Tipo de plan" required class="w-full">
+                <flux:select name="type_view" label="Tipo de plan" class="w-full" disabled>
                     <option value="parking" @selected(old('type', $plan->type)==='parking')>Para estacionamientos</option>
                     <option value="user" @selected(old('type', $plan->type)==='user')>Para usuarios</option>
                 </flux:select>

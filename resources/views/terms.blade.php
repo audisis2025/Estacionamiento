@@ -40,22 +40,6 @@
             </a>
         </div>
 
-        {{-- Logo SAT --}}
-        <div class="flex justify-center mt-4">
-            <svg viewBox="0 0 1230.6145 253.76673" class="h-10 w-auto" xmlns="http://www.w3.org/2000/svg">
-                <g transform="matrix(4.6314932,0,0,4.6314932,-460.15119,-329.55857)" fill="#00529e">
-                    <path
-                        d="m141.09866,125.94734c7.204,0 13.04534,-5.84067 13.04534,-13.046 0,-7.204 -5.84134,-13.045333 -13.04534,-13.045333 -7.20533,0 -13.046,5.841333 -13.046,13.045333 0,7.20533 5.84067,13.046 13.046,13.046" />
-                    <path
-                        d="m112.39786,125.94734c7.2048,0 13.04587,-5.84067 13.04587,-13.046 0,-7.204 -5.84107,-13.045333 -13.04587,-13.045333 -7.20413,0 -13.045196,5.841333 -13.045196,13.045333 0,7.20533 5.841066,13.046 13.045196,13.046" />
-                    <path
-                        d="m141.09866,97.248007c7.204,0 13.04534,-5.841333 13.04534,-13.046666 0,-7.204 -5.84134,-13.045333 -13.04534,-13.045333 -7.20533,0 -13.046,5.841333 -13.046,13.045333 0,7.205333 5.84067,13.046666 13.046,13.046666" />
-                    <path
-                        d="m112.39786,97.248007c7.2048,0 13.04587,-5.841333 13.04587,-13.046666 0,-7.204 -5.84107,-13.045333 -13.04587,-13.045333 -7.20413,0 -13.045196,5.841333 -13.045196,13.045333 0,7.205333 5.841066,13.046666 13.045196,13.046666" />
-                </g>
-            </svg>
-        </div>
-
         {{-- Sección 1 --}}
         <section
             class="space-y-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-zinc-900 p-5">
@@ -95,7 +79,6 @@
             <ul class="list-disc pl-6 text-sm text-zinc-700 dark:text-zinc-300">
                 <li>Pagos procesados por plataformas seguras (p. ej., PayPal).</li>
                 <li>Las suscripciones no se renuevan automáticamente.</li>
-                <li>Se notificará la expiración con anticipación.</li>
             </ul>
         </section>
 
@@ -117,7 +100,7 @@
             <p class="text-sm text-zinc-700 dark:text-zinc-300">
                 Soporte: <a href="mailto:soporte@parkingplus.test"
                     class="text-blue-600 dark:text-blue-400 underline hover:text-blue-700 dark:hover:text-blue-300">
-                    soporte@parkingplus.test
+                    admgenineral@gmail.com
                 </a>
             </p>
         </section>

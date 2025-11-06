@@ -21,10 +21,10 @@ Route::get('/plans', [PlanApiController::class, 'index']);
 Route::get('/plans/{plan}', [PlanApiController::class, 'show']);
 
 
-Route::middleware('auth:sanctum')->prefix('paypal')->group(function () {
-    Route::post('/create', [PayPalApiController::class, 'create']); // Crear orden
-    Route::post('/capture/{orderId}', [PayPalApiController::class, 'capture']); // Capturar orden
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/paypal/success', [PayPalApiController::class, 'store']);
 });
+
 
 
 

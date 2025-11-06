@@ -25,6 +25,7 @@ class AuthApiController extends Controller
         $roleName = $data['type'] ?? 'usuario';
         $roleId = Role::where('name', $roleName)->value('id') ?? 3;
 
+        // ✅ Solo crea el usuario, sin generar token
         $user = User::create([
             'name'         => $data['name'],
             'email'        => $data['email'],
@@ -33,13 +34,8 @@ class AuthApiController extends Controller
             'id_role'      => $roleId,
         ]);
 
-        $device = $request->header('X-Device-Name') ?: 'flutter-app';
-        $token  = $user->createToken($device, ['*'])->plainTextToken;
-
         return response()->json([
             'message' => 'registered',
-            'token'   => $token,
-            'token_type' => 'Bearer',
             'user'    => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -76,13 +72,27 @@ class AuthApiController extends Controller
                 'email' => $user->email,
                 'id_role' => $user->id_role,
                 'role_name' => $user->role->name ?? 'usuario',
+                'plan_id' => $user->id_plan ?? null,
+                'plan_name' => $user->plan->name ?? 'Gratis',
             ],
         ]);
     }
 
     public function me(Request $request)
     {
-        return response()->json(['user' => $request->user()]);
+        $user = $request->user()->load('plan', 'role');
+
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'id_role' => $user->id_role,
+                'role_name' => $user->role->name ?? 'usuario',
+                'plan_id' => $user->plan->id ?? null,
+                'plan_name' => $user->plan->name ?? 'Gratis',
+            ]
+        ]);
     }
 
     public function logout(Request $request)
