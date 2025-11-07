@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Plan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -19,29 +20,47 @@ class AuthApiController extends Controller
             'email'        => ['required', 'email', 'max:255', 'unique:users,email'],
             'password'     => ['required', Password::min(8)],
             'phone_number' => ['required', 'digits:10', 'unique:users,phone_number'],
-            'type'         => ['nullable', 'string', 'in:usuario,admin,adminEstacionamiento'],
+            'type'         => ['nullable', 'string', 'in:usuario,admin,adminEstacionamiento,proveedor'],
         ]);
 
+        // 🔹 Determinar rol según tipo enviado
         $roleName = $data['type'] ?? 'usuario';
-        $roleId = Role::where('name', $roleName)->value('id') ?? 3;
 
-        // ✅ Solo crea el usuario, sin generar token
+        // Si no existe el rol, lo creamos automáticamente (solo primera vez)
+        $role = Role::firstOrCreate(['name' => $roleName], [
+            'description' => ucfirst($roleName) . ' del sistema',
+        ]);
+
+        // 🔹 Crear o usar plan por defecto
+        $defaultPlan = Plan::updateOrCreate(
+            ['type' => 'user', 'name' => 'Plan Básico'],
+            [
+                'price' => 0,
+                'duration_days' => 30,
+                'description' => 'Acciones limitadas para usuarios gratuitos.',
+            ]
+        );
+
+        // 🔹 Crear el usuario
         $user = User::create([
             'name'         => $data['name'],
             'email'        => $data['email'],
             'password'     => Hash::make($data['password']),
             'phone_number' => $data['phone_number'],
-            'id_role'      => $roleId,
+            'id_role'      => $role->id,
+            'id_plan'      => $defaultPlan->id,
         ]);
 
         return response()->json([
             'message' => 'registered',
             'user'    => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'id_role' => $user->id_role,
-                'role_name' => $roleName,
+                'id'         => $user->id,
+                'name'       => $user->name,
+                'email'      => $user->email,
+                'role_id'    => $role->id,
+                'role_name'  => $roleName,
+                'plan_id'    => $defaultPlan->id,
+                'plan_name'  => $defaultPlan->name,
             ],
         ], 201);
     }
@@ -58,7 +77,6 @@ class AuthApiController extends Controller
         }
 
         $user = User::where('email', $credentials['email'])->first();
-
         $device = $request->header('X-Device-Name') ?: 'flutter-app';
         $token  = $user->createToken($device, ['*'])->plainTextToken;
 
@@ -67,12 +85,12 @@ class AuthApiController extends Controller
             'token'   => $token,
             'token_type' => 'Bearer',
             'user'    => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'id_role' => $user->id_role,
+                'id'        => $user->id,
+                'name'      => $user->name,
+                'email'     => $user->email,
+                'role_id'   => $user->id_role,
                 'role_name' => $user->role->name ?? 'usuario',
-                'plan_id' => $user->id_plan ?? null,
+                'plan_id'   => $user->id_plan ?? null,
                 'plan_name' => $user->plan->name ?? 'Gratis',
             ],
         ]);
@@ -84,13 +102,13 @@ class AuthApiController extends Controller
 
         return response()->json([
             'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'id_role' => $user->id_role,
-                'role_name' => $user->role->name ?? 'usuario',
-                'plan_id' => $user->plan->id ?? null,
-                'plan_name' => $user->plan->name ?? 'Gratis',
+                'id'         => $user->id,
+                'name'       => $user->name,
+                'email'      => $user->email,
+                'role_id'    => $user->id_role,
+                'role_name'  => $user->role->name ?? 'usuario',
+                'plan_id'    => $user->plan->id ?? null,
+                'plan_name'  => $user->plan->name ?? 'Gratis',
             ]
         ]);
     }

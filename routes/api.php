@@ -5,7 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PlanApiController;
 use App\Http\Controllers\Api\PayPalApiController;
 use App\Http\Controllers\Api\BalanceApiController;
-
+use App\Http\Controllers\Api\ParkingApiController;
+use App\Http\Controllers\Api\ParkingClientApiController;
+use App\Http\Controllers\Api\PaymentApiController;
+use App\Http\Controllers\Api\RegisterProviderApiController;
 
 Route::prefix('auth')->group(
     function () {
@@ -16,19 +19,29 @@ Route::prefix('auth')->group(
     }
 );
 
-
 Route::get('/plans', [PlanApiController::class, 'index']);
 Route::get('/plans/{plan}', [PlanApiController::class, 'show']);
-
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/paypal/success', [PayPalApiController::class, 'store']);
 });
 
-
-
-
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/balance', [BalanceApiController::class, 'index']);
     Route::post('/user/recharge', [BalanceApiController::class, 'store']);
 });
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user/transactions', [PaymentApiController::class, 'history']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/parkings/nearby', [ParkingApiController::class, 'nearby']);
+});
+
+Route::prefix('parkings')->group(function () {
+    Route::get('/with-dynamic-clients', [ParkingApiController::class, 'withDynamicClients']);
+    Route::get('/{id}/client-types', [ParkingApiController::class, 'clientTypesByParking']);
+});
+
+Route::post('/auth/register-provider', [RegisterProviderApiController::class, 'registerProvider']);
