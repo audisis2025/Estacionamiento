@@ -1,35 +1,64 @@
+{{--
+* Nombre de la vista           : plans.blade.php
+* Descripción de la vista      : Layout principal para las páginas relacionadas con la selección de planes de suscripción.
+* Fecha de creación            : 03/11/2025
+* Elaboró                      : Elian Pérez
+* Fecha de liberación          : 03/11/2025
+* Autorizó                     : Angel Davila
+* Version                      : 1.0
+* Fecha de mantenimiento       : 
+* Folio de mantenimiento       : 
+* Tipo de mantenimiento        :
+* Descripción del mantenimiento: 
+* Responsable                  : 
+* Revisor                      : 
+--}}
 @props(['title' => 'Seleccionar plan'])
 
 <!DOCTYPE html>
 <html lang="es" class="h-full">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title }} · Parking+</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="min-h-screen bg-gray-100 dark:bg-zinc-900 text-gray-800 dark:text-gray-100 flex flex-col">
-    <header class="bg-white dark:bg-zinc-800 shadow-sm">
-        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
-            <a href="{{ route('home') }}" class="text-2xl font-bold text-custom-blue">Parking+</a>
 
-            @auth
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <flux:button type="submit" variant="ghost" class="text-sm">Cerrar sesión</flux:button>
-                </form>
-            @endauth
-        </div>
-    </header>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ $title }} · Parking+</title>
 
-    <main class="flex-1">
-        {{ $slot }}
-    </main>
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @livewireStyles
+        @fluxAppearance
+    </head>
 
-    <footer class="bg-white dark:bg-zinc-800 text-center py-6 mt-auto border-t border-gray-200 dark:border-zinc-700">
-        <p class="text-gray-600 dark:text-gray-400">
-            © {{ date('Y') }} Parking+. Todos los derechos reservados.
-        </p>
-    </footer>
-</body>
+    <body class="font-sans min-h-screen bg-zinc-50 dark:bg-zinc-900 text-black dark:text-white flex flex-col">
+        <header class="bg-white dark:bg-zinc-800 shadow-sm border-b border-zinc-200 dark:border-zinc-700">
+            <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+                <a href="{{ route('home') }}" class="text-2xl font-bold text-custom-blue" wire:navigate>
+                    Parking+
+                </a>
+
+                @auth
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <flux:button type="submit" variant="primary" icon="arrow-right-start-on-rectangle" icon-variant="outline"
+                            class="bg-custom-blue hover:bg-custom-blue-dark text-white">
+                            Cerrar sesión
+                        </flux:button>
+                    </form>
+                @endauth
+
+            </div>
+        </header>
+
+        <main class="flex-1">
+            {{ $slot }}
+        </main>
+
+        <footer class="bg-white dark:bg-zinc-800 text-center py-6 mt-auto border-t border-zinc-200 dark:border-zinc-700">
+            <p class="text-sm text-black/70 dark:text-white/70">
+                © {{ date('Y') }} Parking+. Todos los derechos reservados.
+            </p>
+        </footer>
+        @livewireScripts
+        @fluxScripts
+    </body>
+
 </html>

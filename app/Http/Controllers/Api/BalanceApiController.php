@@ -56,10 +56,8 @@ class BalanceApiController extends Controller
             ], 401);
         }
 
-        // ✅ Incrementa en BD sin usar save() ni update() de instancia
         User::whereKey($userId)->increment('amount', $validated['amount']);
 
-        // ✅ Obtiene el nuevo saldo desde BD
         $newBalance = (float) (User::whereKey($userId)->value('amount') ?? 0);
 
         return response()->json([

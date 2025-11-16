@@ -1,29 +1,38 @@
 <x-layouts.app :title="__('Facturación')">
     <div class="max-w-3xl mx-auto p-6 space-y-6">
+
         <header class="flex items-center justify-between gap-4">
             <div class="flex items-center gap-3">
                 <x-sat-logo class="h-10 w-auto" />
+
                 <div>
-                    <h1 class="text-xl font-semibold">Facturación (en desarrollo)</h1>
-                    <p class="text-sm text-zinc-600 dark:text-zinc-400">
-                        Esta opción está considerada para una próxima versión del sistema. Hemos tenido en cuenta los
-                        requisitos,
-                        pero aún no está desarrollada.
+                    <h1 class="text-xl font-bold text-black dark:text-white">
+                        Facturación (en desarrollo)
+                    </h1>
+
+                    <p class="text-sm text-black/70 dark:text-white/70 mt-1">
+                        Esta opción está considerada para una próxima versión del sistema. Hemos tenido en cuenta
+                        los requisitos, pero aún no está desarrollada.
                     </p>
                 </div>
             </div>
+
             <span
-                class="text-xs rounded-full px-2 py-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+                class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium
+                       bg-custom-orange/10 text-custom-orange
+                       dark:bg-custom-orange/15 dark:text-custom-orange">
                 Próximamente
             </span>
         </header>
 
-        <div class="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-zinc-900 p-6">
-            <div class="rounded-xl bg-zinc-50 dark:bg-zinc-800 p-4 text-sm text-zinc-600 dark:text-zinc-300">
-                Próximamente podrás emitir facturas, consultar historial de CFDI y descargar reportes.
+        <div class="rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-6">
+            <div class="rounded-xl bg-zinc-50 dark:bg-zinc-800 p-4 text-sm text-black/70 dark:text-white/70">
+                Próximamente podrás emitir facturas, consultar historial de CFDI y descargar reportes
+                directamente desde Parking+.
             </div>
-            <p class="mt-4 text-xs text-zinc-500">
-                Marca y logotipo “SAT” pertenecen a sus respectivos titulares. Se muestran con fines de referencia.
+
+            <p class="mt-4 text-xs text-black/60 dark:text-white/60">
+                El nombre y logotipo “SAT” pertenecen a la SHCP y se muestran únicamente con fines de referencia.
             </p>
         </div>
     </div>

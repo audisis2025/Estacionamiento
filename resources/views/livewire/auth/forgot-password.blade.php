@@ -1,51 +1,127 @@
 <?php
+/*
+* Nombre de la clase         : forgot-password.blade.php
+* Descripción de la clase    : Vista de recuperación de contraseña para usuarios.
+* Fecha de creación          : 03/10/2025
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 04/10/2025
+* Autorizó                   : Angel Dávila
+* Versión                    : 1.1
+* Fecha de mantenimiento     : 16/11/2025
+* Folio de mantenimiento     :
+* Tipo de mantenimiento      : Correctivo
+* Descripción del mantenimiento : Implementación de mensajes de alerta con SweetAlert2.
+* Responsable                : Elian Pérez
+* Revisor                    : Angel Dávila
+*/
 
 use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new #[Layout('components.layouts.auth')] class extends Component {
+new #[Layout('components.layouts.auth')] class extends Component
+{
     public string $email = '';
 
-    /**
-     * Send a password reset link to the provided email address.
-     */
     public function sendPasswordResetLink(): void
     {
         $this->validate([
             'email' => ['required', 'string', 'email'],
         ]);
 
-        Password::sendResetLink($this->only('email'));
+        $status = Password::sendResetLink($this->only('email'));
 
-        session()->flash('status', __('Contraseña restablecida enviada correctamente! Por favor, revisa tu correo electrónico.'));
+        if ($status === Password::RESET_LINK_SENT)
+        {
+            $this->dispatch(
+                'show-swal',
+                icon: 'success',
+                title: 'Enlace enviado',
+                text: __($status)
+            );
+        } else
+        {
+            $this->dispatch(
+                'show-swal',
+                icon: 'error',
+                title: 'Error',
+                text: __($status)
+            );
+        }
+    }
+
+    public function exception($e, $stopPropagation): void
+    {
+        if ($e instanceof ValidationException)
+        {
+            $first = collect($e->errors())->flatten()->first();
+
+            $this->dispatch(
+                'show-swal',
+                icon: 'error',
+                title: 'Error',
+                text: $first
+            );
+
+            $this->resetErrorBag();
+            $stopPropagation();
+        }
     }
 }; ?>
 
 <div class="flex flex-col gap-6">
-    <x-auth-header :title="__('Recuperar contraseña')" :description="__('Ingresa tu correo electrónico para recibir un enlace de restablecimiento de contraseña')" />
+    <x-auth-header
+        :title="__('Recuperar contraseña')"
+        :description="__('Ingresa tu correo electrónico para recibir un enlace de restablecimiento de contraseña')"
+    />
 
-    <!-- Session Status -->
-    <x-auth-session-status class="text-center" :status="session('status')" />
 
     <form method="POST" wire:submit="sendPasswordResetLink" class="flex flex-col gap-6">
-        <!-- Email Address -->
         <flux:input
             wire:model="email"
             :label="__('Correo electrónico')"
             type="email"
             required
             autofocus
+            autocomplete="email"
             placeholder="email@gmail.com"
         />
 
-        <flux:button variant="primary" type="submit" class="w-full" data-test="email-password-reset-link-button">
+        <flux:button
+            type="submit"
+            variant="primary"
+            icon="paper-airplane"
+            icon-variant="outline"
+            class="w-full bg-custom-blue hover:bg-custom-blue-dark text-white"
+            data-test="email-password-reset-link-button"
+        >
             {{ __('Enviar enlace') }}
         </flux:button>
     </form>
 
-    <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-400">
+    <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-black/60 dark:text-white/60">
         <span>{{ __('O, regresa a') }}</span>
-        <flux:link :href="route('login')" wire:navigate>{{ __('Iniciar sesión') }}</flux:link>
+        <flux:link
+            :href="route('login')"
+            wire:navigate
+            class="text-custom-blue hover:text-custom-blue-dark"
+        >
+            {{ __('Iniciar sesión') }}
+        </flux:link>
     </div>
+
+    @script
+        <script>
+            $wire.on('show-swal', (data) =>
+            {
+                Swal.fire(
+                {
+                    icon: data.icon,
+                    title: data.title,
+                    text: data.text,
+                });
+            });
+        </script>
+    @endscript
 </div>

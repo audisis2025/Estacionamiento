@@ -28,6 +28,10 @@
     --color-accent-foreground: var(--color-white);
     --color-custom-blue: #241178;
     --color-custom-blue-dark: #1a0d5a;
+    --color-custom-green: #42A958;
+    --color-custom-green-dark: #272800;
+    --color-custom-red: #EE0000;
+    --color-custom-orange: #DE6601;
 }
 
 @layer theme {

@@ -5,14 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\QrReader;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class QrReaderController extends Controller
 {
     public function index()
     {
         $parking = auth()->user()->parking;
-        // Si por alguna razón no hay parking (middleware debería evitarlo)
-        if (!$parking) {
+        
+        if (!$parking) 
+        {
             return redirect()->route('parking.edit')->with('swal', [
                 'icon'  => 'warning',
                 'title' => 'Configura tu estacionamiento',
@@ -32,30 +34,42 @@ class QrReaderController extends Controller
 
     public function store(Request $request)
     {
-        $parking = auth()->user()->parking;
+        try 
+        {
+            $parking = auth()->user()->parking;
 
-        $data = $request->validate([
-            'serial_number' => [
-                'required',
-                'string',
-                'max:50',
-                // único por estacionamiento
-                Rule::unique('qr_readers', 'serial_number')->where(fn($q) => $q->where('id_parking', $parking->id)),
-            ],
-            'sense' => ['required', 'integer', Rule::in([0, 1, 2])],
-        ]);
+            $data = $request->validate([
+                'serial_number' => [
+                    'required',
+                    'string',
+                    'max:50',
+                    Rule::unique('qr_readers', 'serial_number')->where(fn($q) => $q->where('id_parking', $parking->id)),
+                ],
+                'sense' => ['required', 'integer', Rule::in([0, 1, 2])],
+            ]);
 
-        $parking->qrReaders()->create([
-            'serial_number' => $data['serial_number'],
-            'sense'         => $data['sense'],
-            // id_parking se rellena por la relación
-        ]);
+            $parking->qrReaders()->create([
+                'serial_number' => $data['serial_number'],
+                'sense'         => $data['sense'],
+            ]);
 
-        return redirect()->route('parking.qr-readers.index')->with('swal', [
-            'icon'  => 'success',
-            'title' => 'Lector creado',
-            'text'  => 'El lector QR se registró correctamente.',
-        ]);
+            return redirect()->route('parking.qr-readers.index')->with('swal', [
+                'icon'  => 'success',
+                'title' => 'Lector creado',
+                'text'  => 'El lector QR se registró correctamente.',
+            ]);
+
+        } catch (ValidationException $e) 
+        {
+            // Capturar el primer error para mostrar en SweetAlert
+            $firstError = collect($e->errors())->first()[0] ?? 'Error de validación';
+            
+            return back()->with('swal', [
+                'icon'  => 'error',
+                'title' => 'Error de validación',
+                'text'  => $firstError,
+            ])->withInput();
+        }
     }
 
     public function edit(QrReader $reader)
@@ -67,30 +81,42 @@ class QrReaderController extends Controller
 
     public function update(Request $request, QrReader $reader)
     {
-        $this->ensureOwnership($reader);
+        try 
+        {
+            $this->ensureOwnership($reader);
 
-        $parking = auth()->user()->parking;
+            $parking = auth()->user()->parking;
 
-        $data = $request->validate([
-            'serial_number' => [
-                'required',
-                'string',
-                'max:50',
-                // único por estacionamiento, ignorando el propio ID
-                Rule::unique('qr_readers', 'serial_number')
-                    ->where(fn($q) => $q->where('id_parking', $parking->id))
-                    ->ignore($reader->id),
-            ],
-            'sense' => ['required', 'integer', Rule::in([0, 1, 2])],
-        ]);
+            $data = $request->validate([
+                'serial_number' => [
+                    'required',
+                    'string',
+                    'max:50',
+                    Rule::unique('qr_readers', 'serial_number')
+                        ->where(fn($q) => $q->where('id_parking', $parking->id))
+                        ->ignore($reader->id),
+                ],
+                'sense' => ['required', 'integer', Rule::in([0, 1, 2])],
+            ]);
 
-        $reader->update($data);
+            $reader->update($data);
 
-        return redirect()->route('parking.qr-readers.index')->with('swal', [
-            'icon'  => 'success',
-            'title' => 'Lector actualizado',
-            'text'  => 'Se guardaron los cambios correctamente.',
-        ]);
+            return redirect()->route('parking.qr-readers.index')->with('swal', [
+                'icon'  => 'success',
+                'title' => 'Lector actualizado',
+                'text'  => 'Se guardaron los cambios correctamente.',
+            ]);
+
+        } catch (ValidationException $e) 
+        {
+            $firstError = collect($e->errors())->first()[0] ?? 'Error de validación';
+            
+            return back()->with('swal', [
+                'icon'  => 'error',
+                'title' => 'Error de validación',
+                'text'  => $firstError,
+            ])->withInput();
+        }
     }
 
     public function destroy(QrReader $reader)
@@ -106,9 +132,6 @@ class QrReaderController extends Controller
         ]);
     }
 
-    /**
-     * Asegura que el lector pertenezca al estacionamiento del usuario.
-     */
     private function ensureOwnership(QrReader $reader): void
     {
         $parking = auth()->user()->parking;

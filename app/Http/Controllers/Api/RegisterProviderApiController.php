@@ -24,7 +24,6 @@ class RegisterProviderApiController extends Controller
         ]);
 
     
-        // 🔹 Plan básico
         $defaultPlan = Plan::updateOrCreate(
             ['type' => 'user', 'name' => 'Plan Básico'],
             [
@@ -34,7 +33,6 @@ class RegisterProviderApiController extends Controller
             ]
         );
 
-        // 🔹 Crear usuario normal
         $user = User::create([
             'name'         => $data['name'],
             'email'        => $data['email'],
@@ -43,7 +41,6 @@ class RegisterProviderApiController extends Controller
             'id_plan'      => $defaultPlan->id,
         ]);
 
-        // 🔹 Crear registro pendiente en user_client_types
         UserClientType::create([
             'approval'        => 0, // pendiente
             'expiration_date' => null,

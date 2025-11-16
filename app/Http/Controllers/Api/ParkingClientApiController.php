@@ -8,10 +8,7 @@ use Illuminate\Http\Request;
 
 class ParkingClientApiController extends Controller
 {
-    /**
-     * Muestra los estacionamientos del usuario autenticado
-     * que tienen clientes dinámicos (ClientType relacionados).
-     */
+    
     public function index(Request $request)
     {
         $user = $request->user();
@@ -20,7 +17,6 @@ class ParkingClientApiController extends Controller
             return response()->json(['error' => 'Usuario no autenticado'], 401);
         }
 
-        // 🔹 Solo estacionamientos del usuario con clientes dinámicos
         $parkings = Parking::where('id_user', $user->id)
             ->whereHas('clientTypes', function ($query) {
                 $query->where('typename', 'LIKE', '%dinamico%');

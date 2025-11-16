@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ClientType;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException; // <-- IMPORTANTE
 
 class ClientTypeController extends Controller
 {
@@ -32,27 +33,46 @@ class ClientTypeController extends Controller
 
     public function store(Request $request)
     {
-        $parking = auth()->user()->parking;
+        try {
+            $parking = auth()->user()->parking;
 
-        $data = $request->validate([
-            'typename'      => [
-                'required',
-                'string',
-                'max:50',
-                // único por estacionamiento
-                Rule::unique('client_types', 'typename')->where(fn($q) => $q->where('id_parking', $parking->id)),
-            ],
-            'discount_type' => ['required', 'integer', Rule::in([0, 1])], // 0=% | 1=cantidad
-            'amount'        => ['required', 'numeric', 'min:0'],
-        ]);
+            $data = $request->validate([
+                'typename'      => [
+                    'required',
+                    'string',
+                    'max:50',
+                    // único por estacionamiento
+                    Rule::unique('client_types', 'typename')
+                        ->where(fn($q) => $q->where('id_parking', $parking->id)),
+                ],
+                'discount_type' => ['required', 'integer', Rule::in([0, 1])], // 0=% | 1=cantidad
+                'amount'        => ['required', 'numeric', 'min:1'],
+            ]);
 
-        $parking->clientTypes()->create($data);
+            $parking->clientTypes()->create($data);
 
-        return redirect()->route('parking.client-types.index')->with('swal', [
-            'icon'  => 'success',
-            'title' => 'Tipo creado',
-            'text'  => 'El tipo de cliente se registró correctamente.',
-        ]);
+            return redirect()->route('parking.client-types.index')->with('swal', [
+                'icon'  => 'success',
+                'title' => 'Tipo creado',
+                'text'  => 'El tipo de cliente se registró correctamente.',
+            ]);
+
+        } catch (ValidationException $e) {
+            $allErrors = collect($e->errors())->flatten()->toArray();
+            
+            $errorList = '<ul style="text-align: left; margin-left: 20px;">';
+            foreach ($allErrors as $error) {
+                $errorList .= "<li>{$error}</li>";
+            }
+            $errorList .= '</ul>';
+
+            return back()->with('swal', [
+                'icon'  => 'error',
+                'title' => 'Errores en el formulario',
+                'html'  => $errorList,
+            ])->withInput();
+
+        }
     }
 
     public function edit(ClientType $clientType)
@@ -64,30 +84,47 @@ class ClientTypeController extends Controller
 
     public function update(Request $request, ClientType $clientType)
     {
-        $this->ensureOwnership($clientType);
+        try {
+            $this->ensureOwnership($clientType);
 
-        $parking = auth()->user()->parking;
+            $parking = auth()->user()->parking;
 
-        $data = $request->validate([
-            'typename'      => [
-                'required',
-                'string',
-                'max:50',
-                Rule::unique('client_types', 'typename')
-                    ->where(fn($q) => $q->where('id_parking', $parking->id))
-                    ->ignore($clientType->id),
-            ],
-            'discount_type' => ['required', 'integer', Rule::in([0, 1])],
-            'amount'        => ['required', 'numeric', 'min:0'],
-        ]);
+            $data = $request->validate([
+                'typename'      => [
+                    'required',
+                    'string',
+                    'max:50',
+                    Rule::unique('client_types', 'typename')
+                        ->where(fn($q) => $q->where('id_parking', $parking->id))
+                        ->ignore($clientType->id),
+                ],
+                'discount_type' => ['required', 'integer', Rule::in([0, 1])],
+                'amount'        => ['required', 'numeric', 'min:1'],
+            ]);
 
-        $clientType->update($data);
+            $clientType->update($data);
 
-        return redirect()->route('parking.client-types.index')->with('swal', [
-            'icon'  => 'success',
-            'title' => 'Tipo actualizado',
-            'text'  => 'Los cambios se guardaron correctamente.',
-        ]);
+            return redirect()->route('parking.client-types.index')->with('swal', [
+                'icon'  => 'success',
+                'title' => 'Tipo actualizado',
+                'text'  => 'Los cambios se guardaron correctamente.',
+            ]);
+
+        } catch (ValidationException $e) {
+            $allErrors = collect($e->errors())->flatten()->toArray();
+            
+            $errorList = '<ul style="text-align: left; margin-left: 20px;">';
+            foreach ($allErrors as $error) {
+                $errorList .= "<li>{$error}</li>";
+            }
+            $errorList .= '</ul>';
+
+            return back()->with('swal', [
+                'icon'  => 'error',
+                'title' => 'Errores en el formulario',
+                'html'  => $errorList,
+            ])->withInput();
+        }
     }
 
     public function destroy(ClientType $clientType)

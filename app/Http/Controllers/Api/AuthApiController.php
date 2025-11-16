@@ -23,15 +23,12 @@ class AuthApiController extends Controller
             'type'         => ['nullable', 'string', 'in:usuario,admin,adminEstacionamiento,proveedor'],
         ]);
 
-        // 🔹 Determinar rol según tipo enviado
         $roleName = $data['type'] ?? 'usuario';
 
-        // Si no existe el rol, lo creamos automáticamente (solo primera vez)
         $role = Role::firstOrCreate(['name' => $roleName], [
             'description' => ucfirst($roleName) . ' del sistema',
         ]);
 
-        // 🔹 Crear o usar plan por defecto
         $defaultPlan = Plan::updateOrCreate(
             ['type' => 'user', 'name' => 'Plan Básico'],
             [

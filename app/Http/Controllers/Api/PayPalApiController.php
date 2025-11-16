@@ -12,16 +12,10 @@ use Illuminate\Support\Facades\Log;
 
 class PayPalApiController extends Controller
 {
-    /**
-     * 🔹 Registrar un pago exitoso desde Flutter (PayPal)
-     * Endpoint: POST /api/paypal/success
-     */
     public function store(Request $request)
     {
-        // ✅ Usuario autenticado
         $user = Auth::user();
 
-        // ✅ Validar datos
         $request->validate([
             'plan_id' => 'required|exists:plans,id',
             'amount'  => 'required|numeric|min:0',
@@ -39,7 +33,6 @@ class PayPalApiController extends Controller
         try {
             DB::transaction(function () use ($user, $plan, $request) {
 
-                // 🔹 Actualizar el plan y fecha de expiración del usuario que paga
                 DB::table('users')
                     ->where('id', $user->id)
                     ->update([
@@ -48,7 +41,6 @@ class PayPalApiController extends Controller
                         'updated_at' => now(),
                     ]);
 
-                // 🔹 Obtener al administrador que recibe los fondos
                 $admin = DB::table('users')->where('phone_number', '7777777777')->first();
 
                 if ($admin) {
@@ -73,7 +65,6 @@ class PayPalApiController extends Controller
                 }
             });
 
-            // ✅ Confirmación al cliente Flutter
             return response()->json([
                 'status'  => 'success',
                 'message' => 'Pago PayPal registrado correctamente.',
@@ -86,7 +77,7 @@ class PayPalApiController extends Controller
                 ],
             ], 200);
         } catch (\Exception $e) {
-            Log::error('❌ Error en PayPalApiController', [
+            Log::error('Error en PayPalApiController', [
                 'user_id' => $user->id ?? null,
                 'error' => $e->getMessage(),
             ]);

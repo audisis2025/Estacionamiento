@@ -1,10 +1,27 @@
+{{--
+* Nombre de la vista           : index.blade.php
+* Descripción de la vista      : Página para gestionar las entradas abiertas en el estacionamiento del usuario.
+* Fecha de creación            : 06/11/2025
+* Elaboró                      : Elian Pérez
+* Fecha de liberación          : 06/11/2025
+* Autorizó                     : Angel Davila
+* Version                      : 1.0
+* Fecha de mantenimiento       : 
+* Folio de mantenimiento       : 
+* Tipo de mantenimiento        :
+* Descripción del mantenimiento: 
+* Responsable                  : 
+* Revisor                      : 
+--}}
 <x-layouts.app :title="__('Entradas abiertas')">
     <div class="max-w-6xl mx-auto p-6 space-y-6">
-        <h1 class="text-2xl font-semibold">Entradas abiertas</h1>
 
-        {{-- Mostrar tipo de tarifa --}}
+        <h1 class="text-2xl font-bold text-black dark:text-white">
+            Entradas abiertas
+        </h1>
+
         @php $parking = auth()->user()->parking; @endphp
-        <p class="text-sm text-zinc-500">
+        <p class="text-sm text-black/60 dark:text-white/60">
             Tipo de cobro:
             @if ($parking->type === 1)
                 Por hora — ${{ number_format($parking->price, 2) }} / hora
@@ -13,48 +30,94 @@
             @endif
         </p>
 
-        <form method="GET" class="flex gap-3 items-end">
-            <div>
-                <label class="text-xs text-zinc-500">Buscar por teléfono</label>
-                <input type="text" name="q" value="{{ $phone }}" class="border rounded-lg px-3 py-2"
-                    placeholder="Ej. 7221234567">
+        <form method="GET" class="flex flex-wrap gap-3 items-end">
+            <div class="w-full sm:w-auto">
+                <flux:input
+                    name="q"
+                    :label="__('Buscar por teléfono')"
+                    type="text"
+                    value="{{ $phone }}"
+                    placeholder="Ej. 7221234567"
+                />
             </div>
-            <button class="px-4 py-2 rounded-lg border">Filtrar</button>
+
+            <flux:button
+                type="submit"
+                variant="primary"
+                icon="magnifying-glass"
+                icon-variant="outline"
+                class="bg-gray-500 hover:bg-gray-600 text-white text-sm"
+            >
+                Buscar
+            </flux:button>
         </form>
 
-        {{-- Tabla --}}
-        <div class="rounded-xl border overflow-x-auto">
-            <table class="min-w-full text-sm">
+        <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-x-auto bg-white dark:bg-zinc-900">
+            <table class="min-w-full text-sm divide-y divide-zinc-200 dark:divide-zinc-700">
                 <thead class="bg-zinc-100 dark:bg-zinc-800">
                     <tr class="text-left">
-                        <th class="px-4 py-3 font-semibold">ID</th>
-                        <th class="px-4 py-3 font-semibold">Usuario</th>
-                        <th class="px-4 py-3 font-semibold">Entrada</th>
-                        <th class="px-4 py-3 font-semibold text-right">Acción</th>
+                        <th class="px-4 py-3 font-semibold text-black dark:text-white">
+                            ID
+                        </th>
+                        <th class="px-4 py-3 font-semibold text-black dark:text-white">
+                            Usuario
+                        </th>
+                        <th class="px-4 py-3 font-semibold text-black dark:text-white">
+                            Entrada
+                        </th>
+                        <th class="px-4 py-3 font-semibold text-right text-black dark:text-white">
+                            Acción
+                        </th>
                     </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-zinc-900 divide-y">
+
+                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
                     @forelse ($entries as $t)
-                        <tr>
-                            <td class="px-4 py-3">{{ $t->id }}</td>
-                            <td class="px-4 py-3">
-                                <div class="font-medium">{{ $t->user->name ?? 'N/D' }}</div>
-                                <div class="text-xs text-zinc-500">{{ $t->user->email ?? '' }}</div>
+                        <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition">
+                            <td class="px-4 py-3 text-black dark:text-white">
+                                {{ $t->id }}
                             </td>
-                            <td class="px-4 py-3">{{ \Carbon\Carbon::parse($t->entry_date)->format('Y-m-d H:i') }}</td>
+
+                            <td class="px-4 py-3">
+                                <div class="font-medium text-black dark:text-white">
+                                    {{ $t->user->name ?? 'N/D' }}
+                                </div>
+                                <div class="text-xs text-black/60 dark:text-white/60">
+                                    {{ $t->user->email ?? '' }}
+                                </div>
+                            </td>
+
+                            <td class="px-4 py-3 text-black/80 dark:text-white/80">
+                                {{ \Carbon\Carbon::parse($t->entry_date)->format('Y-m-d H:i') }}
+                            </td>
+
                             <td class="px-4 py-3 text-right">
-                                <form method="POST" action="{{ route('parking.entries.release', $t) }}"
-                                    class="form-release">
+                                <form
+                                    method="POST"
+                                    action="{{ route('parking.entries.release', $t) }}"
+                                    class="form-release inline-block"
+                                >
                                     @csrf
-                                    <button type="submit" class="px-3 py-2 rounded-lg border hover:bg-zinc-50 text-sm">
+
+                                    <flux:button
+                                        type="submit"
+                                        size="sm"
+                                        icon="arrow-right-start-on-rectangle"
+                                        icon-variant="outline"
+                                        variant="primary"
+                                        class="bg-custom-green hover:bg-custom-green-dark text-white text-xs md:text-sm"
+                                    >
                                         Liberar salida
-                                    </button>
+                                    </flux:button>
                                 </form>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-4 py-6 text-center text-zinc-500">
+                            <td
+                                colspan="4"
+                                class="px-4 py-6 text-center text-black/60 dark:text-white/60"
+                            >
                                 No hay entradas pendientes de salida.
                             </td>
                         </tr>
@@ -63,48 +126,71 @@
             </table>
         </div>
 
-        {{ $entries->links() }}
+        <div>
+            {{ $entries->links() }}
+        </div>
     </div>
 
-    {{-- SweetAlert mensajes --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        // Confirmación al liberar
-        document.querySelectorAll('.form-release').forEach(form => {
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const result = await Swal.fire({
-                    title: '¿Liberar salida?',
-                    text: 'Se calculará automáticamente el monto según el tiempo y la tarifa.',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sí, liberar',
-                    cancelButtonText: 'Cancelar',
-                    confirmButtonColor: '#2563eb',
-                    cancelButtonColor: '#6b7280'
+        (function ()
+        {
+            function bindReleaseForms()
+            {
+                document.querySelectorAll('.form-release').forEach((form) =>
+                {
+                    if (form.dataset.bound === '1')
+                    {
+                        return;
+                    }
+
+                    form.dataset.bound = '1';
+
+                    form.addEventListener('submit', async (e) =>
+                    {
+                        e.preventDefault();
+
+                        const result = await Swal.fire(
+                        {
+                            title: '¿Liberar salida?',
+                            text: 'Se calculará automáticamente el monto según el tiempo y la tarifa.',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Sí, liberar',
+                            cancelButtonText: 'Cancelar',
+                            confirmButtonColor: '#3182ce', 
+                            cancelButtonColor: '#EE0000',
+                        });
+
+                        if (result.isConfirmed)
+                        {
+                            form.submit();
+                        }
+                    });
                 });
-                if (result.isConfirmed) form.submit();
-            });
-        });
+            }
 
-        // Éxito
-        @if (session('ok'))
-            Swal.fire({
-                icon: 'success',
-                title: '¡Éxito!',
-                text: "{{ session('ok') }}",
-                confirmButtonColor: '#22c55e'
-            });
-        @endif
+            document.addEventListener('DOMContentLoaded', bindReleaseForms);
+            document.addEventListener('livewire:navigated', bindReleaseForms);
 
-        // Error
-        @if (session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: "{{ session('error') }}",
-                confirmButtonColor: '#dc2626'
-            });
-        @endif
+            @if (session('ok'))
+                Swal.fire(
+                {
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: "{{ session('ok') }}",
+                });
+            @endif
+
+            @if (session('error'))
+                Swal.fire(
+                {
+                    icon: 'error',
+                    title: 'Error',
+                    text: "{{ session('error') }}",
+                });
+            @endif
+        })();
     </script>
 </x-layouts.app>

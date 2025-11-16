@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class ParkingApiController extends Controller
 {
-    // 🔹 Ya existente
     public function nearby(Request $request)
     {
         $lat = $request->query('lat');
@@ -26,7 +25,6 @@ class ParkingApiController extends Controller
         return response()->json(['parkings' => $parkings]);
     }
 
-    // 🔹 NUEVO: listar estacionamientos con usuarios dinámicos
     public function withDynamicClients()
     {
         $parkings = Parking::whereHas('clientTypes', function ($q) {
@@ -37,7 +35,6 @@ class ParkingApiController extends Controller
         return response()->json($parkings);
     }
 
-    // 🔹 NUEVO: listar tipos de usuario dinámico de un estacionamiento
     public function clientTypesByParking($id)
     {
         $parking = Parking::with(['clientTypes:id,typename,id_parking'])

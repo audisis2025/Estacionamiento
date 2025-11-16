@@ -11,41 +11,42 @@ class UserDashboardController extends Controller
     public function index(Request $request)
     {
         $user    = auth()->user();
-        $range   = $request->input('range', 'day'); // day|week|month
+        $range   = $request->input('range', 'day');
         $now     = Carbon::now();
 
-        // Ventana fija (no “corre” la UI sola; solo cambia si el user cambia range)
-        if ($range === 'week') {
+        if ($range === 'week') 
+        {
             $from  = (clone $now)->startOfWeek();
             $to    = (clone $now)->endOfWeek();
             $group = "YEARWEEK(entry_date, 1)";
             $label = "CONCAT(YEAR(entry_date), '-W', LPAD(WEEK(entry_date,1),2,'0'))";
-        } elseif ($range === 'month') {
+        } elseif ($range === 'month') 
+        {
             $from  = (clone $now)->startOfMonth();
             $to    = (clone $now)->endOfMonth();
             $group = "DATE_FORMAT(entry_date, '%Y-%m')";
             $label = $group;
-        } else {
+        } else 
+        {
             $from  = (clone $now)->startOfDay();
             $to    = (clone $now)->endOfDay();
             $group = "DATE(entry_date)";
             $label = $group;
         }
 
-        // --------- NUEVO: tolerar usuario sin estacionamiento/lectores ----------
-        $parking   = $user->parking;           // puede ser null
-        $readerIds = collect();                // por defecto vacío
+        $parking   = $user->parking;           
+        $readerIds = collect();               
         $hasParking = (bool) $parking;
 
-        if ($hasParking) {
-            $readerIds = $parking->qrReaders()->pluck('id'); // puede estar vacío
+        if ($hasParking) 
+        {
+            $readerIds = $parking->qrReaders()->pluck('id'); 
         }
 
-        // Si NO hay parking o NO hay lectores, no ejecutes consultas con whereIn vacío.
         $noReaders = !$hasParking || $readerIds->isEmpty();
 
-        if ($noReaders) {
-            // Datos “vacíos”, la vista sigue renderizando sin romper
+        if ($noReaders) 
+        {
             $revenue      = collect([]);
             $usersNormal  = collect([]);
             $usersDynamic = collect([]);
@@ -55,7 +56,7 @@ class UserDashboardController extends Controller
                 'users_dynamic'  => 0,
             ];
 
-            return view('dashboard', [
+            return view('user.dashboard', [
                 'range'         => $range,
                 'revenue'       => $revenue,
                 'usersNormal'   => $usersNormal,
@@ -66,7 +67,6 @@ class UserDashboardController extends Controller
             ]);
         }
 
-        // --------- Hay lectores: ejecuta consultas normalmente ----------
         $revenue = DB::table('transactions')
             ->selectRaw("$label AS label, SUM(amount) AS total")
             ->whereIn('id_qr_reader', $readerIds)
@@ -91,7 +91,7 @@ class UserDashboardController extends Controller
             ->selectRaw("$label AS label, COUNT(DISTINCT t.id_user) AS total")
             ->whereIn('t.id_qr_reader', $readerIds)
             ->whereBetween('t.entry_date', [$from, $to])
-            ->whereNull('u.id_role') // tu definición de “dinámico” (ajústala si hace falta)
+            ->whereNull('u.id_role')
             ->groupBy('label')
             ->orderBy('label')
             ->get();
@@ -118,7 +118,7 @@ class UserDashboardController extends Controller
                 ->distinct('t.id_user')->count('t.id_user'),
         ];
 
-        return view('dashboard', [
+        return view('user.dashboard', [
             'range'         => $range,
             'revenue'       => $revenue,
             'usersNormal'   => $usersNormal,

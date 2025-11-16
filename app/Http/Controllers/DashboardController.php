@@ -34,7 +34,7 @@ class DashboardController extends Controller
         // Si aún no la tienes, mostramos 0.00 y luego te digo cómo agregarla.
         $monthRevenue = 0.00;
 
-        return view('admin-dashboard', compact(
+        return view('admin.admin-dashboard', compact(
             'activeParking',
             'activeUser',
             'totalRevenue',

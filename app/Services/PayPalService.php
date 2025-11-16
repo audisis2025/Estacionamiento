@@ -30,7 +30,6 @@ class PayPalService
                     'grant_type' => 'client_credentials'
                 ]);
 
-            // Solo log en caso de error
             if (!$resp->successful()) {
                 Log::error('PayPal token error', ['status' => $resp->status()]);
             }
@@ -69,7 +68,6 @@ class PayPalService
                 ])
                 ->post("{$this->base}/v2/checkout/orders", $payload);
 
-            // Solo log de errores
             if (!$resp->successful()) {
                 Log::error('PayPal createOrder failed', [
                     'status' => $resp->status(),
@@ -119,7 +117,7 @@ class PayPalService
 
             $responseBody = json_decode($response, true) ?: [];
             
-            // Solo log de errores con debug_id para soporte
+            // Solo log de errores
             if ($statusCode !== 201) {
                 Log::error('PayPal capture failed', [
                     'orderId' => $orderId,

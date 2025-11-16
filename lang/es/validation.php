@@ -169,5 +169,8 @@ return [
         'number' => 'número',
         'email' => 'correo',
         'price' => 'precio',
+        'serial_number' => 'número de serie',
+        'amount' => 'monto',
+        'typename' => 'nombre del tipo',
     ],
 ];

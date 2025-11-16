@@ -14,14 +14,12 @@ class PaymentApiController extends Controller
     {
         $user = Auth::user();
 
-        // ✅ Carga relaciones de forma segura
         $transactions = Transaction::with(['qrReader.parking'])
             ->where('id_user', $user->id)
             ->whereNotNull('departure_date')
             ->orderByDesc('entry_date')
             ->get(['id', 'amount', 'entry_date', 'departure_date', 'id_qr_reader', 'id_user']);
 
-        // ✅ Estructura de salida segura
         $data = $transactions->map(function ($t) {
             $qrReader = $t->qrReader;
             $parking = $qrReader?->parking;
@@ -30,7 +28,6 @@ class PaymentApiController extends Controller
                 'id' => $t->id,
                 'amount' => (float) $t->amount,
 
-                // 🔹 Usa Carbon::parse() como en tu otro código
                 'entry_date' => $t->entry_date
                     ? Carbon::parse($t->entry_date)->format('Y-m-d H:i:s')
                     : null,
