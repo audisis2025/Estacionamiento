@@ -47,10 +47,7 @@ new #[Layout('components.layouts.auth')] class extends Component
 
         if (Features::canManageTwoFactorAuthentication() && $user->hasEnabledTwoFactorAuthentication()) 
         {
-            Session::put([
-                'login.id' => $user->getKey(),
-                'login.remember' => $this->remember,
-            ]);
+            Session::put(['login.id' => $user->getKey(),'login.remember' => $this->remember]);
 
             $this->redirect(route('two-factor.login'), navigate: true);
 
@@ -64,7 +61,8 @@ new #[Layout('components.layouts.auth')] class extends Component
 
         if ($user->isAdmin()) 
         {
-            $this->redirectIntended(default: route('admin.dashboard', absolute: false), navigate: true);
+            $this->redirectIntended(
+                default: route('admin.dashboard', absolute: false), navigate: true);
         } else 
         {
             $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
@@ -73,18 +71,13 @@ new #[Layout('components.layouts.auth')] class extends Component
 
     protected function validateCredentials(): User
     {
-        $user = Auth::getProvider()->retrieveByCredentials([
-            'email' => $this->email,
-            'password' => $this->password,
-        ]);
+        $user = Auth::getProvider()->retrieveByCredentials(['email' => $this->email,'password' => $this->password,]);
 
         if (!$user || !Auth::getProvider()->validateCredentials($user, ['password' => $this->password])) 
         {
             RateLimiter::hit($this->throttleKey());
 
-            throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
-            ]);
+            throw ValidationException::withMessages(['email' => __('auth.failed'),]);
         }
 
         return $user;
@@ -101,12 +94,7 @@ new #[Layout('components.layouts.auth')] class extends Component
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
-        throw ValidationException::withMessages([
-            'email' => __('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
-        ]);
+        throw ValidationException::withMessages(['email' => __('auth.throttle', ['seconds' => $seconds,'minutes' => ceil($seconds / 60),]),]);
     }
 
     public function exception($e, $stopPropagation): void

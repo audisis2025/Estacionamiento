@@ -134,7 +134,7 @@ new #[Layout('components.layouts.auth')] class extends Component
 
         <div class="flex items-center justify-end">
             <flux:button icon="plus" icon-variant="outline" type="submit" variant="primary" class="w-full bg-custom-blue hover:bg-custom-blue-dark text-white" data-test="register-user-button">
-                {{ __('Crear cuenta') }}
+                {{ __('Registrarse') }}
             </flux:button>
         </div>
     </form>

@@ -1,3 +1,12 @@
+{{--
+* Nombre de la vista           : app-logo-icon.blade.php
+* Descripción de la vista      : Icono svg del logo de la aplicación Parking +.
+* Fecha de creación            : 03/11/2025
+* Elaboró                      : Elian Pérez
+* Fecha de liberación          : 04/11/2025
+* Autorizó                     : Angel Davila
+* Version                      : 1.0
+--}}
 <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="300.000000pt" height="285.000000pt"
     viewBox="0 0 300.000000 285.000000" preserveAspectRatio="xMidYMid meet">
     <g transform="translate(0.000000,285.000000) scale(0.100000,-0.100000)" fill="#0d1d5e" stroke="none">

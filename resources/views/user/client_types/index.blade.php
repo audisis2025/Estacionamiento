@@ -1,3 +1,18 @@
+{{--
+* Nombre de la vista           : index.blade.php
+* Descripción de la vista      : Pantalla donde se muestran todos los tipos de cliente.
+* Fecha de creación            : 03/11/2025
+* Elaboró                      : Elian Pérez
+* Fecha de liberación          : 04/11/2025
+* Autorizó                     : Angel Davila
+* Version                      : 1.0
+* Fecha de mantenimiento       : 
+* Folio de mantenimiento       :
+* Tipo de mantenimiento        : 
+* Descripción del mantenimiento: 
+* Responsable                  : 
+* Revisor                      : 
+--}}
 <x-layouts.app :title="__('Tipos de cliente')">
     <div class="p-6 w-full max-w-6xl mx-auto">
         <div class="flex items-center justify-between mb-5">

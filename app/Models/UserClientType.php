@@ -11,8 +11,8 @@ class UserClientType extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'approval',        // 0|1
-        'expiration_date', // nullable date
+        'approval',
+        'expiration_date', 
         'id_user',
         'id_client_type',
     ];
@@ -32,13 +32,11 @@ class UserClientType extends Model
         return $this->belongsTo(ClientType::class, 'id_client_type', 'id');
     }
 
-    // Atajo: $request->parking devuelve el parking del tipo elegido
     public function parking()
     {
         return $this->clientType?->parking();
     }
 
-    /* Scopes de conveniencia */
     public function scopePending($q)
     {
         return $q->where('approval', 0);

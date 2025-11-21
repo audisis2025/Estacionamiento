@@ -1,3 +1,24 @@
+{{--
+* Nombre de la vista           : app.blade.php
+* Descripción de la vista      : Layout que utiliza la aplicación para las vistas del usuario.
+* Fecha de creación            : 03/10/2025
+* Elaboró                      : Elian Pérez
+* Fecha de liberación          : 04/10/2025
+* Autorizó                     : Angel Davila
+* Version                      : 2.0
+* Fecha de mantenimiento       : 03/11/2025
+* Folio de mantenimiento       :
+* Tipo de mantenimiento        : Correctivo
+* Descripción del mantenimiento: Se agregaron las opciones del usuario al menu lateral.
+* Responsable                  : Elian Pérez
+* Revisor                      : Angel Dávila
+* Fecha de mantenimiento       : 16/11/2025
+* Folio de mantenimiento       : 
+* Tipo de mantenimiento        : Correctivo
+* Descripción del mantenimiento: Se implementaron cambios según el manual de programación.
+* Responsable                  : Elian Pérez
+* Revisor                      : Angel Dávila   
+--}}
 @props(['title' => 'Parking'])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
@@ -80,7 +101,6 @@
 
             <flux:spacer />
 
-            <!-- Desktop User Menu -->
             <flux:dropdown class="hidden lg:block" position="bottom" align="start">
                 <flux:profile :name="auth()->user()->name" :initials="auth()->user()->initials()"
                     icon:trailing="chevrons-up-down" data-test="sidebar-menu-button" />
@@ -106,11 +126,6 @@
 
                     <flux:menu.separator />
 
-                    {{-- <flux:menu.radio.group>
-                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>Configuración
-                        </flux:menu.item>
-                    </flux:menu.radio.group> --}}
-
                     <flux:menu.separator />
 
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
@@ -124,7 +139,6 @@
             </flux:dropdown>
         </flux:sidebar>
 
-        <!-- Mobile User Menu -->
         <flux:header class="lg:hidden">
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
@@ -193,7 +207,8 @@
                     (errs.length > 5 ? `<li>… (${errs.length - 5} más)</li>` : '') +
                     '</ul>';
 
-                Swal.fire({
+                Swal.fire(
+                {
                     icon: 'error',
                     title: 'Revisa la información',
                     html: list,

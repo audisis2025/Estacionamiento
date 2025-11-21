@@ -1,3 +1,18 @@
+{{--
+* Nombre de la vista           : index.blade.php
+* Descripción de la vista      : Panel de visualización de facturas para una implementación futura.
+* Fecha de creación            : 06/11/2025
+* Elaboró                      : Elian Pérez
+* Fecha de liberación          : 06/11/2025
+* Autorizó                     : Angel Davila
+* Version                      : 1.0
+* Fecha de mantenimiento       : 16/11/2025
+* Folio de mantenimiento       :
+* Tipo de mantenimiento        : Correctivo
+* Descripción del mantenimiento: Actualización de la interfaz
+* Responsable                  : Elian Pérez
+* Revisor                      : Angel Davila
+--}}
 <x-layouts.app :title="__('Facturación')">
     <div class="max-w-3xl mx-auto p-6 space-y-6">
 

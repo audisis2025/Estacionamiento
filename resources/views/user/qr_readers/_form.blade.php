@@ -67,7 +67,7 @@
                 <flux:button
                     type="submit"
                     variant="primary"
-                    icon="arrow-path"
+                    icon="check-circle"
                     icon-variant="outline"
                     class="bg-blue-600 hover:bg-blue-600 text-white text-sm"
                 >

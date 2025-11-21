@@ -1,19 +1,37 @@
 <?php
+/*
+* Nombre de la clase         : ClientTypeController.php
+* Descripción de la clase    : Controlador que maneja las operaciones CRUD para los tipos de cliente asociados 
+*                              al estacionamiento del usuario autenticado.
+* Fecha de creación          : 04/11/2025
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 04/11/2025
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
+*/
 
 namespace App\Http\Controllers;
 
 use App\Models\ClientType;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException; // <-- IMPORTANTE
+use Illuminate\Validation\ValidationException;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class ClientTypeController extends Controller
 {
-    public function index()
+    public function index(): View|RedirectResponse
     {
         $parking = auth()->user()->parking;
 
-        if (!$parking) {
+        if (!$parking)
+        {
             return redirect()->route('parking.edit')->with('swal', [
                 'icon'  => 'warning',
                 'title' => 'Configura tu estacionamiento',
@@ -21,32 +39,44 @@ class ClientTypeController extends Controller
             ]);
         }
 
-        $clientTypes = $parking->clientTypes()->orderByDesc('id')->get();
+        $clientTypes = $parking->clientTypes()
+            ->orderByDesc('id')
+            ->get();
 
         return view('user.client_types.index', compact('clientTypes'));
     }
 
-    public function create()
+    public function create(): View
     {
         return view('user.client_types.create');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        try {
+        try
+        {
             $parking = auth()->user()->parking;
 
             $data = $request->validate([
-                'typename'      => [
+                'typename' => [
                     'required',
                     'string',
                     'max:50',
-                    // único por estacionamiento
                     Rule::unique('client_types', 'typename')
-                        ->where(fn($q) => $q->where('id_parking', $parking->id)),
+                        ->where(
+                            fn ($query) => $query->where('id_parking', $parking->id)
+                        ),
                 ],
-                'discount_type' => ['required', 'integer', Rule::in([0, 1])], // 0=% | 1=cantidad
-                'amount'        => ['required', 'numeric', 'min:1'],
+                'discount_type' => [
+                    'required',
+                    'integer',
+                    Rule::in([0, 1]),
+                ],
+                'amount' => [
+                    'required',
+                    'numeric',
+                    'min:1',
+                ],
             ]);
 
             $parking->clientTypes()->create($data);
@@ -56,14 +86,20 @@ class ClientTypeController extends Controller
                 'title' => 'Tipo creado',
                 'text'  => 'El tipo de cliente se registró correctamente.',
             ]);
+        }
+        catch (ValidationException $e)
+        {
+            $allErrors = collect($e->errors())
+                ->flatten()
+                ->toArray();
 
-        } catch (ValidationException $e) {
-            $allErrors = collect($e->errors())->flatten()->toArray();
-            
             $errorList = '<ul style="text-align: left; margin-left: 20px;">';
-            foreach ($allErrors as $error) {
+
+            foreach ($allErrors as $error)
+            {
                 $errorList .= "<li>{$error}</li>";
             }
+
             $errorList .= '</ul>';
 
             return back()->with('swal', [
@@ -71,35 +107,43 @@ class ClientTypeController extends Controller
                 'title' => 'Errores en el formulario',
                 'html'  => $errorList,
             ])->withInput();
-
         }
     }
 
-    public function edit(ClientType $clientType)
+    public function edit(ClientType $clientType): View
     {
         $this->ensureOwnership($clientType);
 
         return view('user.client_types.edit', compact('clientType'));
     }
 
-    public function update(Request $request, ClientType $clientType)
+    public function update(Request $request, ClientType $clientType): RedirectResponse
     {
-        try {
+        try
+        {
             $this->ensureOwnership($clientType);
 
             $parking = auth()->user()->parking;
 
             $data = $request->validate([
-                'typename'      => [
+                'typename' => [
                     'required',
                     'string',
                     'max:50',
                     Rule::unique('client_types', 'typename')
-                        ->where(fn($q) => $q->where('id_parking', $parking->id))
+                        ->where(fn ($query) => $query->where('id_parking', $parking->id))
                         ->ignore($clientType->id),
                 ],
-                'discount_type' => ['required', 'integer', Rule::in([0, 1])],
-                'amount'        => ['required', 'numeric', 'min:1'],
+                'discount_type' => [
+                    'required',
+                    'integer',
+                    Rule::in([0, 1]),
+                ],
+                'amount' => [
+                    'required',
+                    'numeric',
+                    'min:1',
+                ],
             ]);
 
             $clientType->update($data);
@@ -109,14 +153,20 @@ class ClientTypeController extends Controller
                 'title' => 'Tipo actualizado',
                 'text'  => 'Los cambios se guardaron correctamente.',
             ]);
+        }
+        catch (ValidationException $e)
+        {
+            $allErrors = collect($e->errors())
+                ->flatten()
+                ->toArray();
 
-        } catch (ValidationException $e) {
-            $allErrors = collect($e->errors())->flatten()->toArray();
-            
             $errorList = '<ul style="text-align: left; margin-left: 20px;">';
-            foreach ($allErrors as $error) {
+
+            foreach ($allErrors as $error)
+            {
                 $errorList .= "<li>{$error}</li>";
             }
+
             $errorList .= '</ul>';
 
             return back()->with('swal', [
@@ -127,7 +177,7 @@ class ClientTypeController extends Controller
         }
     }
 
-    public function destroy(ClientType $clientType)
+    public function destroy(ClientType $clientType): RedirectResponse
     {
         $this->ensureOwnership($clientType);
 
@@ -143,6 +193,11 @@ class ClientTypeController extends Controller
     private function ensureOwnership(ClientType $clientType): void
     {
         $parking = auth()->user()->parking;
-        abort_unless($parking && $clientType->id_parking === $parking->id, 403, 'No autorizado.');
+
+        abort_unless(
+            $parking && $clientType->id_parking === $parking->id,
+            403,
+            'No autorizado.'
+        );
     }
 }

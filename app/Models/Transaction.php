@@ -9,7 +9,6 @@ class Transaction extends Model
 {
     protected $table = 'transactions';
 
-    // Tu tabla no tiene created_at / updated_at
     public $timestamps = false;
 
     protected $fillable = [
@@ -26,9 +25,6 @@ class Transaction extends Model
         'departure_date' => 'datetime',
     ];
 
-    /* ---------------------------
-     | Relaciones
-     |----------------------------*/
     public function user()
     {
         return $this->belongsTo(\App\Models\User::class, 'id_user');
@@ -39,9 +35,6 @@ class Transaction extends Model
         return $this->belongsTo(\App\Models\QrReader::class, 'id_qr_reader');
     }
 
-    /* ---------------------------
-     | Helpers / Scopes
-     |----------------------------*/
     public function isOpen(): bool
     {
         return is_null($this->departure_date);

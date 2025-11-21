@@ -13,7 +13,7 @@ class ClientType extends Model
 
     protected $fillable = [
         'typename',
-        'discount_type', // 0 = %, 1 = cantidad fija
+        'discount_type',
         'amount',
         'id_parking',
     ];

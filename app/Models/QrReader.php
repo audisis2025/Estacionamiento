@@ -8,7 +8,11 @@ class QrReader extends Model
 {
     protected $table = 'qr_readers';
     public $timestamps = false;
-    protected $fillable = ['serial_number', 'sense', 'id_parking'];
+    protected $fillable = [
+        'serial_number', 
+        'sense', 
+        'id_parking'
+    ];
 
     public function parking()
     {

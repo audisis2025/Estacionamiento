@@ -1,30 +1,36 @@
 
-export default function initParkingForm(formId) {
+export default function initParkingForm(formId) 
+{
     const $ = (suffix) => document.getElementById(`${formId}-${suffix}`);
     const mapDivId = `${formId}-map`;
     let map, marker;
 
-    function initScheduleUi() {
+    function initScheduleUi() 
+    {
         const sameCheck = $('same-schedule');
         const globalDiv = $('global-schedule');
         const daysDiv = $('days-schedule');
 
-        const applyClosedState = (chk) => {
+        const applyClosedState = (chk) => 
+        {
             const card = chk.closest('.rounded-lg');
             if (!card) return;
 
             const timeInputs = card.querySelectorAll('input[type="time"]');
             const closed = chk.checked;
 
-            timeInputs.forEach((inp) => {
+            timeInputs.forEach((inp) => 
+            {
                 inp.disabled = closed;
-                if (closed) {
+                if (closed) 
+                {
                     inp.removeAttribute('required');
                 }
             });
         };
 
-        const toggleGlobal = () => {
+        const toggleGlobal = () => 
+        {
             const activeGlobal = !!sameCheck?.checked;
 
             globalDiv?.classList.toggle('hidden', !activeGlobal);
@@ -33,18 +39,22 @@ export default function initParkingForm(formId) {
             const gOpen = document.querySelector('input[name="schedules[all][open]"]');
             const gClose = document.querySelector('input[name="schedules[all][close]"]');
 
-            if (gOpen && gClose) {
-                if (activeGlobal) {
+            if (gOpen && gClose) 
+            {
+                if (activeGlobal) 
+                {
                     gOpen.setAttribute('required', 'required');
                     gClose.setAttribute('required', 'required');
                 }
-                else {
+                else 
+                {
                     gOpen.removeAttribute('required');
                     gClose.removeAttribute('required');
                 }
             }
 
-            if (!activeGlobal && daysDiv) {
+            if (!activeGlobal && daysDiv) 
+            {
                 daysDiv
                     .querySelectorAll('input[type="checkbox"][name$="[closed]"]')
                     .forEach(applyClosedState);
@@ -53,10 +63,12 @@ export default function initParkingForm(formId) {
 
         sameCheck?.addEventListener('change', toggleGlobal);
 
-        if (daysDiv) {
+        if (daysDiv) 
+        {
             const boxes = daysDiv.querySelectorAll('input[type="checkbox"][name$="[closed]"]');
 
-            boxes.forEach((chk) => {
+            boxes.forEach((chk) => 
+            {
                 applyClosedState(chk);
                 chk.addEventListener('change', () => applyClosedState(chk));
             });
@@ -65,11 +77,13 @@ export default function initParkingForm(formId) {
         toggleGlobal();
     }
 
-    function initUiBindings() {
+    function initUiBindings() 
+    {
         const typeSel = $('type');
         const priceInp = $('price');
 
-        const updatePriceUi = () => {
+        const updatePriceUi = () => 
+        {
             if (!priceInp || !typeSel) return;
 
             priceInp.placeholder = parseInt(typeSel.value, 10) === 1
@@ -80,19 +94,22 @@ export default function initParkingForm(formId) {
         updatePriceUi();
         typeSel?.addEventListener('change', updatePriceUi);
 
-        $('btn-center')?.addEventListener('click', () => {
+        $('btn-center')?.addEventListener('click', () => 
+        {
             if (!marker || !map) return;
 
             map.setZoom(Math.max(map.getZoom(), 16));
             map.setCenter(marker.getPosition());
         });
 
-        $('btn-geo')?.addEventListener('click', () => {
+        $('btn-geo')?.addEventListener('click', () => 
+        {
             const isSecure = location.protocol === 'https:'
                 || location.hostname === 'localhost'
                 || location.hostname === '127.0.0.1';
 
-            if (!isSecure) {
+            if (!isSecure) 
+            {
                 Swal.fire(
                     {
                         icon: 'warning',
@@ -102,7 +119,8 @@ export default function initParkingForm(formId) {
                 return;
             }
 
-            if (!navigator.geolocation) {
+            if (!navigator.geolocation) 
+            {
                 Swal.fire(
                     {
                         icon: 'error',
@@ -115,7 +133,8 @@ export default function initParkingForm(formId) {
             const btn = $('btn-geo');
             const original = btn?.textContent || 'Usar mi ubicación';
 
-            const setBtn = (dis, text) => {
+            const setBtn = (dis, text) => 
+            {
                 if (!btn) return;
                 btn.disabled = !!dis;
                 if (text) btn.textContent = text;
@@ -132,20 +151,31 @@ export default function initParkingForm(formId) {
 
             let watchId = null;
 
-            const stop = () => {
-                if (watchId != null) {
+            const stop = () => 
+            {
+                if (watchId != null) 
+                {
                     navigator.geolocation.clearWatch(watchId);
                 }
                 setBtn(false, original);
             };
 
-            const apply = (pos, pan = false) => {
-                const { latitude, longitude, accuracy } = pos.coords || {};
+            const apply = (pos, pan = false) => 
+            {
+                const 
+                { 
+                    latitude, 
+                    longitude, 
+                    accuracy 
+                } = pos.coords || {};
 
                 if (latitude == null || longitude == null) return;
 
-                if (accuracy < best.acc) {
-                    best = { acc: accuracy, lat: latitude, lng: longitude };
+                if (accuracy < best.acc) 
+                {
+                    best = { 
+                                acc: accuracy, lat: latitude, lng: longitude 
+                            };
                     setInputs(latitude, longitude, pan);
                 }
             };
@@ -161,16 +191,20 @@ export default function initParkingForm(formId) {
             );
 
             watchId = navigator.geolocation.watchPosition(
-                (p) => {
+                (p) => 
+                {
                     apply(p, !isFinite(best.acc));
-                    if (p.coords?.accuracy <= 10) {
+                    if (p.coords?.accuracy <= 10) 
+                    {
                         stop();
                     }
                 },
-                (e) => {
+                (e) => 
+                {
                     console.warn(e);
 
-                    if (!isFinite(best.acc)) {
+                    if (!isFinite(best.acc)) 
+                    {
                         Swal.fire(
                             {
                                 icon: 'error',
@@ -188,11 +222,14 @@ export default function initParkingForm(formId) {
                 }
             );
 
-            setTimeout(() => {
-                if (isFinite(best.acc)) {
+            setTimeout(() => 
+            {
+                if (isFinite(best.acc)) 
+                {
                     setInputs(best.lat, best.lng, true);
                 }
-                else {
+                else 
+                {
                     Swal.fire(
                         {
                             icon: 'error',
@@ -206,14 +243,16 @@ export default function initParkingForm(formId) {
         });
     }
 
-    function setInputs(lat, lng, pan = false) {
+    function setInputs(lat, lng, pan = false) 
+    {
         const latInput = $('lat');
         const lngInput = $('lng');
 
         if (latInput) latInput.value = Number(lat).toFixed(6);
         if (lngInput) lngInput.value = Number(lng).toFixed(6);
 
-        if (marker) {
+        if (marker) 
+        {
             marker.setPosition(
                 {
                     lat: Number(lat),
@@ -221,7 +260,8 @@ export default function initParkingForm(formId) {
                 });
         }
 
-        if (pan && map) {
+        if (pan && map) 
+        {
             map.setCenter(
                 {
                     lat: Number(lat),
@@ -230,7 +270,8 @@ export default function initParkingForm(formId) {
         }
     }
 
-    function initGoogleMap() {
+    function initGoogleMap() 
+    {
         const mapDiv = document.getElementById(mapDivId);
         if (!mapDiv) return;
 
@@ -261,37 +302,45 @@ export default function initParkingForm(formId) {
                 draggable: true,
             });
 
-        map.addListener('click', (e) => {
+        map.addListener('click', (e) => 
+        {
             setInputs(e.latLng.lat(), e.latLng.lng(), true);
         });
 
-        marker.addEventListener('dragend', () => {
+        marker.addEventListener('dragend', () => 
+        {
             const pos = marker.getPosition();
             setInputs(pos.lat(), pos.lng(), false);
         });
 
-        const ro = new ResizeObserver(() => {
+        const ro = new ResizeObserver(() => 
+        {
             google.maps.event.trigger(map, 'resize');
         });
 
         ro.observe(mapDiv);
     }
 
-    window.__initParkingMap__ = function () {
+    window.__initParkingMap__ = function () 
+    {
         initUiBindings();
         initScheduleUi();
         initGoogleMap();
     };
 
-    const runWhenDom = () => {
-        if (window.google && window.google.maps) {
+    const runWhenDom = () => 
+    {
+        if (window.google && window.google.maps) 
+        {
             window.__initParkingMap__();
         }
     };
 
-    if (document.readyState === 'loading') {
+    if (document.readyState === 'loading') 
+    {
         document.addEventListener('DOMContentLoaded', runWhenDom, { once: true });
-    } else {
+    } else 
+    {
         runWhenDom();
     }
 

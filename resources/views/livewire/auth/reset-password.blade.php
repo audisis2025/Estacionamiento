@@ -43,17 +43,29 @@ new #[Layout('components.layouts.auth')] class extends Component {
     {
         $this->validate([
             'token'    => ['required'],
-            'email'    => ['required', 'string', 'email'],
-            'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+            'email'    => [
+                            'required', 
+                            'string', 
+                            'email'
+                        ],
+            'password' => [
+                            'required',
+                            'string',
+                            'confirmed', 
+                            Rules\Password::defaults()
+                        ],
         ]);
 
         $status = Password::reset(
-            $this->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user) {
-                $user->forceFill([
-                    'password'       => Hash::make($this->password),
-                    'remember_token' => Str::random(60),
-                ])->save();
+            $this->only(
+                            'email', 
+                            'password', 
+                            'password_confirmation', 
+                            'token'
+                        ),
+            function ($user) 
+            {
+                $user->forceFill(['password'       => Hash::make($this->password),'remember_token' => Str::random(60),])->save();
 
                 event(new PasswordReset($user));
             }
@@ -71,10 +83,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             return;
         }
 
-        $this->dispatch(
-            'password-reset-success',
-            text: __($status)
-        );
+        $this->dispatch( 'password-reset-success',text: __($status));
     }
 
     

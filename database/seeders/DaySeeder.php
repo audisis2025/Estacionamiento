@@ -7,18 +7,15 @@ use Illuminate\Database\Seeder;
 
 class DaySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $days = [
             'Lunes',
             'Martes',
-            'Miércoles', // Nota: Corregí la tilde
+            'Miércoles',
             'Jueves',
             'Viernes',
-            'Sábado',    // Nota: Corregí la tilde
+            'Sábado',
             'Domingo'
         ];
 

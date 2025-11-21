@@ -1,8 +1,16 @@
+{{--
+* Nombre de la vista           : sat-logo.blade.php
+* Descripción de la vista      : Logo del Servicio de Administración Tributaria (SAT).
+* Fecha de creación            : 04/11/2025
+* Elaboró                      : Elian Pérez
+* Fecha de liberación          : 04/11/2025
+* Autorizó                     : Angel Davila
+* Version                      : 1.0
+--}}
 @props(['class' => 'h-8 w-auto'])
 
 <svg {{ $attributes->merge(['class' => $class]) }} viewBox="0 0 1230.6145 253.76673" role="img"
     aria-label="SAT - Servicio de Administración Tributaria" xmlns="http://www.w3.org/2000/svg">
-    {{-- Versión en color oficial. Se eliminaron metadatos para aligerar. --}}
     <g transform="matrix(4.8006493,0,0,4.8006493,-73.565806,-582.31791)" fill="#231f20">
         <path d="m175.22,136.38387h-31.63334v8.52134h10.644v16.112h10.436v-16.112H175.22v-8.52134" />
         <path
@@ -21,10 +29,7 @@
             d="m112.39786,97.248007c7.2048,0 13.04587,-5.841333 13.04587,-13.046666 0,-7.204 -5.84107,-13.045333 -13.04587,-13.045333 -7.20413,0 -13.045196,5.841333 -13.045196,13.045333 0,7.205333 5.841066,13.046666 13.045196,13.046666" />
     </g>
     <g transform="matrix(3.9795634,0,0,3.9795634,251.57815,-445.94825)" fill="#231f20">
-        {{-- Tramos tipográficos en negro (paths largos). Mantengo contenido original. --}}
         <path
-            d="M17.621333,169.46361H17.3948l-0.574,-1.56054c-0.05307,-0.14626-0.6536,-0.3468-1.293734,-0.3468-0.827066,0-1.574,0.41347-1.574,1.3068 0,2.02814 4.149067,1.44107 4.149067,4.2692 0,2.1084 -2.228133,2.6948 -3.428667,2.6948 -1.601066,0 -2.441693,-0.25306 -2.93492,-0.44013l0.07968,-2.30773h0.22708l0.560427,1.5208c0.106773,0.27973 0.987467,0.5068 1.387467,0.5068 1.000533,0 1.840666,-0.44014 1.840666,-1.374 0,-1.96094 -4.148973,-1.5208 -4.148973,-4.17547 0,-2.00107 1.640627,-2.72133 3.775507,-2.72133 0.600533,0 1.4276,0.13333 2.2412,0.33333l-0.08027,2.29427" />
-        {{-- … (resto de <path> negros originales) … --}}
-        {{-- Para no hacer la respuesta kilométrica, puedes pegar aquí exactamente todos los <path> negros de tu SVG. --}}
+            d="M17.621333,169.46361H17.3948l-0.574,-1.56054c-0.05307,-0.14626-0.6536,-0.3468-1.293734,-0.3468-0.827066,0-1.57
     </g>
 </svg>

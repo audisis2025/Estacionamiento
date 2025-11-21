@@ -1,14 +1,28 @@
 <?php
-
+/*
+* Nombre de la clase         : PlanController.php
+* Descripción de la clase    : Controlador que maneja las interacciones con los planes de usuario.
+* Fecha de creación          : 03/11/2025
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 03/11/2025
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0
+* Fecha de mantenimiento     :
+* Folio de mantenimiento     :
+* Descripción del mantenimiento :
+* Responsable                :
+* Revisor                    :
+*/
 namespace App\Http\Controllers;
 
 use App\Models\Plan;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class PlanController extends Controller
 {
-    public function index()
+    public function index() : View
     {
         $plans = Plan::orderBy('type')->orderBy('price')->get();
         return view('admin.plans.index', compact('plans'));
@@ -23,7 +37,7 @@ class PlanController extends Controller
     {
         $validated = $request->validate(
             [
-                'name'           => [
+                'name'=> [
                     'required',
                     'string',
                     'max:60',
@@ -31,9 +45,21 @@ class PlanController extends Controller
                         ->where(fn($q) => $q->where('type', $request->type))
                         ->ignore($plan->id),
                 ],
-                'price'          => ['required', 'numeric', 'min:0'],
-                'duration_days'  => ['required', 'integer', 'min:1'],
-                'description'    => ['required', 'string', 'max:255'],
+                'price' => [
+                    'required', 
+                    'numeric', 
+                    'min:0'
+                ],
+                'duration_days' => [
+                    'required', 
+                    'integer', 
+                    'min:1'
+                ],
+                'description' => [
+                    'required',
+                    'string',
+                    'max:255'
+                ],
             ]
         );
 

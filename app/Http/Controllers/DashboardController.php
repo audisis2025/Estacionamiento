@@ -1,44 +1,63 @@
 <?php
+/*
+* Nombre de la clase         : DashboardController.php
+* Descripción de la clase    : Controlador que maneja el dashboard administrativo.
+* Fecha de creación          : 05/11/2025
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 05/11/2025
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
+*/
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function __invoke()
+    public function __invoke(): View
     {
         $today = Carbon::today();
 
-        // Planes activos (Parking)
         $activeParking = User::query()
             ->whereNotNull('id_plan')
-            ->whereDate('end_date', '>=', $today)
-            ->whereHas('plan', fn($q) => $q->where('type', 'parking'))
+            ->whereDate(
+                'end_date',
+                '>=',
+                $today
+            )
+            ->whereHas('plan', fn ($query) => $query->where('type', 'parking'))
             ->count();
 
-        // Planes activos (Usuario)
         $activeUser = User::query()
             ->whereNotNull('id_plan')
-            ->whereDate('end_date', '>=', $today)
-            ->whereHas('plan', fn($q) => $q->where('type', 'user'))
+            ->whereDate(
+                'end_date',
+                '>=',
+                $today
+            )
+            ->whereHas('plan', fn ($query) => $query->where('type', 'user'))
             ->count();
 
-        // Ingresos acumulados (desde el admin con teléfono 777...)
-        $admin = User::where('phone_number', '7777777777')->first();
+        $admin = User::where('phone_number','7777777777')->first();
+
         $totalRevenue = (float) optional($admin)->amount ?? 0.0;
 
-        // Ingreso del mes actual (si tienes tabla de pagos, reemplaza este bloque)
-        // Si aún no la tienes, mostramos 0.00 y luego te digo cómo agregarla.
         $monthRevenue = 0.00;
 
         return view('admin.admin-dashboard', compact(
-            'activeParking',
-            'activeUser',
-            'totalRevenue',
-            'monthRevenue'
-        ));
+                                                        'activeParking',
+                                                        'activeUser',
+                                                        'totalRevenue',
+                                                        'monthRevenue'
+                                                    )
+        );
     }
 }

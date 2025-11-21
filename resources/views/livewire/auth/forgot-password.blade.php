@@ -26,10 +26,13 @@ new #[Layout('components.layouts.auth')] class extends Component
 
     public function sendPasswordResetLink(): void
     {
-        $this->validate([
-            'email' => ['required', 'string', 'email'],
-        ]);
-
+        $this->validate(['email' => [
+                                        'required', 
+                                        'string', 
+                                        'email'
+                                    ],
+                        ]);
+    
         $status = Password::sendResetLink($this->only('email'));
 
         if ($status === Password::RESET_LINK_SENT)

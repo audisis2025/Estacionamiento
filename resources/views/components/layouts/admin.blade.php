@@ -1,3 +1,24 @@
+{{--
+* Nombre de la vista           : admin.blade.php
+* Descripción de la vista      : Layout que utiliza la aplicación para las vistas del admin.
+* Fecha de creación            : 05/10/2025
+* Elaboró                      : Elian Pérez
+* Fecha de liberación          : 06/10/2025
+* Autorizó                     : Angel Davila
+* Version                      : 2.0
+* Fecha de mantenimiento       : 03/11/2025
+* Folio de mantenimiento       :
+* Tipo de mantenimiento        : Correctivo
+* Descripción del mantenimiento: Se agregaron las opciones del usuario al menu lateral.
+* Responsable                  : Elian Pérez
+* Revisor                      : Angel Dávila
+* Fecha de mantenimiento       : 16/11/2025
+* Folio de mantenimiento       : 
+* Tipo de mantenimiento        : Correctivo
+* Descripción del mantenimiento: Se implementaron cambios según el manual de programación.
+* Responsable                  : Elian Pérez
+* Revisor                      : Angel Dávila   
+--}}
 @props(['title' => 'Parking'])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
