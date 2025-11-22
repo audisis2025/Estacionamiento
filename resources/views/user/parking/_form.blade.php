@@ -59,10 +59,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <flux:field class="w-full">
-                <flux:label
-                    for="{{ $formId }}-type"
-                    class="text-sm font-medium text-black dark:text-white"
-                >
+                <flux:label for="{{ $formId }}-type" class="text-sm font-medium text-black dark:text-white">
                     Tipo de estacionamiento
                 </flux:label>
 
@@ -72,24 +69,47 @@
                     name="type"
                     id="{{ $formId }}-type"
                     class="mt-1 block w-full rounded-md border border-zinc-200 dark:border-zinc-700 p-2 text-sm
-                           bg-white dark:bg-zinc-900 text-black dark:text-white focus:outline-none
-                           focus:ring-2 focus:ring-custom-blue focus:border-custom-blue"
-                >
-                    <option value="0" {{ $type === 0 ? 'selected' : '' }}>Tiempo libre</option>
-                    <option value="1" {{ $type === 1 ? 'selected' : '' }}>Precio por hora</option>
+                        bg-white dark:bg-zinc-900 text-black dark:text-white focus:outline-none
+                        focus:ring-2 focus:ring-custom-blue focus:border-custom-blue">
+                    <option value="0" {{ $type === 0 ? 'selected' : '' }}>Tiempo libre (tarifa fija)</option>
+                    <option value="1" {{ $type === 1 ? 'selected' : '' }}>Por hora</option>
+                    <option value="2" {{ $type === 2 ? 'selected' : '' }}>Mixto (hora + fija)</option>
                 </select>
             </flux:field>
 
             <flux:input
-                name="price"
-                id="{{ $formId }}-price"
+                name="price_hour"
+                id="{{ $formId }}-price-hour"
                 type="number"
                 step="0.01"
                 min="0"
-                :label="__('Precio')"
-                placeholder="{{ $type === 1 ? 'Ej. 25.00 (por hora)' : 'Ej. 50.00 (tarifa fija)' }}"
-                value="{{ old('price', $parking->price ?? '') }}"
+                :label="__('Precio por hora')"
+                placeholder="Ej. 25.00"
+                value="{{ old('price_hour', ($type === 1 || $type === 2) ? ($parking->price ?? '') : '') }}"
             />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <flux:input
+                name="price_flat"
+                id="{{ $formId }}-price-flat"
+                type="number"
+                step="0.01"
+                min="0"
+                :label="__('Precio fijo (tiempo libre)')"
+                placeholder="Ej. 50.00"
+                value="{{ old('price_flat', ($type === 0 || $type === 2) ? ($parking->price_flat ?? '') : '') }}"
+            />
+
+            <div class="text-sm text-zinc-500 dark:text-zinc-400 flex items-end">
+                <span id="{{ $formId }}-price-hint">
+                    @switch($type)
+                        @case(0) La tarifa usada será la fija (tiempo libre). @break
+                        @case(1) La tarifa usada será por hora. @break
+                        @case(2) En mixto se usan ambas: por hora al calcular y fija cuando aplique. @break
+                    @endswitch
+                </span>
+            </div>
         </div>
 
         <div class="flex justify-center-safe flex-wrap gap-3 ">
@@ -238,6 +258,68 @@
 
 @push('scripts')
     <script>
+        (function () 
+        {
+            const id = @json($formId);
+            const $ = (s) => document.getElementById(`${id}-${s}`);
+
+            function togglePrices() 
+            {
+                const t = parseInt($('type')?.value ?? '0', 10);
+
+                const priceHourInput = $('price-hour');
+                const priceFlatInput = $('price-flat');
+
+                const priceHourWrapper = priceHourInput ? priceHourInput.closest('div') : null;
+                const priceFlatWrapper = priceFlatInput ? priceFlatInput.closest('div') : null;
+
+                if (t === 0) 
+                {
+                    priceHourInput?.removeAttribute('required');
+                    priceFlatInput?.setAttribute('required', 'required');
+
+                    priceHourWrapper?.classList.add('hidden');
+                    priceFlatWrapper?.classList.remove('hidden');
+                } else if (t === 1) 
+                {
+                    priceHourInput?.setAttribute('required', 'required');
+                    priceFlatInput?.removeAttribute('required');
+
+                    priceHourWrapper?.classList.remove('hidden');
+                    priceFlatWrapper?.classList.add('hidden');
+                } else 
+                {
+                    priceHourInput?.setAttribute('required', 'required');
+                    priceFlatInput?.setAttribute('required', 'required');
+
+                    priceHourWrapper?.classList.remove('hidden');
+                    priceFlatWrapper?.classList.remove('hidden');
+                }
+
+                const hint = $('price-hint');
+                if (hint) 
+                {
+                    hint.textContent = t === 0 ? 'La tarifa usada será la fija (tiempo libre).' : t === 1 ? 'La tarifa usada será por hora.' :'En mixto se usan ambas: por hora y fija.';
+                }
+            }
+
+            function run()
+            {
+                $('type')?.addEventListener('change', togglePrices);
+                togglePrices();
+            }
+
+            if (document.readyState === 'loading') 
+            {
+                document.addEventListener('DOMContentLoaded', run, { once: true });
+            } else 
+            {
+                run();
+            }
+        })();
+    </script>
+
+    <script>
         window.runParkingForm = () => window.initParkingForm(@json($formId));
 
         document.addEventListener("DOMContentLoaded", window.runParkingForm);
@@ -252,7 +334,7 @@
 
     @if ($errors->any())
         <script>
-            document.addEventListener('DOMContentLoaded', () =>
+            document.addEventListener('DOMContentLoaded', () => 
             {
                 let errorList = `
                     <ul style="text-align:left; margin-left:20px;">

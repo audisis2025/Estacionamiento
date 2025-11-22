@@ -16,8 +16,9 @@ return new class extends Migration
             $table->string('name', 30);                         // not null
             $table->float('latitude_coordinate');               // not null
             $table->float('longitude_coordinate');              // not null
-            $table->boolean('type');                            // not null
-            $table->float('price');                             // not null
+            $table->tinyInteger('type');                       // not null
+            $table->float('price');  
+            $table->float('price_flat')->nullable();                           // not null
             $table->unsignedBigInteger('id_user')->nullable();  // FK a users
 
             $table->foreign('id_user')->references('id')->on('users');

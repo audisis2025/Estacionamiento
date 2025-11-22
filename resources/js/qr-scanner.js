@@ -100,6 +100,7 @@ export default function initQrScanner(routeUrl, csrfTok)
 
                         if (evt === 'entry' || evt === 'exit')
                         {
+                            
                             Swal.fire(
                             {
                                 icon             : 'success',

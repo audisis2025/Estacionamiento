@@ -16,6 +16,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateNotificationTokenRequest;
+use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +25,11 @@ use Illuminate\View\View;
 
 class UserDashboardController extends Controller
 {
+    public function __construct(private UserService $service)
+    {
+
+    }
+
     public function index(Request $request): View
     {
         $user = auth()->user();
@@ -144,6 +151,34 @@ class UserDashboardController extends Controller
             'kpis'         => $kpis,
             'hasParking'   => true,
             'readersCount' => $parking->qrReaders()->count(),
+        ]);
+    }
+
+    //Se agrego esto 
+    // public function updateNotificationToken(int $id, UpdateNotificationTokenRequest $request)
+    // {
+    //     $response = $this->service->updateNotificationToken($id, $request->validated());
+    // }
+
+    public function updateNotificationToken(Request $request)
+    {
+        $request->validate(['notification_token' => ['required', 'string'],]);
+
+        $user = $request->user();
+
+        $token = $request->input('notification_token');
+
+        \App\Models\User::where('notification_token', $token)
+            ->where('id', '!=', $user->id)
+            ->update(['notification_token' => null]);
+
+        $user->update([
+            'notification_token' => $token,
+        ]);
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Notification token actualizado.',
         ]);
     }
 }

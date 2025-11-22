@@ -19,13 +19,15 @@ class Parking extends Model
         'longitude_coordinate',
         'type',
         'price',
+        'price_flat',
     ];
 
     protected $casts = [
-        'latitude_coordinate'  => 'float',
+        'latitude_coordinate' => 'float',
         'longitude_coordinate' => 'float',
-        'type'                 => 'integer',
-        'price'                => 'float',
+        'type' => 'integer',
+        'price' => 'float',
+        'price_flat' => 'float',
     ];
 
     public function user(): BelongsTo

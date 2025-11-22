@@ -5,10 +5,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PlanApiController;
 use App\Http\Controllers\Api\PayPalApiController;
 use App\Http\Controllers\Api\BalanceApiController;
+use App\Http\Controllers\Api\FirebaseApiController;
 use App\Http\Controllers\Api\ParkingApiController;
 use App\Http\Controllers\Api\ParkingClientApiController;
 use App\Http\Controllers\Api\PaymentApiController;
 use App\Http\Controllers\Api\RegisterProviderApiController;
+use App\Http\Controllers\UserDashboardController;
 
 Route::prefix('auth')->group(
     function () {
@@ -45,3 +47,17 @@ Route::prefix('parkings')->group(function () {
 });
 
 Route::post('/auth/register-provider', [RegisterProviderApiController::class, 'registerProvider']);
+
+//cambiar controlador
+// Route::put('/users/notification_token/{id}', [UserDashboardController::class, 'updateNotificationToken']);
+
+Route::middleware('auth:sanctum')->put(
+    '/user/notification-token',
+    [UserDashboardController::class, 'updateNotificationToken']
+);
+
+Route::middleware('auth:sanctum')->group(function()
+{
+    Route::post('/firebase-notification/send/notification', [FirebaseApiController::class, 'send']);
+}
+);

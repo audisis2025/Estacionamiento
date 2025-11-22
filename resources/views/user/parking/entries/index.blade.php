@@ -23,11 +23,21 @@
         @php $parking = auth()->user()->parking; @endphp
         <p class="text-sm text-black/60 dark:text-white/60">
             Tipo de cobro:
-            @if ($parking->type === 1)
-                Por hora — ${{ number_format($parking->price, 2) }} / hora
-            @else
-                Tarifa fija — ${{ number_format($parking->price, 2) }}
-            @endif
+            @switch((int) $parking->type)
+                @case(0)
+                    Tiempo libre — ${{ number_format($parking->price_flat ?? $parking->price, 2) }}
+                    @break
+
+                @case(1)
+                    Por hora — ${{ number_format($parking->price, 2) }} / hora
+                    @break
+
+                @case(2)
+                    Mixto —
+                    Hora: ${{ number_format($parking->price, 2) }} / hora,
+                    Fija: ${{ number_format($parking->price_flat ?? $parking->price, 2) }}
+                    @break
+            @endswitch
         </p>
 
         <form method="GET" class="flex flex-wrap gap-3 items-end">
@@ -136,12 +146,13 @@
     <script>
         (function ()
         {
+            const parkingType = {{ (int) (auth()->user()->parking->type ?? 0) }};
+
             function bindReleaseForms()
             {
                 document.querySelectorAll('.form-release').forEach((form) =>
                 {
-                    if (form.dataset.bound === '1')
-                    {
+                    if (form.dataset.bound === '1') {
                         return;
                     }
 
@@ -151,22 +162,58 @@
                     {
                         e.preventDefault();
 
-                        const result = await Swal.fire(
-                        {
-                            title: '¿Liberar salida?',
-                            text: 'Se calculará automáticamente el monto según el tiempo y la tarifa.',
-                            icon: 'warning',
+                        if (parkingType === 0 || parkingType === 1) {
+                            const result = await Swal.fire({
+                                title: '¿Liberar salida?',
+                                text: 'Se calculará automáticamente el monto según el tiempo y la tarifa.',
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonText: 'Sí, liberar',
+                                cancelButtonText: 'Cancelar',
+                                confirmButtonColor: '#3182ce',
+                                cancelButtonColor: '#EE0000',
+                            });
+
+                            if (!result.isConfirmed) {
+                                return;
+                            }
+
+                            form.submit();
+                            return;
+                        }
+
+                        const modeResult = await Swal.fire({
+                            title: '¿Cómo deseas cobrar la salida?',
+                            text: 'Selecciona el tipo de cobro que aplicarás al cliente.',
+                            icon: 'question',
                             showCancelButton: true,
-                            confirmButtonText: 'Sí, liberar',
+                            showDenyButton: true,
+                            confirmButtonText: 'Por hora',
+                            denyButtonText: 'Tiempo libre',
                             cancelButtonText: 'Cancelar',
-                            confirmButtonColor: '#3182ce', 
-                            cancelButtonColor: '#EE0000',
+                            confirmButtonColor: '#2563EB',
+                            denyButtonColor: '#16A34A',
                         });
 
-                        if (result.isConfirmed)
-                        {
-                            form.submit();
+                        if (!modeResult.isConfirmed && !modeResult.isDenied) {
+                            return;
                         }
+
+                        let mode = 'hour'; 
+                        if (modeResult.isDenied) {
+                            mode = 'flat';
+                        }
+
+                        let modeInput = form.querySelector('input[name="billing_mode"]');
+                        if (!modeInput) {
+                            modeInput = document.createElement('input');
+                            modeInput.type = 'hidden';
+                            modeInput.name = 'billing_mode';
+                            form.appendChild(modeInput);
+                        }
+                        modeInput.value = mode;
+
+                        form.submit();
                     });
                 });
             }
@@ -175,8 +222,7 @@
             document.addEventListener('livewire:navigated', bindReleaseForms);
 
             @if (session('ok'))
-                Swal.fire(
-                {
+                Swal.fire({
                     icon: 'success',
                     title: '¡Éxito!',
                     text: "{{ session('ok') }}",
@@ -184,8 +230,7 @@
             @endif
 
             @if (session('error'))
-                Swal.fire(
-                {
+                Swal.fire({
                     icon: 'error',
                     title: 'Error',
                     text: "{{ session('error') }}",

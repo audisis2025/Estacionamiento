@@ -23,6 +23,7 @@ class User extends Authenticatable
         'end_date',
         'amount',
         'id_role',
+        'notification_token'
     ];
 
     protected $hidden = [

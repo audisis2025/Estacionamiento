@@ -15,6 +15,7 @@ namespace App\Http\Controllers;
 use App\Models\QrReader;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Services\FirebaseService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +24,9 @@ use Illuminate\View\View;
 
 class ScanController extends Controller
 {
+    public function __construct(private FirebaseService $firebase)
+    {
+    }
 
     public function form(QrReader $reader): View
     {
@@ -35,7 +39,9 @@ class ScanController extends Controller
     {
         $this->ensureOwnership($reader);
 
-        $data = $request->validate(['qr' => ['required','string',],]);
+        $data = $request->validate([
+            'qr' => ['required', 'string'],
+        ]);
 
         $raw = trim($data['qr']);
         $raw = preg_replace(
@@ -46,32 +52,51 @@ class ScanController extends Controller
 
         $payload = json_decode($raw, true);
 
-        if (!is_array($payload) || !isset($payload['id'], $payload['fechaHora']))
-        {
+        if (! is_array($payload) || ! isset($payload['id'], $payload['fechaHora'])) {
+            // QR mal formado: no sabemos quién es el usuario → no hay push
             return $this->fail('QR inválido.');
         }
 
-        try
-        {
+        // Intentamos cargar al usuario desde aquí para poder notificar en errores tempranos
+        $user = User::find($payload['id']); // Puede ser null, notifyUser lo maneja
+
+        try {
             $qrTime = Carbon::parse($payload['fechaHora']);
-        }catch (\Throwable)
-        {
+        } catch (\Throwable) {
+            // Fecha/hora inválida en el QR → si el usuario existe y tiene token, se notifica
+            $this->notifyUser(
+                $user,
+                'Parking+',
+                'Fecha/hora inválida en el código QR.',
+                [
+                    'event' => 'qr_error',
+                    'code'  => 'date_invalid',
+                ]
+            );
+
             return $this->fail('Fecha/hora inválida en el QR.');
         }
 
-        if ($qrTime->diffInSeconds(now()) > 15)
-        {
+        if ($qrTime->diffInSeconds(now()) > 15) {
+            // QR expirado → también notificamos si es posible
+            $this->notifyUser(
+                $user,
+                'Parking+',
+                'QR expirado. Vuelve a generar el código en la app (15s).',
+                [
+                    'event' => 'qr_error',
+                    'code'  => 'expired',
+                ]
+            );
+
             return $this->fail('QR expirado. Vuelve a generar el código (15s).');
         }
 
-        $user = User::find($payload['id']);
-
-        if (!$user)
-        {
+        if (! $user) {
             return $this->fail('Usuario no encontrado.');
         }
 
-        $parking = auth()->user()->parking;
+        $parking   = auth()->user()->parking;
         $readerIds = $parking->qrReaders()->pluck('id');
 
         $openTx = Transaction::where('id_user', $user->id)
@@ -80,26 +105,46 @@ class ScanController extends Controller
             ->latest('id')
             ->first();
 
-        if ($reader->sense === 1 && !$openTx)
-        {
+        // Lector de salida pero no hay entrada abierta
+        if ($reader->sense === 1 && ! $openTx) {
+            $this->notifyUser(
+                $user,
+                'Parking+',
+                'Este lector es de salida y no tienes una entrada abierta.',
+                [
+                    'event' => 'error',
+                    'code'  => 'no_open_entry',
+                ]
+            );
+
             return $this->fail('Este lector es de salida y el usuario no tiene entrada abierta.');
         }
 
-        if ($reader->sense === 0 && $openTx)
-        {
+        // Lector de entrada pero ya tiene estancia abierta
+        if ($reader->sense === 0 && $openTx) {
+            $this->notifyUser(
+                $user,
+                'Parking+',
+                'Este lector es de entrada y ya tienes una estancia abierta.',
+                [
+                    'event' => 'error',
+                    'code'  => 'already_open_entry',
+                ]
+            );
+
             return $this->fail('Este lector es de entrada y el usuario ya tiene una estancia abierta.');
         }
 
-        if (!$openTx)
-        {
+        // No hay estancia abierta → registrar ENTRADA
+        if (! $openTx) {
             $recentEntry = Transaction::where('id_user', $user->id)
                 ->whereNull('departure_date')
                 ->whereIn('id_qr_reader', $readerIds)
                 ->where('entry_date', '>=', now()->subSeconds(3))
                 ->exists();
 
-            if ($recentEntry)
-            {
+            if ($recentEntry) {
+                // Evento silencioso, no se notifica
                 return $this->silent('recent_entry');
             }
 
@@ -108,8 +153,12 @@ class ScanController extends Controller
                 ->latest('id')
                 ->first();
 
-            if ($lastTx&& $lastTx->departure_date&& $lastTx->departure_date->diffInSeconds(now()) < 5)
-            {
+            if (
+                $lastTx &&
+                $lastTx->departure_date &&
+                $lastTx->departure_date->diffInSeconds(now()) < 5
+            ) {
+                // También silencioso
                 return $this->silent('post_exit_bounce');
             }
 
@@ -121,6 +170,17 @@ class ScanController extends Controller
                 'id_user'        => $user->id,
             ]);
 
+            // Notificación de entrada registrada
+            $this->notifyUser(
+                $user,
+                'Parking+',
+                'Entrada registrada correctamente.',
+                [
+                    'event' => 'entry',
+                    'tx_id' => (string) $tx->id,
+                ]
+            );
+
             return $this->ok('Entrada registrada', [
                 'event'          => 'entry',
                 'transaction_id' => $tx->id,
@@ -128,8 +188,9 @@ class ScanController extends Controller
             ]);
         }
 
-        if ($openTx->entry_date->diffInSeconds(now()) < 5)
-        {
+        // Hay estancia abierta → registrar SALIDA
+        if ($openTx->entry_date->diffInSeconds(now()) < 5) {
+            // Silencioso
             return $this->silent('too_soon_after_entry');
         }
 
@@ -141,41 +202,68 @@ class ScanController extends Controller
             $minutes
         );
 
-        if (!$user->hasEnoughBalance($charge))
-        {
+        if (! $user->hasEnoughBalance($charge)) {
+            // Notificación de saldo insuficiente
+            $this->notifyUser(
+                $user,
+                'Parking+',
+                'Saldo insuficiente para completar el pago.',
+                [
+                    'event'  => 'no_funds',
+                    'charge' => (string) $charge,
+                ]
+            );
+
             return $this->fail('Saldo insuficiente para completar el pago.');
         }
 
-        try
-        {
-            DB::transaction(
-                function () use ($user, $charge, $openTx, $reader)
-                {
-                    $affected = User::whereKey($user->id)
-                        ->where('amount', '>=', $charge)
-                        ->decrement('amount', $charge);
+        try {
+            DB::transaction(function () use ($user, $charge, $openTx, $reader) {
+                $affected = User::whereKey($user->id)
+                    ->where('amount', '>=', $charge)
+                    ->decrement('amount', $charge);
 
-                    if ($affected !== 1)
-                    {
-                        throw new \RuntimeException('NO_FUNDS');
-                    }
-
-                    $openTx->update([
-                        'amount'         => (int) round($charge),
-                        'departure_date' => now(),
-                        'id_qr_reader'   => $reader->id,
-                    ]);
+                if ($affected !== 1) {
+                    throw new \RuntimeException('NO_FUNDS');
                 }
-            );
-        } catch (\RuntimeException $exception)
-        {
-            if ($exception->getMessage() === 'NO_FUNDS')
-            {
+
+                $openTx->update([
+                    'amount'         => (int) round($charge),
+                    'departure_date' => now(),
+                    'id_qr_reader'   => $reader->id,
+                ]);
+            });
+        } catch (\RuntimeException $exception) {
+            if ($exception->getMessage() === 'NO_FUNDS') {
+                // También notificación de saldo insuficiente
+                $this->notifyUser(
+                    $user,
+                    'Parking+',
+                    'Saldo insuficiente para completar el pago.',
+                    [
+                        'event'  => 'no_funds',
+                        'charge' => (string) $charge,
+                    ]
+                );
+
                 return $this->fail('Saldo insuficiente para completar el pago.');
             }
 
             throw $exception;
         }
+
+        // Notificación de salida registrada, incluyendo el monto cobrado
+        $this->notifyUser(
+            $user,
+            'Parking+',
+            'Salida registrada. Monto cobrado: $' . number_format($charge, 2),
+            [
+                'event'   => 'exit',
+                'tx_id'   => (string) $openTx->id,
+                'charged' => (string) $charge,
+                'minutes' => (string) $minutes,
+            ]
+        );
 
         return $this->ok('Salida registrada', [
             'event'          => 'exit',
@@ -191,11 +279,12 @@ class ScanController extends Controller
 
         $authorized = $parking && $reader->id_parking === $parking->id;
 
-        if (!$authorized)
-        {
-            if (request()->expectsJson())
-            {
-                abort(response()->json(['ok' => false,'message' => 'No autorizado.',], 403));
+        if (! $authorized) {
+            if (request()->expectsJson()) {
+                abort(response()->json([
+                    'ok'      => false,
+                    'message' => 'No autorizado.',
+                ], 403));
             }
 
             abort(403, 'No autorizado.');
@@ -208,27 +297,24 @@ class ScanController extends Controller
 
         $minutes = max(1, $minutes);
 
-        $raw = ((int) $parking->type === 0) ? $base : $base * (int) ceil($minutes / 60);
+        $raw = ((int) $parking->type === 0)
+            ? $base
+            : $base * (int) ceil($minutes / 60);
 
         $uct = $user->activeUserClientTypeForParking((int) $parking->id);
 
-        if (!$uct || !$uct->clientType)
-        {
+        if (! $uct || ! $uct->clientType) {
             return (int) $raw;
         }
 
-        $ct = $uct->clientType;
+        $ct         = $uct->clientType;
         $discounted = $raw;
 
-        if ((int) $ct->discount_type === 0)
-        {
-            $pct = min(100.0, max(0.0, (float) $ct->amount));
-
-            $discounted = $raw - round( $raw * ($pct / 100), 2);
-        } elseif ((int) $ct->discount_type === 1)
-        {
-            $fixed = max( 0.0, (float) $ct->amount);
-
+        if ((int) $ct->discount_type === 0) {
+            $pct        = min(100.0, max(0.0, (float) $ct->amount));
+            $discounted = $raw - round($raw * ($pct / 100), 2);
+        } elseif ((int) $ct->discount_type === 1) {
+            $fixed      = max(0.0, (float) $ct->amount);
             $discounted = $raw - $fixed;
         }
 
@@ -252,8 +338,29 @@ class ScanController extends Controller
             'reason' => $reason,
         ]);
     }
+
     private function fail(string $msg, int $code = 422): JsonResponse
     {
-        return response()->json(['ok' => false, 'message' => $msg,], $code);
+        return response()->json([
+            'ok'      => false,
+            'message' => $msg,
+        ], $code);
+    }
+
+    /**
+     * Envía una notificación push al usuario (si tiene notification_token).
+     */
+    private function notifyUser(?User $user, string $title, string $body, array $data = []): void
+    {
+        if (! $user || empty($user->notification_token)) {
+            return;
+        }
+
+        $this->firebase->sendNotification(
+            $user->notification_token,
+            $title,
+            $body,
+            $data
+        );
     }
 }

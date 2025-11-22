@@ -50,12 +50,13 @@ class ParkingController extends Controller
         $this->validateSchedules($request);
 
         $parking = Parking::create([
-            'id_user'              => Auth::id(),
-            'name'                 => $data['name'],
-            'latitude_coordinate'  => $data['lat'],
+            'id_user' => Auth::id(),
+            'name' => $data['name'],
+            'latitude_coordinate' => $data['lat'],
             'longitude_coordinate' => $data['lng'],
-            'type'                 => (int) $data['type'],
-            'price'                => $data['price'] ?? 0,
+            'type' => (int) $data['type'],
+            'price' => (int)$data['type'] === 0 ? ($data['price_flat'] ?? 0) : ($data['price_hour'] ?? 0),
+            'price_flat' => $data['price_flat'] ?? null,
         ]);
 
         $this->saveSchedules($parking, $request);
@@ -100,7 +101,8 @@ class ParkingController extends Controller
             'latitude_coordinate'  => $data['lat'],
             'longitude_coordinate' => $data['lng'],
             'type'                 => (int) $data['type'],
-            'price'                => $data['price'] ?? 0,
+            'price'                => (int)$data['type'] === 0 ? ($data['price_flat'] ?? 0) : ($data['price_hour'] ?? 0),
+            'price_flat'           => $data['price_flat'] ?? null,
         ]);
 
         $this->saveSchedules($parking, $request);
@@ -113,35 +115,55 @@ class ParkingController extends Controller
     }
 
     protected function validateParking(Request $request): array
-    {
-        return $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:30',
-            ],
-            'lat' => [
-                'required',
-                'numeric',
-                'between:-90,90',
-            ],
-            'lng' => [
-                'required',
-                'numeric',
-                'between:-180,180',
-            ],
-            'type' => [
-                'required',
-                'integer',
-                'in:0,1',
-            ],
-            'price' => [
-                'required',
-                'numeric',
-                'min:0',
-            ],
-        ]);
-    }
+{
+    return $request->validate([
+        'name' => [
+            'required',
+            'string',
+            'max:30'
+        ],
+        'lat' => [
+            'required',
+            'numeric',
+            'between:-90,90'
+        ],
+        'lng' => [
+            'required',
+            'numeric',
+            'between:-180,180'
+        ],
+
+        'type'  => [
+            'required',
+            'integer',
+            'in:0,1,2'
+        ],
+
+        'price_hour' => [
+            'required_if:type,1,2',
+            'nullable',
+            'numeric',
+            'min:0'
+        ],
+        'price_flat' => 
+        [
+            'required_if:type,0,2',
+            'nullable',
+            'numeric',
+            'min:0'
+        ],
+    ], [
+        'required' => 'El campo :attribute es obligatorio.',
+        'required_if' => 'El campo :attribute es obligatorio para el tipo seleccionado.',
+        'numeric' => 'El campo :attribute debe ser numérico.',
+        'min' => 'El campo :attribute debe ser mayor o igual a 0.',
+        'in'  => 'Tipo de estacionamiento inválido.',
+    ], [
+        'price_hour' => 'precio por hora',
+        'price_flat' => 'precio fijo',
+    ]);
+}
+
 
     protected function saveSchedules(Parking $parking, Request $request): RedirectResponse|null
     {
