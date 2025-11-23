@@ -94,34 +94,39 @@ export default function initQrScanner(routeUrl, csrfTok)
                         result.textContent = JSON.stringify(json, null, 2);
                     }
 
-                    if (res.ok && json.ok && ! json.silent)
+                    if (res.ok && json.ok && ! json.silent) 
                     {
                         const evt = json?.data?.event;
 
-                        if (evt === 'entry' || evt === 'exit')
+                        if (evt === 'entry' || evt === 'exit') 
                         {
-                            
+                            Swal.fire({
+                                icon : 'success',
+                                title : json.message || (evt === 'entry' ? 'Entrada registrada' : 'Salida registrada'),
+                                timer : 2000,
+                                showConfirmButton: false,
+                            });
+                        } else if (evt === 'entry_pending') 
+                        {
                             Swal.fire(
                             {
-                                icon             : 'success',
-                                title            : json.message || (evt === 'entry'
-                                                    ? 'Entrada registrada'
-                                                    : 'Salida registrada'),
-                                timer            : 2000,
+                                icon: 'info',
+                                title: 'Entrada pendiente',
+                                text: 'El usuario debe confirmar en la app si pagará por hora o por tiempo libre.',
+                                timer: 4000,
                                 showConfirmButton: false,
                             });
                         }
                     }
 
+
                     if (! res.ok || (json && json.ok === false))
                     {
                         Swal.fire(
                         {
-                            icon             : 'error',
-                            title            : (json && json.message)
-                                                ? json.message
-                                                : `Error ${res.status}`,
-                            timer            : 3000,
+                            icon : 'error',
+                            title : (json && json.message) ? json.message : `Error ${res.status}`,
+                            timer : 3000,
                             showConfirmButton: false,
                         });
                     }

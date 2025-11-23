@@ -152,7 +152,8 @@
             {
                 document.querySelectorAll('.form-release').forEach((form) =>
                 {
-                    if (form.dataset.bound === '1') {
+                    if (form.dataset.bound === '1') 
+                    {
                         return;
                     }
 
@@ -162,8 +163,10 @@
                     {
                         e.preventDefault();
 
-                        if (parkingType === 0 || parkingType === 1) {
-                            const result = await Swal.fire({
+                        if (parkingType === 0 || parkingType === 1) 
+                        {
+                            const result = await Swal.fire(
+                            {
                                 title: '¿Liberar salida?',
                                 text: 'Se calculará automáticamente el monto según el tiempo y la tarifa.',
                                 icon: 'warning',
@@ -174,7 +177,8 @@
                                 cancelButtonColor: '#EE0000',
                             });
 
-                            if (!result.isConfirmed) {
+                            if (!result.isConfirmed) 
+                            {
                                 return;
                             }
 
@@ -182,7 +186,8 @@
                             return;
                         }
 
-                        const modeResult = await Swal.fire({
+                        const modeResult = await Swal.fire(
+                        {
                             title: '¿Cómo deseas cobrar la salida?',
                             text: 'Selecciona el tipo de cobro que aplicarás al cliente.',
                             icon: 'question',
@@ -195,17 +200,20 @@
                             denyButtonColor: '#16A34A',
                         });
 
-                        if (!modeResult.isConfirmed && !modeResult.isDenied) {
+                        if (!modeResult.isConfirmed && !modeResult.isDenied) 
+                        {
                             return;
                         }
 
                         let mode = 'hour'; 
-                        if (modeResult.isDenied) {
+                        if (modeResult.isDenied) 
+                        {
                             mode = 'flat';
                         }
 
                         let modeInput = form.querySelector('input[name="billing_mode"]');
-                        if (!modeInput) {
+                        if (!modeInput) 
+                        {
                             modeInput = document.createElement('input');
                             modeInput.type = 'hidden';
                             modeInput.name = 'billing_mode';
@@ -222,7 +230,8 @@
             document.addEventListener('livewire:navigated', bindReleaseForms);
 
             @if (session('ok'))
-                Swal.fire({
+                Swal.fire(
+                {
                     icon: 'success',
                     title: '¡Éxito!',
                     text: "{{ session('ok') }}",
@@ -230,7 +239,8 @@
             @endif
 
             @if (session('error'))
-                Swal.fire({
+                Swal.fire(
+                {
                     icon: 'error',
                     title: 'Error',
                     text: "{{ session('error') }}",

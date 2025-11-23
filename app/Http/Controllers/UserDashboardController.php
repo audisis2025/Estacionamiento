@@ -120,7 +120,7 @@ class UserDashboardController extends Controller
             ->get();
 
         $kpis = [
-            'revenue' => (int) DB::table('transactions')
+            'revenue' => DB::table('transactions')
                 ->whereIn('id_qr_reader', $readerIds)
                 ->whereBetween('entry_date', [$from, $to])
                 ->sum('amount'),

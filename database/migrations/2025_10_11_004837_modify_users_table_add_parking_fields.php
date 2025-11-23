@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             // Tus columnas
             $table->dateTime('end_date')->nullable()->after('password');
-            $table->float('amount')->default(0)->after('end_date');
+            $table->decimal('amount', 10, 2)->nullable()->default(0)->after('end_date');
             $table->string('phone_number', 10)->unique()->after('amount');
             $table->string('notification_token', 255)->nullable();
             // Foreign keys (tipos compatibles con INT en roles/plans)

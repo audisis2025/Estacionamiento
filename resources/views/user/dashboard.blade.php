@@ -57,7 +57,7 @@
 
     <div class="max-w-6xl mx-auto p-6 space-y-8">
 
-        <form method="GET" class="flex items-center">
+         <form method="GET" class="flex items-center">
             <flux:field variant="inline" class="items-center gap-3">
                 <flux:label
                     for="range"
@@ -66,35 +66,34 @@
                     Rango:
                 </flux:label>
 
-                <select
+                <flux:select
                     id="range"
                     name="range"
-                    class="text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900
-                           text-black dark:text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-custom-blue focus:border-custom-blue"
+                    class="text-sm w-48"
                     onchange="this.form.submit()"
                 >
                     <option value="day"   {{ $range === 'day' ? 'selected' : '' }}>Día (hoy)</option>
                     <option value="week"  {{ $range === 'week' ? 'selected' : '' }}>Semana actual</option>
                     <option value="month" {{ $range === 'month' ? 'selected' : '' }}>Mes actual</option>
-                </select>
+                </flux:select>
             </flux:field>
         </form>
 
         <div class="grid md:grid-cols-3 gap-4">
             <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white dark:bg-zinc-900">
-                <div class="text-xs font-medium text-black/60 dark:text-white/60">
-                    Ingresos
-                </div>
+                <flux:heading size="sm" class="mb-2 text-black dark:text-white">
+                        Ingresos
+                </flux:heading>
 
                 <div class="text-3xl font-bold mt-1 text-custom-green">
-                    ${{ number_format($kpis['revenue'], 0, ',', '.') }}
+                    ${{ number_format($kpis['revenue'], 2, '.', '.') }}
                 </div>
             </div>
 
             <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white dark:bg-zinc-900">
-                <div class="text-xs font-medium text-black/60 dark:text-white/60">
-                    Usuarios normales
-                </div>
+                <flux:heading size="sm" class="mb-2 text-black dark:text-white">
+                        Usuarios normales
+                </flux:heading>
 
                 <div class="text-3xl font-bold mt-1 text-custom-blue">
                     {{ $kpis['users_normal'] }}
@@ -102,9 +101,9 @@
             </div>
 
             <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white dark:bg-zinc-900">
-                <div class="text-xs font-medium text-black/60 dark:text-white/60">
-                    Usuarios dinámicos
-                </div>
+                <flux:heading size="sm" class="mb-2 text-black dark:text-white">
+                        Usuarios dinámicos
+                </flux:heading>
 
                 <div class="text-3xl font-bold mt-1 text-custom-orange">
                     {{ $kpis['users_dynamic'] }}
@@ -115,9 +114,9 @@
         {{-- Gráficas --}}
         <div class="grid md:grid-cols-3 gap-4">
             <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white dark:bg-zinc-900">
-                <h3 class="text-sm font-semibold mb-2 text-black dark:text-white">
-                    Ingresos
-                </h3>
+                <flux:heading size="sm" class="mb-2 text-black dark:text-white">
+                        Ingresos
+                </flux:heading>
 
                 <div style="height:220px">
                     <canvas id="chartRevenue"></canvas>
@@ -125,9 +124,9 @@
             </div>
 
             <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white dark:bg-zinc-900">
-                <h3 class="text-sm font-semibold mb-2 text-black dark:text-white">
-                    Usuarios normales (rol 3)
-                </h3>
+                <flux:heading size="sm" class="mb-2 text-black dark:text-white">
+                        Usuarios normales
+                </flux:heading>
 
                 <div style="height:220px">
                     <canvas id="chartUsersNormal"></canvas>
@@ -135,9 +134,9 @@
             </div>
 
             <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white dark:bg-zinc-900">
-                <h3 class="text-sm font-semibold mb-2 text-black dark:text-white">
-                    Usuarios dinámicos
-                </h3>
+                <flux:heading size="sm" class="mb-2 text-black dark:text-white">
+                        Usuarios dinámicos
+                </flux:heading>
 
                 <div style="height:220px">
                     <canvas id="chartUsersDyn"></canvas>
@@ -146,108 +145,131 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
-    <script>
-        const dataRevenue     = @json($revenue);
-        const dataUsersNormal = @json($usersNormal);
-        const dataUsersDyn    = @json($usersDynamic);
-
-        const L = (arr) => arr.map(i => i.label);
-        const V = (arr) => arr.map(i => Number(i.total || 0));
-
-        const baseOptions =
-        {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: false,
-            plugins:
+    @push('scripts')
+        <script>
+            function renderDashboardCharts() 
             {
-                legend:
+                const dataRevenue     = @json($revenue);
+                const dataUsersNormal = @json($usersNormal);
+                const dataUsersDyn    = @json($usersDynamic);
+
+                const L = (arr) => arr.map(i => i.label);
+                const V = (arr) => arr.map(i => Number(i.total || 0));
+
+                const baseOptions = 
                 {
-                    display: false
-                },
-                tooltip:
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    plugins: 
+                    {
+                        legend: 
+                        { 
+                            display: false 
+                        },
+                        tooltip: 
+                        { 
+                            enabled: true 
+                        }
+                    },
+                    scales: 
+                    {
+                        x: 
+                        {
+                            ticks: 
+                            {
+                                maxRotation: 0,
+                                autoSkip: true
+                            }
+                        },
+                        y: 
+                        {
+                            beginAtZero: true,
+                            ticks: 
+                            { 
+                                precision: 0 
+                            }
+                        }
+                    }
+                };
+
+                const barDataset = (values) => (
                 {
-                    enabled: true
+                    data: values,
+                    maxBarThickness: 28,
+                    barPercentage: 0.9,
+                    categoryPercentage: 0.9,
+                    backgroundColor: '#241178'
+                });
+
+                if (window.dashboardCharts) 
+                {
+                    window.dashboardCharts.forEach(c => c.destroy());
                 }
-            },
-            scales:
-            {
-                x:
+                window.dashboardCharts = [];
+
+                const revenueCtx = document.getElementById('chartRevenue');
+                const usersNormCtx = document.getElementById('chartUsersNormal');
+                const usersDynCtx = document.getElementById('chartUsersDyn');
+
+                if (revenueCtx) 
                 {
-                    ticks:
+                    window.dashboardCharts.push(new Chart(revenueCtx, 
                     {
-                        maxRotation: 0,
-                        autoSkip: true
-                    }
-                },
-                y:
+                        type: 'bar',
+                        data: 
+                        {
+                            labels: L(dataRevenue),
+                            datasets: [
+                            {
+                                ...barDataset(V(dataRevenue)),
+                                backgroundColor: '#42A958'
+                            }]
+                        },
+                        options: baseOptions
+                    }));
+                }
+
+                if (usersNormCtx) 
                 {
-                    beginAtZero: true,
-                    ticks:
+                    window.dashboardCharts.push(new Chart(usersNormCtx, 
                     {
-                        precision: 0
-                    }
+                        type: 'bar',
+                        data: 
+                        {
+                            labels: L(dataUsersNormal),
+                            datasets: [
+                            {
+                                ...barDataset(V(dataUsersNormal)),
+                                backgroundColor: '#241178'
+                            }]
+                        },
+                        options: baseOptions
+                    }));
+                }
+
+                if (usersDynCtx) 
+                {
+                    window.dashboardCharts.push(new Chart(usersDynCtx, 
+                    {
+                        type: 'bar',
+                        data: 
+                        {
+                            labels: L(dataUsersDyn),
+                            datasets: [
+                            {
+                                ...barDataset(V(dataUsersDyn)),
+                                backgroundColor: '#DE6601'
+                            }]
+                        },
+                        options: baseOptions
+                    }));
                 }
             }
-        };
 
-        const barDataset = (values) =>
-        ({
-            data: values,
-            maxBarThickness: 28,
-            barPercentage: 0.9,
-            categoryPercentage: 0.9,
-            backgroundColor: '#241178'
-        });
+            document.addEventListener('DOMContentLoaded', renderDashboardCharts);
 
-        new Chart(document.getElementById('chartRevenue'),
-        {
-            type: 'bar',
-            data:
-            {
-                labels: L(dataRevenue),
-                datasets: [
-                    {
-                        ...barDataset(V(dataRevenue)),
-                        backgroundColor: '#42A958'
-                    }
-                ]
-            },
-            options: baseOptions
-        });
-
-        new Chart(document.getElementById('chartUsersNormal'),
-        {
-            type: 'bar',
-            data:
-            {
-                labels: L(dataUsersNormal),
-                datasets: [
-                    {
-                        ...barDataset(V(dataUsersNormal)),
-                        backgroundColor: '#241178'
-                    }
-                ]
-            },
-            options: baseOptions
-        });
-
-        new Chart(document.getElementById('chartUsersDyn'),
-        {
-            type: 'bar',
-            data:
-            {
-                labels: L(dataUsersDyn),
-                datasets: [
-                    {
-                        ...barDataset(V(dataUsersDyn)),
-                        backgroundColor: '#DE6601'
-                    }
-                ]
-            },
-            options: baseOptions
-        });
-    </script>
+            document.addEventListener('livewire:navigated', renderDashboardCharts);
+        </script>
+    @endpush
 </x-layouts.app>

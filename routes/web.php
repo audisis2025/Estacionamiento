@@ -24,10 +24,8 @@ Route::middleware(['auth'])->group(function ()
     Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
 
     Volt::route('settings/two-factor', 'settings.two-factor')
-        ->middleware(
-            when(
-                Features::canManageTwoFactorAuthentication()
-                    && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
+        ->middleware(when(
+                Features::canManageTwoFactorAuthentication() && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
                 ['password.confirm'],
                 [],
             ),

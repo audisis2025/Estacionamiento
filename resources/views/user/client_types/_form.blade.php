@@ -31,25 +31,23 @@
         />
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <label class="block">
-                <span class="text-sm font-medium text-black dark:text-white">
+            <flux:field class="w-full">
+                <flux:label class="text-sm font-medium text-black dark:text-white">
                     Tipo de descuento
-                </span>
+                </flux:label>
 
                 @php
                     $dt = (int) old('discount_type', $clientType->discount_type ?? 0);
                 @endphp
 
-                <select
+                <flux:select
                     name="discount_type"
-                    class="mt-1 block w-full rounded-md border border-zinc-200 dark:border-zinc-700
-                           bg-white dark:bg-zinc-900 text-sm text-black dark:text-white
-                           px-2 py-2 focus:outline-none focus:ring-2 focus:ring-custom-blue focus:border-custom-blue"
+                    class="mt-1 w-full"
                 >
-                    <option value="0" {{ $dt === 0 ? 'selected' : '' }}>Porcentaje (%)</option>
-                    <option value="1" {{ $dt === 1 ? 'selected' : '' }}>Cantidad fija ($)</option>
-                </select>
-            </label>
+                    <option value="0" @selected($dt === 0)>Porcentaje (%)</option>
+                    <option value="1" @selected($dt === 1)>Cantidad fija ($)</option>
+                </flux:select>
+            </flux:field>
 
             <flux:input
                 name="amount"

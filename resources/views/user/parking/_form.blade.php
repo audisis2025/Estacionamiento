@@ -59,22 +59,21 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <flux:field class="w-full">
-                <flux:label for="{{ $formId }}-type" class="text-sm font-medium text-black dark:text-white">
+                <flux:label for="{{ $formId }}-type">
                     Tipo de estacionamiento
                 </flux:label>
 
                 @php $type = (int) old('type', $parking->type ?? 0); @endphp
 
-                <select
-                    name="type"
+                <flux:select
                     id="{{ $formId }}-type"
-                    class="mt-1 block w-full rounded-md border border-zinc-200 dark:border-zinc-700 p-2 text-sm
-                        bg-white dark:bg-zinc-900 text-black dark:text-white focus:outline-none
-                        focus:ring-2 focus:ring-custom-blue focus:border-custom-blue">
-                    <option value="0" {{ $type === 0 ? 'selected' : '' }}>Tiempo libre (tarifa fija)</option>
-                    <option value="1" {{ $type === 1 ? 'selected' : '' }}>Por hora</option>
-                    <option value="2" {{ $type === 2 ? 'selected' : '' }}>Mixto (hora + fija)</option>
-                </select>
+                    name="type"
+                    class="mt-1 w-full"
+                >
+                    <option value="0" @selected($type === 0)>Tiempo libre (tarifa fija)</option>
+                    <option value="1" @selected($type === 1)>Por hora</option>
+                    <option value="2" @selected($type === 2)>Mixto (hora + fija)</option>
+                </flux:select>
             </flux:field>
 
             <flux:input

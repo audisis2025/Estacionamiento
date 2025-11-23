@@ -17,12 +17,14 @@ class Transaction extends Model
         'departure_date',
         'id_qr_reader',
         'id_user',
+        'billing_mode',
     ];
 
     protected $casts = [
-        'amount'         => 'integer',
-        'entry_date'     => 'datetime',
+        'amount' => 'float',
+        'entry_date' => 'datetime',
         'departure_date' => 'datetime',
+        'billing_mode' => 'string',
     ];
 
     public function user()

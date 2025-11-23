@@ -95,18 +95,12 @@
         <script>
             document.addEventListener("DOMContentLoaded", () => 
             {
-                window.initQrScanner(
-                    @json(route('parking.qr-readers.scan.ingest', $reader)),
-                    @json(csrf_token())
-                );
+                window.initQrScanner(@json(route('parking.qr-readers.scan.ingest', $reader)),@json(csrf_token()));
             });
 
             document.addEventListener("livewire:navigated", () => 
             {
-                window.initQrScanner(
-                    @json(route('parking.qr-readers.scan.ingest', $reader)),
-                    @json(csrf_token())
-                );
+                window.initQrScanner(@json(route('parking.qr-readers.scan.ingest', $reader)),@json(csrf_token()));
             });
         </script>
     @endpush

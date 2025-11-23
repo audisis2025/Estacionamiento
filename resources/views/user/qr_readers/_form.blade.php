@@ -38,27 +38,26 @@
                 required
             />
 
-            <label class="block">
-                <span class="text-sm font-medium text-black dark:text-white">
+            <flux:field class="w-full">
+                <flux:label class="text-sm font-medium text-black dark:text-white">
                     Sentido
-                </span>
+                </flux:label>
 
                 @php
                     $sense = (int) old('sense', $reader->sense ?? 2);
                 @endphp
 
-                <select
+                <flux:select
                     name="sense"
-                    class="mt-1 block w-full rounded-md border border-zinc-200 dark:border-zinc-700
-                           bg-white dark:bg-zinc-900 text-sm text-black dark:text-white
-                           px-2 py-2 focus:outline-none focus:ring-2 focus:ring-custom-blue focus:border-custom-blue"
+                    class="mt-1 w-full"
                     required
                 >
-                    <option value="0" {{ $sense === 0 ? 'selected' : '' }}>Entrada</option>
-                    <option value="1" {{ $sense === 1 ? 'selected' : '' }}>Salida</option>
-                    <option value="2" {{ $sense === 2 ? 'selected' : '' }}>Mixto</option>
-                </select>
-            </label>
+                    <option value="0" @selected($sense === 0)>Entrada</option>
+                    <option value="1" @selected($sense === 1)>Salida</option>
+                    <option value="2" @selected($sense === 2)>Mixto</option>
+                </flux:select>
+            </flux:field>
+
         </div>
 
         <div class="flex justify-end gap-3">

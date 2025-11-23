@@ -15,7 +15,7 @@ return new class extends Migration
             $table->increments('id');                         // int auto_increment
             $table->string('typename', 50);                   // not null
             $table->boolean('discount_type');                 // not null
-            $table->float('amount');                          // not null
+            $table->decimal('amount', 10, 2);                          // not null
             $table->unsignedInteger('id_parking')->nullable();
 
             $table->foreign('id_parking')->references('id')->on('parkings');

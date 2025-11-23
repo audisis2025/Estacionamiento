@@ -71,7 +71,7 @@ class EntryController extends Controller
 
     public function release(Request $request, Transaction $transaction): RedirectResponse
     {
-         $user    = Auth::user();
+        $user    = Auth::user();
         $parking = $user->parking;
 
         if (! $parking || ! $parking->qrReaders()->where('id', $transaction->id_qr_reader)->exists()) 
@@ -79,28 +79,24 @@ class EntryController extends Controller
             return back()->with('error', 'No autorizado para liberar esta transacción.');
         }
 
-        try 
-        {
-            DB::transaction(function () use ($transaction, $parking, $request) 
-            {
-                $t = Transaction::whereKey($transaction->id)
-                    ->lockForUpdate()
-                    ->first();
+        try {
+            DB::transaction(function () use ($transaction, $parking, $request) {
 
-                if (! is_null($t->departure_date)) 
-                {
+                $t = Transaction::whereKey($transaction->id)->lockForUpdate()->first();
+
+                if (! is_null($t->departure_date)) {
                     abort(409, 'La transacción ya fue liberada o cerrada.');
                 }
 
                 $releasedAt = Carbon::now();
-
                 $minutes = max(1, $t->entry_date->diffInMinutes($releasedAt));
-                $charge  = 0.0;
 
-                $type        = (int) $parking->type;
-                $priceHour   = (float) ($parking->price ?? 0);
-                $priceFlat   = (float) ($parking->price_flat ?? $parking->price ?? 0);
-                $billingMode = $request->input('billing_mode');
+                $priceHour = (float) ($parking->price ?? 0);
+                $priceFlat = (float) ($parking->price_flat ?? $parking->price ?? 0);
+                $type      = (int) $parking->type;
+                $modeUI    = $request->input('billing_mode');
+
+                $charge = 0.0;
 
                 switch ($type) 
                 {
@@ -109,38 +105,53 @@ class EntryController extends Controller
                         break;
 
                     case 1:
-                        $hours  = max(1, (int) ceil($minutes / 60));
+                        $hours = max(1, ceil($minutes / 60));
                         $charge = $hours * $priceHour;
                         break;
 
                     case 2:
-                        $mode = $billingMode === 'flat' ? 'flat' : 'hour';
-
-                        if ($mode === 'flat') 
+                        $effective = $modeUI === 'flat' ? 'flat' : 'hour';
+                        if ($effective === 'flat') 
                         {
                             $charge = $priceFlat;
                         } else 
                         {
-                            $hours  = max(1, (int) ceil($minutes / 60));
+                            $hours = max(1, ceil($minutes / 60));
                             $charge = $hours * $priceHour;
                         }
                         break;
-
-                    default:
-                        // Por seguridad, si llegara un tipo desconocido
-                        $charge = $priceFlat;
-                        break;
                 }
 
-                $t->amount         = (int) round($charge);
-                $t->departure_date = $releasedAt;
-                $t->save();
+                $uct = $t->user->activeUserClientTypeForParking($parking->id);
+
+                if ($uct && $uct->clientType) 
+                {
+
+                    $ct = $uct->clientType;
+
+                    if ((int) $ct->discount_type === 0) 
+                    {
+                        $pct = min(100, max(0, (float) $ct->amount));
+                        $charge -= round($charge * ($pct / 100), 2);
+                    }
+                    elseif ((int) $ct->discount_type === 1) 
+                    {
+                        $charge -= (float) $ct->amount;
+                    }
+                }
+
+                $charge = round(max(0, $charge), 2);
+
+                $t->update([
+                    'amount'         => $charge,
+                    'departure_date' => $releasedAt,
+                ]);
             });
 
-            return back()->with('ok', 'Salida liberada correctamente. Monto calculado automáticamente.');
-        } catch (\Throwable $e) 
-        {
+            return back()->with('ok', 'Salida liberada correctamente. Monto calculado con decimales y descuentos.');
+        } catch (\Throwable $e) {
             return back()->with('error', 'Ocurrió un error al liberar la salida.');
         }
     }
+
 }

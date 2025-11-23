@@ -38,7 +38,7 @@ new #[Layout('components.layouts.auth')] class extends Component
             'name'          => ['required', 'string', 'max:255'],
             'email'         => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
             'password'      => ['required', 'string', 'confirmed', Rules\Password::defaults()],
-            'phone_number'  => ['required', 'string', 'size:10', 'unique:users,phone_number'],
+            'phone_number' => ['required', 'numeric', 'digits:10', 'unique:users,phone_number'],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->increments('id');                           // int auto_increment
-            $table->integer('amount')->nullable();             
+            $table->decimal('amount', 10, 2)->nullable();             
             $table->dateTime('entry_date');                     // not null
             $table->dateTime('departure_date')->nullable();     // null
             $table->unsignedInteger('id_qr_reader')->nullable();

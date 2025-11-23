@@ -16,11 +16,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () 
 {
-    Route::get('/plans/choose', [PlanPurchaseController::class, 'choose'])
-        ->name('plans.choose');
+    Route::get('/plans/choose', [PlanPurchaseController::class, 'choose'])->name('plans.choose');
 
-    Route::post('/plans/pay/{plan}', [PlanPurchaseController::class, 'pay'])
-        ->name('plans.pay');
+    Route::post('/plans/pay/{plan}', [PlanPurchaseController::class, 'pay'])->name('plans.pay');
 
     Route::middleware(['auth'])->group(function () 
     {
