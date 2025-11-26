@@ -41,14 +41,14 @@ class TestParkingSeeder extends Seeder
         }
 
         $taxistaId = DB::table('client_types')->insertGetId([
-            'typename'      => 'Taxista',
+            'type_name'      => 'Taxista',
             'discount_type' => 0,
             'amount'        => 15,
             'id_parking'    => $parkingId,
         ]);
 
         $proveedorId = DB::table('client_types')->insertGetId([
-            'typename'      => 'Proveedor',
+            'type_name'      => 'Proveedor',
             'discount_type' => 1,
             'amount'        => 10,
             'id_parking'    => $parkingId,

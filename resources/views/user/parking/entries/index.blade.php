@@ -16,12 +16,12 @@
 <x-layouts.app :title="__('Entradas abiertas')">
     <div class="max-w-6xl mx-auto p-6 space-y-6">
 
-        <h1 class="text-2xl font-bold text-black dark:text-white">
+        <flux:heading level="2" size="xl" class="text-2xl !font-black text-black dark:text-white">
             Entradas abiertas
-        </h1>
+        </flux:heading>
 
         @php $parking = auth()->user()->parking; @endphp
-        <p class="text-sm text-black/60 dark:text-white/60">
+        <flux:text class="text-sm text-black/60 dark:text-white/60">
             Tipo de cobro:
             @switch((int) $parking->type)
                 @case(0)
@@ -38,7 +38,7 @@
                     Fija: ${{ number_format($parking->price_flat ?? $parking->price, 2) }}
                     @break
             @endswitch
-        </p>
+        </flux:text>
 
         <form method="GET" class="flex flex-wrap gap-3 items-end">
             <div class="w-full sm:w-auto">
@@ -67,16 +67,24 @@
                 <thead class="bg-zinc-100 dark:bg-zinc-800">
                     <tr class="text-left">
                         <th class="px-4 py-3 font-semibold text-black dark:text-white">
-                            ID
+                            <flux:text class="font-semibold text-black dark:text-white">
+                                ID
+                            </flux:text>
                         </th>
                         <th class="px-4 py-3 font-semibold text-black dark:text-white">
-                            Usuario
+                            <flux:text class="font-semibold text-black dark:text-white">
+                                Usuario
+                            </flux:text>
                         </th>
                         <th class="px-4 py-3 font-semibold text-black dark:text-white">
-                            Entrada
+                            <flux:text class="font-semibold text-black dark:text-white">
+                                Entrada
+                            </flux:text>
                         </th>
                         <th class="px-4 py-3 font-semibold text-right text-black dark:text-white">
-                            Acción
+                            <flux:text class="font-semibold text-right text-black dark:text-white">
+                                Acción
+                            </flux:text>
                         </th>
                     </tr>
                 </thead>
@@ -124,11 +132,10 @@
                         </tr>
                     @empty
                         <tr>
-                            <td
-                                colspan="4"
-                                class="px-4 py-6 text-center text-black/60 dark:text-white/60"
-                            >
-                                No hay entradas pendientes de salida.
+                            <td colspan="4" class="px-4 py-6 text-center text-black/60 dark:text-white/60">
+                                <flux:text class="text-sm text-black/60 dark:text-white/60">
+                                    No hay entradas pendientes de salida.
+                                </flux:text>
                             </td>
                         </tr>
                     @endforelse

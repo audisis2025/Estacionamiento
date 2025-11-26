@@ -16,7 +16,9 @@
 <x-layouts.app :title="__('Editar lector QR')">
     <div class="max-w-3xl mx-auto px-6 py-8">
         <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold">Editar lector #{{ $reader->id }}</h1>
+            <flux:heading level="2" size="xl" class="text-2xl !font-black text-black dark:text-white">
+                Editar lector #{{ $reader->id }}
+            </flux:heading>
             <flux:button variant="ghost" icon="arrow-long-left" icon-variant="outline" :href="route('parking.qr-readers.index')" wire:navigate>
                 Regresar
             </flux:button>

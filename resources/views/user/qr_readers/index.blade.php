@@ -1,4 +1,4 @@
-{{--
+{{-- 
 * Nombre de la vista           : index.blade.php
 * Descripción de la vista      : Página de listado de lectores QR.
 * Fecha de creación            : 04/11/2025
@@ -7,7 +7,7 @@
 * Autorizó                     : Angel Davila
 * Version                      : 1.0
 * Fecha de mantenimiento       : 
-* Folio de mantenimiento       : 
+* Folio de mantenimiento       :
 * Tipo de mantenimiento        :
 * Descripción del mantenimiento: 
 * Responsable                  : 
@@ -16,9 +16,9 @@
 <x-layouts.app :title="__('Lectores QR')">
     <div class="p-6 w-full max-w-6xl mx-auto">
         <div class="flex items-center justify-between mb-5">
-            <h2 class="text-2xl font-bold text-black dark:text-white">
+            <flux:heading level="2" size="xl" class="text-2xl !font-black text-black dark:text-white">
                 Lectores QR
-            </h2>
+            </flux:heading>
 
             <flux:button
                 variant="primary"
@@ -51,7 +51,9 @@
 
         @if ($readers->isEmpty())
             <div class="text-center text-black/60 dark:text-white/60 py-8">
-                No hay lectores registrados aún.
+                <flux:text class="text-black/60 dark:text-white/60">
+                    No hay lectores registrados aún.
+                </flux:text>
             </div>
         @else
             <div class="overflow-x-auto border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm">
@@ -59,16 +61,24 @@
                     <thead class="bg-zinc-100 dark:bg-zinc-800">
                         <tr>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-black dark:text-white">
-                                ID
+                                <flux:text class="text-sm font-semibold text-black dark:text-white">
+                                    ID
+                                </flux:text>
                             </th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-black dark:text-white">
-                                Número de serie
+                                <flux:text class="text-sm font-semibold text-black dark:text-white">
+                                    Número de serie
+                                </flux:text>
                             </th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-black dark:text-white">
-                                Sentido
+                                <flux:text class="text-sm font-semibold text-black dark:text-white">
+                                    Sentido
+                                </flux:text>
                             </th>
                             <th class="px-4 py-3 text-center text-sm font-semibold text-black dark:text-white">
-                                Acciones
+                                <flux:text class="text-sm font-semibold text-black dark:text-white">
+                                    Acciones
+                                </flux:text>
                             </th>
                         </tr>
                     </thead>
@@ -78,7 +88,8 @@
                             @php
                                 $labels = [0 => 'Entrada', 1 => 'Salida', 2 => 'Mixto'];
 
-                                $badgeClasses = match ($reader->sense) {
+                                $badgeClasses = match ($reader->sense) 
+                                {
                                     0       => 'bg-custom-green text-white',
                                     1       => 'bg-custom-orange text-white',
                                     2       => 'bg-custom-blue text-white',
@@ -128,11 +139,7 @@
                                             Escanear
                                         </flux:button>
 
-                                        <form
-                                            method="POST"
-                                            action="{{ route('parking.qr-readers.destroy', $reader) }}"
-                                            class="delete-form"
-                                        >
+                                        <form method="POST" action="{{ route('parking.qr-readers.destroy', $reader) }}" class="delete-form">
                                             @csrf
                                             @method('DELETE')
 

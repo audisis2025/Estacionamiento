@@ -126,7 +126,9 @@
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />
-
+                        <flux:menu.item :href="route('terms')" icon="document-text" icon-variant="outline" target="_blank" class="w-full">
+                            Términos y Condiciones
+                        </flux:menu.item>
                     <flux:menu.separator />
 
                     <form method="POST" action="{{ route('logout') }}" class="w-full">

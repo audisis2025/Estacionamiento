@@ -1,4 +1,4 @@
-{{--
+{{-- 
 * Nombre de la vista           : index.blade.php
 * Descripción de la vista      : Panel de visualización de facturas para una implementación futura.
 * Fecha de creación            : 06/11/2025
@@ -21,19 +21,22 @@
                 <x-sat-logo class="h-10 w-auto" />
 
                 <div>
-                    <h1 class="text-xl font-bold text-black dark:text-white">
+                    <flux:heading
+                        level="2"
+                        size="xl"
+                        class="text-xl !font-black text-black dark:text-white"
+                    >
                         Facturación (en desarrollo)
-                    </h1>
+                    </flux:heading>
 
-                    <p class="text-sm text-black/70 dark:text-white/70 mt-1">
-                        Esta opción está considerada para una próxima versión del sistema. Hemos tenido en cuenta
-                        los requisitos, pero aún no está desarrollada.
-                    </p>
+                    <flux:text class="text-sm text-black/70 dark:text-white/70 mt-1">
+                        Esta opción está considerada para una próxima versión del sistema.
+                        Hemos tenido en cuenta los requisitos, pero aún no está desarrollada.
+                    </flux:text>
                 </div>
             </div>
 
-            <span
-                class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium
+            <span class="mb-4 inline-flex items-center rounded-full px-3 py-1 text-xs font-medium
                        bg-custom-orange/10 text-custom-orange
                        dark:bg-custom-orange/15 dark:text-custom-orange">
                 Próximamente
@@ -46,9 +49,9 @@
                 directamente desde Parking+.
             </div>
 
-            <p class="mt-4 text-xs text-black/60 dark:text-white/60">
+            <flux:text class="mt-4 text-xs text-black/60 dark:text-white/60">
                 El nombre y logotipo “SAT” pertenecen a la SHCP y se muestran únicamente con fines de referencia.
-            </p>
+            </flux:text>
         </div>
     </div>
 </x-layouts.app>

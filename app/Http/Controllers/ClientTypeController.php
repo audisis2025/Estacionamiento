@@ -43,7 +43,7 @@ class ClientTypeController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        return view('user.client_types.index', compact('clientTypes'));
+        return view('user.client_types.index', ['client_types'=> $clientTypes]);
     }
 
     public function create(): View
@@ -58,11 +58,11 @@ class ClientTypeController extends Controller
             $parking = auth()->user()->parking;
 
             $data = $request->validate([
-                'typename' => [
+                'type_name' => [
                     'required',
                     'string',
                     'max:50',
-                    Rule::unique('client_types', 'typename')
+                    Rule::unique('client_types', 'type_name')
                         ->where(
                             fn ($query) => $query->where('id_parking', $parking->id)
                         ),
@@ -114,7 +114,7 @@ class ClientTypeController extends Controller
     {
         $this->ensureOwnership($clientType);
 
-        return view('user.client_types.edit', compact('clientType'));
+        return view('user.client_types.edit', ['clientType' => $clientType]);
     }
 
     public function update(Request $request, ClientType $clientType): RedirectResponse
@@ -126,11 +126,11 @@ class ClientTypeController extends Controller
             $parking = auth()->user()->parking;
 
             $data = $request->validate([
-                'typename' => [
+                'type_name' => [
                     'required',
                     'string',
                     'max:50',
-                    Rule::unique('client_types', 'typename')
+                    Rule::unique('client_types', 'type_name')
                         ->where(fn ($query) => $query->where('id_parking', $parking->id))
                         ->ignore($clientType->id),
                 ],

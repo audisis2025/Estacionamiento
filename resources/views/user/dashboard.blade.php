@@ -15,7 +15,7 @@
 --}}
 <x-layouts.app :title="__('Estadísticas del Estacionamiento')">
 
-    @if (! $hasParking)
+    @if (! $has_parking)
         <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5 mb-6">
             <h3 class="font-semibold text-black dark:text-white">
                 Configura tu estacionamiento
@@ -32,7 +32,7 @@
                 </flux:button>
             </div>
         </div>
-    @elseif ($readersCount === 0)
+    @elseif ($readers_count === 0)
         <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5 mb-6">
             <h3 class="font-semibold text-black dark:text-white">
                 Agrega tus lectores QR
@@ -111,7 +111,6 @@
             </div>
         </div>
 
-        {{-- Gráficas --}}
         <div class="grid md:grid-cols-3 gap-4">
             <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white dark:bg-zinc-900">
                 <flux:heading size="sm" class="mb-2 text-black dark:text-white">
@@ -150,8 +149,8 @@
             function renderDashboardCharts() 
             {
                 const dataRevenue     = @json($revenue);
-                const dataUsersNormal = @json($usersNormal);
-                const dataUsersDyn    = @json($usersDynamic);
+                const dataUsersNormal = @json($users_normal);
+                const dataUsersDyn    = @json($users_dynamic);
 
                 const L = (arr) => arr.map(i => i.label);
                 const V = (arr) => arr.map(i => Number(i.total || 0));

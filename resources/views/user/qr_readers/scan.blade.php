@@ -17,16 +17,16 @@
     <div class="p-6 max-w-2xl mx-auto space-y-6 text-black dark:text-white">
         <div class="flex items-start justify-between gap-4">
             <div>
-                <h2 class="text-2xl font-bold">
+                <flux:heading level="2" size="xl" class="text-2xl !font-black">
                     Escanear — Lector #{{ $reader->id }}
-                </h2>
+                </flux:heading>
 
-                <p class="text-sm text-black/70 dark:text-white/70 mt-1">
+                <flux:text class="text-sm text-black/70 dark:text-white/70 mt-1">
                     Tipo:
                     <span class="font-medium">
                         {{ ['Entrada', 'Salida', 'Mixto'][$reader->sense] ?? $reader->sense }}
                     </span>
-                </p>
+                </flux:text>
             </div>
 
             <div
@@ -40,16 +40,16 @@
                     <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-custom-green"></span>
                 </span>
 
-                <span class="text-sm font-medium text-custom-green">
+                <flux:text class="text-sm font-medium text-custom-green">
                     Listo para escanear
-                </span>
+                </flux:text>
             </div>
         </div>
 
         <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4">
-            <p class="text-sm text-black/70 dark:text-white/70">
+            <flux:text class="text-sm text-black/70 dark:text-white/70">
                 Coloca el cursor en <strong>“Capturar”</strong> y escanea el código QR desde el lector USB.
-            </p>
+            </flux:text>
         </div>
 
         <form id="scan-form" class="flex items-center gap-3" onsubmit="return false;">
@@ -80,9 +80,9 @@
         </form>
 
         <div class="hidden rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4">
-            <h3 class="text-sm font-semibold mb-3 text-black dark:text-white">
+            <flux:heading level="3" size="md" class="text-sm !font-black mb-3 text-black dark:text-white">
                 Log de actividad
-            </h3>
+            </flux:heading>
 
             <pre
                 id="result"

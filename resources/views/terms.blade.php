@@ -13,6 +13,7 @@
 * Responsable                  : 
 * Revisor                      : 
 --}}
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -35,49 +36,55 @@
                     </div>
 
                     <div>
-                        <h1 class="text-2xl font-bold">
+                        <flux:heading level="1" size="xl" class="text-2xl font-bold">
                             Términos y Condiciones
-                        </h1>
-                        <p class="text-sm text-black/60 dark:text-white/60">
+                        </flux:heading>
+
+                        <flux:text class="text-sm text-black/60 dark:text-white/60">
                             Última actualización: {{ now()->format('d/m/Y') }}
-                        </p>
+                        </flux:text>
                     </div>
                 </div>
             </div>
 
             <section class="space-y-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5">
-                <h2 class="text-xl font-semibold">
+                <flux:heading level="2" size="lg" class="text-xl font-semibold">
                     1. Aceptación de los términos
-                </h2>
-                <p class="text-sm leading-relaxed text-black/80 dark:text-white/80">
+                </flux:heading>
+
+                <flux:text class="text-sm leading-relaxed text-black/80 dark:text-white/80">
                     Al acceder o utilizar la aplicación <strong>Parking+</strong>, el usuario acepta los presentes
                     términos y condiciones, incluyendo privacidad de datos, administración de estacionamientos, emisión
                     de facturas y uso de planes de suscripción.
-                </p>
+                </flux:text>
             </section>
 
             <section class="space-y-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5">
-                <h2 class="text-xl font-semibold">
+                <flux:heading level="2" size="lg" class="text-xl font-semibold">
                     2. Privacidad y manejo de datos
-                </h2>
-                <p class="text-sm leading-relaxed text-black/80 dark:text-white/80">
+                </flux:heading>
+
+                <flux:text class="text-sm leading-relaxed text-black/80 dark:text-white/80">
                     <strong>Parking+</strong> recopila los datos necesarios para operar (nombre, correo, teléfono,
                     ubicación de estacionamientos). Los datos se almacenan de forma segura y se manejan conforme a la
                     normatividad aplicable.
-                </p>
-                <p class="text-sm leading-relaxed text-black/80 dark:text-white/80">
+                </flux:text>
+
+                <flux:text class="text-sm leading-relaxed text-black/80 dark:text-white/80">
                     No se venderán ni transferirán a terceros sin consentimiento, salvo requerimiento legal.
-                </p>
+                </flux:text>
             </section>
 
             <section class="space-y-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5">
-                <h2 class="text-xl font-semibold">
+                <flux:heading level="2" size="lg" class="text-xl font-semibold">
                     3. Planes y suscripciones
-                </h2>
-                <p class="text-sm leading-relaxed text-black/80 dark:text-white/80">
+                </flux:heading>
+
+                <flux:text class="text-sm leading-relaxed text-black/80 dark:text-white/80">
                     Los administradores pueden contratar planes con diferentes niveles de funciones (lectores QR,
                     reportes, clientes dinámicos y soporte).
-                </p>
+                </flux:text>
+
                 <ul class="list-disc pl-6 text-sm text-black/80 dark:text-white/80">
                     <li>Pagos procesados por plataformas seguras (p. ej., PayPal).</li>
                     <li>Las suscripciones no se renuevan automáticamente.</li>
@@ -85,32 +92,40 @@
             </section>
 
             <section class="space-y-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5">
-                <h2 class="text-xl font-semibold">
+                <flux:heading level="2" size="lg" class="text-xl font-semibold">
                     4. Responsabilidad del usuario
-                </h2>
-                <p class="text-sm leading-relaxed text-black/80 dark:text-white/80">
+                </flux:heading>
+
+                <flux:text class="text-sm leading-relaxed text-black/80 dark:text-white/80">
                     El usuario debe usar responsablemente las herramientas, mantener datos actualizados y evitar usos
                     indebidos. El administrador del estacionamiento es responsable de los registros bajo su cuenta.
-                </p>
+                </flux:text>
             </section>
 
             <section class="space-y-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5">
-                <h2 class="text-xl font-semibold">
+                <flux:heading level="2" size="lg" class="text-xl font-semibold">
                     5. Contacto
-                </h2>
-                <p class="text-sm text-black/80 dark:text-white/80">
+                </flux:heading>
+
+                <flux:text class="text-sm text-black/80 dark:text-white/80">
                     Soporte:
-                    <a href="mailto:admgenineral@gmail.com"
-                        class="text-custom-blue hover:text-custom-blue-dark underline underline-offset-4">
+                    <flux:link
+                        href="mailto:admgenineral@gmail.com"
+                        class="text-custom-blue hover:text-custom-blue-dark underline underline-offset-4"
+                    >
                         admgenineral@gmail.com
-                    </a>
-                </p>
+                    </flux:link>
+                </flux:text>
             </section>
 
-            <div
-                class="text-center text-xs text-black/60 dark:text-white/60 pt-6 border-t border-zinc-200 dark:border-zinc-700">
-                <p>&copy; {{ now()->year }} Parking+. Todos los derechos reservados.</p>
-                <p>El logotipo y nombre "SAT" pertenecen a la SHCP; se incluyen con fines ilustrativos.</p>
+            <div class="text-center text-xs text-black/60 dark:text-white/60 pt-6 border-t border-zinc-200 dark:border-zinc-700">
+                <flux:text class="text-xs text-black/60 dark:text-white/60">
+                    &copy; {{ now()->year }} Parking+. Todos los derechos reservados.
+                </flux:text>
+
+                <flux:text class="text-xs text-black/60 dark:text-white/60">
+                    El logotipo y nombre "SAT" pertenecen a la SHCP; se incluyen con fines ilustrativos.
+                </flux:text>
             </div>
 
         </main>

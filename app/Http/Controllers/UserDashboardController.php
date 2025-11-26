@@ -82,11 +82,11 @@ class UserDashboardController extends Controller
             return view('user.dashboard', [
                 'range'        => $range,
                 'revenue'      => $revenue,
-                'usersNormal'  => $usersNormal,
-                'usersDynamic' => $usersDynamic,
+                'users_normal'  => $usersNormal,
+                'users_dynamic' => $usersDynamic,
                 'kpis'         => $kpis,
-                'hasParking'   => $hasParking,
-                'readersCount' => $hasParking ? $parking->qrReaders()->count() : 0,
+                'has_parking'   => $hasParking,
+                'readers_count' => $hasParking ? $parking->qrReaders()->count() : 0,
             ]);
         }
 
@@ -146,11 +146,11 @@ class UserDashboardController extends Controller
         return view('user.dashboard', [
             'range'        => $range,
             'revenue'      => $revenue,
-            'usersNormal'  => $usersNormal,
-            'usersDynamic' => $usersDynamic,
+            'users_normal'  => $usersNormal,
+            'users_dynamic' => $usersDynamic,
             'kpis'         => $kpis,
-            'hasParking'   => true,
-            'readersCount' => $parking->qrReaders()->count(),
+            'has_parking'   => true,
+            'readers_count' => $parking->qrReaders()->count(),
         ]);
     }
 

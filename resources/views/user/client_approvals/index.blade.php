@@ -17,34 +17,44 @@
     <div class="p-6 w-full max-w-6xl mx-auto space-y-8">
 
         <div class="flex items-center justify-between">
-            <h2 class="text-2xl font-bold text-black dark:text-white">
+            <flux:heading level="2" size="xl" class="text-2xl !font-black text-black dark:text-white">
                 Solicitudes pendientes
-            </h2>
+            </flux:heading>
         </div>
 
         @if ($pending->isEmpty())
-            <div class="text-center text-black/60 dark:text-white/60 py-8">
+            <flux:text class="text-black/60 dark:text-white/60">
                 No hay solicitudes pendientes.
-            </div>
+            </flux:text>
         @else
             <div class="overflow-x-auto border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm">
                 <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
                     <thead class="bg-zinc-100 dark:bg-zinc-800">
                         <tr>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-black dark:text-white">
-                                Usuario
+                                <flux:text class="text-sm font-semibold text-black dark:text-white">
+                                    Usuario
+                                </flux:text>
                             </th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-black dark:text-white">
-                                Correo
+                                <flux:text class="text-sm font-semibold text-black dark:text-white">
+                                    Correo
+                                </flux:text>
                             </th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-black dark:text-white">
-                                Teléfono
+                                <flux:text class="text-sm font-semibold text-black dark:text-white">
+                                    Teléfono
+                                </flux:text>
                             </th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-black dark:text-white">
-                                Tipo solicitado
+                                <flux:text class="text-sm font-semibold text-black dark:text-white">
+                                    Tipo solicitado
+                                </flux:text>
                             </th>
                             <th class="px-4 py-3 text-center text-sm font-semibold text-black dark:text-white">
-                                Acciones
+                                <flux:text class="text-sm font-semibold text-black dark:text-white">
+                                    Acciones
+                                </flux:text>
                             </th>
                         </tr>
                     </thead>
@@ -65,7 +75,7 @@
                                 </td>
 
                                 <td class="px-4 py-3 text-sm text-black dark:text-white">
-                                    {{ $r->clientType->typename }}
+                                    {{ $r->clientType->type_name }}
                                     —
                                     {{ $r->clientType->discount_type
                                         ? '$' . number_format($r->clientType->amount, 2)
@@ -111,12 +121,11 @@
                                                 variant="danger"
                                                 as="button"
                                                 type="submit"
-                                                class=" text-xs md:text-sm"
+                                                class="text-xs md:text-sm"
                                             >
                                                 Eliminar
                                             </flux:button>
                                         </form>
-
                                     </div>
                                 </td>
                             </tr>
@@ -127,9 +136,9 @@
         @endif
 
         <div class="flex items-center justify-between mt-4">
-            <h2 class="text-2xl font-bold text-black dark:text-white">
+            <flux:heading level="2" size="xl" class="text-2xl !font-black text-black dark:text-white">
                 Aprobados recientes
-            </h2>
+            </flux:heading>
         </div>
 
         <div class="overflow-x-auto border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm">
@@ -137,13 +146,19 @@
                 <thead class="bg-zinc-100 dark:bg-zinc-800">
                     <tr>
                         <th class="px-4 py-3 text-left text-sm font-semibold text-black dark:text-white">
-                            Usuario
+                            <flux:text class="text-sm font-semibold text-black dark:text-white">
+                                Usuario
+                            </flux:text>
                         </th>
                         <th class="px-4 py-3 text-left text-sm font-semibold text-black dark:text-white">
-                            Tipo
+                            <flux:text class="text-sm font-semibold text-black dark:text-white">
+                                Tipo
+                            </flux:text>
                         </th>
                         <th class="px-4 py-3 text-left text-sm font-semibold text-black dark:text-white">
-                            Expira
+                            <flux:text class="text-sm font-semibold text-black dark:text-white">
+                                Expira
+                            </flux:text>
                         </th>
                     </tr>
                 </thead>
@@ -156,7 +171,7 @@
                             </td>
 
                             <td class="px-4 py-3 text-sm text-black/80 dark:text-white/80">
-                                {{ $r->clientType->typename }}
+                                {{ $r->clientType->type_name }}
                             </td>
 
                             <td class="px-4 py-3 text-sm text-black/80 dark:text-white/80">

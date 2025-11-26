@@ -15,11 +15,20 @@
 --}}
 <x-layouts.app :title="__('Editar tipo de cliente')">
     <div class="p-6 w-full max-w-3xl mx-auto">
-        <h2 class="text-2xl font-bold mb-5">Editar tipo de cliente</h2>
+        <div class="flex items-center justify-between mb-2">
+            <flux:heading level="2" size="xl" class="text-2xl !font-black mb-5 text-black dark:text-white">
+                Editar tipo de cliente
+            </flux:heading>
+
+            <flux:button variant="ghost" icon="arrow-long-left" icon-variant="outline" :href="route('parking.client-types.index')" wire:navigate>
+                    Regresar
+            </flux:button>
+        </div>
+
         @include('user.client_types._form', [
             'action' => route('parking.client-types.update', $clientType),
             'method' => 'PUT',
-            'clientType' => $clientType,
+            'client_type' => $clientType,
         ])
     </div>
 </x-layouts.app>

@@ -14,14 +14,16 @@
 * Revisor                      : 
 --}}
 <x-layouts.app :title="__('Mi estacionamiento')">
-  <div class="max-w-5xl mx-auto px-6 py-8">
-    <h1 class="text-2xl font-bold mb-6">Editar estacionamiento</h1>
+    <div class="max-w-5xl mx-auto px-6 py-8">
+        <flux:heading level="2" size="xl" class="text-2xl !font-black mb-6 text-black dark:text-white">
+          Editar estacionamiento
+        </flux:heading>
     
-    @include('user.parking._form', [
-        'action' => route('parking.update'),
-        'method' => 'PUT',
-        'parking' => $parking,
-        'formId' => 'parking-edit'
-    ])
-  </div>
+        @include('user.parking._form', [
+            'action' => route('parking.update'),
+            'method' => 'PUT',
+            'parking' => $parking,
+            'formId' => 'parking-edit'
+        ])
+    </div>
 </x-layouts.app>

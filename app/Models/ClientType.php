@@ -12,7 +12,7 @@ class ClientType extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'typename',
+        'type_name',
         'discount_type',
         'amount',
         'id_parking',

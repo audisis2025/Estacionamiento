@@ -172,5 +172,6 @@ return [
         'serial_number' => 'número de serie',
         'amount' => 'monto',
         'typename' => 'nombre del tipo',
+        'terms' => 'términos y condiciones'
     ],
 ];

@@ -59,7 +59,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <flux:field class="w-full">
-                <flux:label for="{{ $formId }}-type">
+                <flux:label for="{{ $formId }}-type" class="text-sm font-medium text-black dark:text-white">
                     Tipo de estacionamiento
                 </flux:label>
 
@@ -68,7 +68,7 @@
                 <flux:select
                     id="{{ $formId }}-type"
                     name="type"
-                    class="mt-1 w-full"
+                    class="mt-1 block w-full"
                 >
                     <option value="0" @selected($type === 0)>Tiempo libre (tarifa fija)</option>
                     <option value="1" @selected($type === 1)>Por hora</option>
@@ -139,15 +139,15 @@
     <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-3">
         <div id="{{ $formId }}-map" class="w-full h-96 min-h-[380px] rounded-lg overflow-hidden"></div>
 
-        <p class="mt-2 text-xs text-black/60 dark:text-white/60">
+        <flux:text class="mt-2 text-xs text-black/60 dark:text-white/60">
             Haz clic en el mapa o arrastra el marcador para establecer la ubicación del estacionamiento.
-        </p>
+        </flux:text>
     </div>
 
     <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-5">
-        <h2 class="text-lg font-semibold mb-3 text-black dark:text-white">
+        <flux:heading level="3" size="lg" class="text-lg !font-black mb-3 text-black dark:text-white">
             Horario del estacionamiento
-        </h2>
+        </flux:heading>
 
         <div class="mb-4">
             <flux:checkbox
@@ -223,9 +223,9 @@
             @endforeach
         </div>
 
-        <p class="mt-3 text-xs text-black/60 dark:text-white/60">
+        <flux:text class="mt-3 text-xs text-black/60 dark:text:white/60">
             Si no usas horario global, ingresa la hora de apertura y cierre por día o marca “Cerrado” cuando aplique.
-        </p>
+        </flux:text>
     </div>
 
     <div class="flex justify-center-safe">
@@ -264,13 +264,16 @@
 
             function togglePrices() 
             {
-                const t = parseInt($('type')?.value ?? '0', 10);
+                const typeElement = $('type');
+                if (!typeElement) return;
+                
+                const t = parseInt(typeElement.value ?? '0', 10);
 
                 const priceHourInput = $('price-hour');
                 const priceFlatInput = $('price-flat');
 
-                const priceHourWrapper = priceHourInput ? priceHourInput.closest('div') : null;
-                const priceFlatWrapper = priceFlatInput ? priceFlatInput.closest('div') : null;
+                const priceHourWrapper = priceHourInput?.closest('div');
+                const priceFlatWrapper = priceFlatInput?.closest('div');
 
                 if (t === 0) 
                 {
@@ -298,14 +301,26 @@
                 const hint = $('price-hint');
                 if (hint) 
                 {
-                    hint.textContent = t === 0 ? 'La tarifa usada será la fija (tiempo libre).' : t === 1 ? 'La tarifa usada será por hora.' :'En mixto se usan ambas: por hora y fija.';
+                    hint.textContent = t === 0 
+                        ? 'La tarifa usada será la fija (tiempo libre).' 
+                        : t === 1 
+                        ? 'La tarifa usada será por hora.' 
+                        : 'En mixto se usan ambas: por hora y fija.';
                 }
             }
 
             function run()
             {
-                $('type')?.addEventListener('change', togglePrices);
-                togglePrices();
+                requestAnimationFrame(() => 
+                {
+                    const typeElement = $('type');
+                    if (typeElement) 
+                    {
+                        typeElement.removeEventListener('change', togglePrices);
+                        typeElement.addEventListener('change', togglePrices);
+                        togglePrices();
+                    }
+                });
             }
 
             if (document.readyState === 'loading') 
@@ -315,6 +330,11 @@
             {
                 run();
             }
+            
+            document.addEventListener('livewire:navigated', () => 
+            {
+                setTimeout(run, 100);
+            });
         })();
     </script>
 

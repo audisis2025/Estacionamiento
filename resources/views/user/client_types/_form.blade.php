@@ -23,31 +23,30 @@
 
     <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-5 space-y-4">
         <flux:input
-            name="typename"
+            name="type_name"
             :label="__('Nombre del tipo de cliente')"
-            value="{{ old('typename', $clientType->typename ?? '') }}"
+            value="{{ old('typename', $client_type->type_name ?? '') }}"
             placeholder="Ej. Taxistas, Residentes, Empleados"
             required
         />
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <flux:field class="w-full">
-                <flux:label class="text-sm font-medium text-black dark:text-white">
-                    Tipo de descuento
-                </flux:label>
+        <flux:field class="w-full">
+            <flux:label class="text-sm font-medium text-black dark:text-white">
+                Tipo de descuento
+            </flux:label>
 
-                @php
-                    $dt = (int) old('discount_type', $clientType->discount_type ?? 0);
-                @endphp
+            @php
+                $dt = (int) old('discount_type', $client_type->discount_type ?? 0);
+            @endphp
 
-                <flux:select
-                    name="discount_type"
-                    class="mt-1 w-full"
-                >
-                    <option value="0" @selected($dt === 0)>Porcentaje (%)</option>
-                    <option value="1" @selected($dt === 1)>Cantidad fija ($)</option>
-                </flux:select>
-            </flux:field>
+            <flux:select
+                name="discount_type"
+                class="mt-1 w-full"
+            >
+                <option value="0" @selected($dt === 0)>Porcentaje (%)</option>
+                <option value="1" @selected($dt === 1)>Cantidad fija ($)</option>
+            </flux:select>
+        </flux:field>
 
             <flux:input
                 name="amount"
@@ -56,13 +55,13 @@
                 min="0"
                 :label="__('Monto')"
                 placeholder="Ej. 10 (si es %) o 20.00 (si es $)"
-                value="{{ old('amount', $clientType->amount ?? '') }}"
+                value="{{ old('amount', $client_type->amount ?? '') }}"
                 required
             />
         </div>
 
         <div class="flex justify-end gap-3">
-            @if ($clientType)
+            @if ($client_type)
                 <flux:button
                     type="submit"
                     variant="primary"

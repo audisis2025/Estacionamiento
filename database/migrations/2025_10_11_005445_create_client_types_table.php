@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('client_types', function (Blueprint $table) {
             $table->increments('id');                         // int auto_increment
-            $table->string('typename', 50);                   // not null
+            $table->string('type_name', 50);                   // not null
             $table->boolean('discount_type');                 // not null
             $table->decimal('amount', 10, 2);                          // not null
             $table->unsignedInteger('id_parking')->nullable();

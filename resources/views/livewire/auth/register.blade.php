@@ -31,6 +31,7 @@ new #[Layout('components.layouts.auth')] class extends Component
     public string $password = '';
     public string $password_confirmation = '';
     public string $phone_number = '';
+    public bool $terms = false;
 
     public function register(): void
     {
@@ -39,6 +40,7 @@ new #[Layout('components.layouts.auth')] class extends Component
             'email'         => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
             'password'      => ['required', 'string', 'confirmed', Rules\Password::defaults()],
             'phone_number' => ['required', 'numeric', 'digits:10', 'unique:users,phone_number'],
+            'terms'         => ['accepted'],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -91,7 +93,7 @@ new #[Layout('components.layouts.auth')] class extends Component
             required
             autofocus
             autocomplete="name"
-            :placeholder="__('Pedro Filomeno')"
+            :placeholder="__('Juan Pérez')"
         />
 
         <flux:input
@@ -131,6 +133,28 @@ new #[Layout('components.layouts.auth')] class extends Component
             :placeholder="__('Confirmar contraseña')"
             viewable
         />
+
+        <div class="flex items-start gap-3">
+            <flux:checkbox
+                id="terms"
+                wire:model="terms"
+                name="terms"
+                class="mt-0.5"
+            />
+
+            <flux:text class="text-xs text-black/70 dark:text-white/70">
+                He leído y acepto los
+                <flux:link
+                    href="{{ route('terms') }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-custom-blue hover:text-custom-blue-dark underline underline-offset-4"
+                >
+                    Términos y Condiciones
+                </flux:link>
+                de Parking+.
+            </flux:text>
+        </div>
 
         <div class="flex items-center justify-end">
             <flux:button icon="plus" icon-variant="outline" type="submit" variant="primary" class="w-full bg-custom-blue hover:bg-custom-blue-dark text-white" data-test="register-user-button">

@@ -30,13 +30,13 @@ class ClientTypeApprovalController extends Controller
 		$parking = Auth::user()->parking;
 
 		$pending = $parking->userClientTypes()
-			->with(['user:id,name,email,phone_number','clientType:id,typename,discount_type,amount,id_parking'])
+			->with(['user:id,name,email,phone_number','clientType:id,type_name,discount_type,amount,id_parking'])
 			->where('approval', 0)
 			->orderByDesc('id')
 			->get();
 
 		$approved = $parking->userClientTypes()
-			->with(['user:id,name,email,phone_number','clientType:id,typename,discount_type,amount,id_parking'])
+			->with(['user:id,name,email,phone_number','clientType:id,type_name,discount_type,amount,id_parking'])
 			->where('approval', 1)
 			->orderByDesc('id')
 			->limit(30)

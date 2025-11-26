@@ -28,9 +28,14 @@
     <body class="font-sans bg-zinc-50 dark:bg-zinc-900 text-black dark:text-white flex flex-col min-h-screen">
         <header class="bg-white dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700 py-4 shadow-sm">
             <div class="container mx-auto px-6 flex justify-between items-center">
-                <flux:heading level="1" size="xl" class="text-2xl font-bold text-custom-blue">
-                    Parking+
-                </flux:heading>
+                <div class="flex items-center gap-3">
+                    <div class="flex aspect-square size-12 items-center justify-center rounded-md text-accent-foreground">
+                        <x-app-logo-icon class="size-9 fill-current text-white" />
+                    </div>
+                    <flux:heading level="1" size="xl" class="text-2xl !font-bold text-custom-blue">
+                        Parking+
+                    </flux:heading>
+                </div>
 
                 <nav class="space-x-4">
                     <flux:button icon="user-circle" icon-variant="outline" variant="primary" :href="route('login')"
@@ -47,7 +52,7 @@
         </header>
 
         <main class="flex-grow container mx-auto px-6 py-16 text-center">
-            <flux:heading level="2" size="xl" class="text-4xl font-extrabold mb-4">
+            <flux:heading level="2" size="xl" class="text-4xl !font-extrabold mb-4">
                 Bienvenido a Parking+
             </flux:heading>
 
@@ -100,10 +105,13 @@
             </flux:text>
 
             <p class="mt-2">
-                <a href="{{ route('terms') }}" target="_blank" rel="noopener noreferrer"
-                    class="text-custom-blue hover:text-custom-blue-dark text-sm underline-offset-4 hover:underline">
+                <flux:link
+                    href="{{ route('terms') }}"
+                    class="text-custom-blue hover:text-custom-blue-dark text-sm underline-offset-4 hover:underline"
+                    target="_blank" rel="noopener noreferrer"
+                >
                     Términos y Condiciones
-                </a>
+                </flux:link>
             </p>
         </footer>
     </body>

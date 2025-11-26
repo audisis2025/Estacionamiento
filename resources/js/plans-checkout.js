@@ -94,7 +94,6 @@ function initPlansCheckout(config)
             onClick: function (data, actions)
             {
                 const checked = document.querySelector('input[name="plan_id"]:checked');
-                const termsCheckbox = document.getElementById('terms');
 
                 if (!checked)
                 {
@@ -103,18 +102,6 @@ function initPlansCheckout(config)
                         icon: 'warning',
                         title: 'Plan no seleccionado',
                         text: 'Por favor selecciona un plan antes de continuar',
-                    });
-
-                    return actions.reject();
-                }
-
-                if (!termsCheckbox || !termsCheckbox.checked)
-                {
-                    Swal.fire(
-                    {
-                        icon: 'warning',
-                        title: 'Términos y Condiciones',
-                        text: 'Debes aceptar los Términos y Condiciones antes de continuar con el pago.',
                     });
 
                     return actions.reject();
