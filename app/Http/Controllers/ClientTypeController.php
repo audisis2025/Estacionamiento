@@ -35,7 +35,7 @@ class ClientTypeController extends Controller
             return redirect()->route('parking.edit')->with('swal', [
                 'icon'  => 'warning',
                 'title' => 'Configura tu estacionamiento',
-                'text'  => 'Debes registrar tu estacionamiento y su horario antes de administrar tipos de cliente.',
+                'text'  => 'Debes registrar tu estacionamiento y su horario antes de administrar tipos de cliente.'
             ]);
         }
 
@@ -63,19 +63,17 @@ class ClientTypeController extends Controller
                     'string',
                     'max:50',
                     Rule::unique('client_types', 'type_name')
-                        ->where(
-                            fn ($query) => $query->where('id_parking', $parking->id)
-                        ),
+                        ->where(fn ($query) => $query->where('id_parking', $parking->id))
                 ],
                 'discount_type' => [
                     'required',
                     'integer',
-                    Rule::in([0, 1]),
+                    Rule::in([0, 1])
                 ],
                 'amount' => [
                     'required',
                     'numeric',
-                    'min:1',
+                    'min:1'
                 ],
             ]);
 
@@ -84,14 +82,11 @@ class ClientTypeController extends Controller
             return redirect()->route('parking.client-types.index')->with('swal', [
                 'icon'  => 'success',
                 'title' => 'Tipo creado',
-                'text'  => 'El tipo de cliente se registró correctamente.',
+                'text'  => 'El tipo de cliente se registró correctamente.'
             ]);
-        }
-        catch (ValidationException $e)
+        }catch (ValidationException $e)
         {
-            $allErrors = collect($e->errors())
-                ->flatten()
-                ->toArray();
+            $allErrors = collect($e->errors())->flatten()->toArray();
 
             $errorList = '<ul style="text-align: left; margin-left: 20px;">';
 
@@ -105,7 +100,7 @@ class ClientTypeController extends Controller
             return back()->with('swal', [
                 'icon'  => 'error',
                 'title' => 'Errores en el formulario',
-                'html'  => $errorList,
+                'html'  => $errorList
             ])->withInput();
         }
     }
@@ -132,17 +127,17 @@ class ClientTypeController extends Controller
                     'max:50',
                     Rule::unique('client_types', 'type_name')
                         ->where(fn ($query) => $query->where('id_parking', $parking->id))
-                        ->ignore($clientType->id),
+                        ->ignore($clientType->id)
                 ],
                 'discount_type' => [
                     'required',
                     'integer',
-                    Rule::in([0, 1]),
+                    Rule::in([0, 1])
                 ],
                 'amount' => [
                     'required',
                     'numeric',
-                    'min:1',
+                    'min:1'
                 ],
             ]);
 
@@ -151,14 +146,11 @@ class ClientTypeController extends Controller
             return redirect()->route('parking.client-types.index')->with('swal', [
                 'icon'  => 'success',
                 'title' => 'Tipo actualizado',
-                'text'  => 'Los cambios se guardaron correctamente.',
+                'text'  => 'Los cambios se guardaron correctamente.'
             ]);
-        }
-        catch (ValidationException $e)
+        } catch (ValidationException $e)
         {
-            $allErrors = collect($e->errors())
-                ->flatten()
-                ->toArray();
+            $allErrors = collect($e->errors())->flatten()->toArray();
 
             $errorList = '<ul style="text-align: left; margin-left: 20px;">';
 
@@ -172,7 +164,7 @@ class ClientTypeController extends Controller
             return back()->with('swal', [
                 'icon'  => 'error',
                 'title' => 'Errores en el formulario',
-                'html'  => $errorList,
+                'html'  => $errorList
             ])->withInput();
         }
     }
@@ -186,7 +178,7 @@ class ClientTypeController extends Controller
         return redirect()->route('parking.client-types.index')->with('swal', [
             'icon'  => 'success',
             'title' => 'Tipo eliminado',
-            'text'  => 'El tipo de cliente fue eliminado.',
+            'text'  => 'El tipo de cliente fue eliminado.'
         ]);
     }
 

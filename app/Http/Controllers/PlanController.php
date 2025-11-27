@@ -43,7 +43,7 @@ class PlanController extends Controller
                     'max:60',
                     Rule::unique('plans', 'name')
                         ->where(fn($q) => $q->where('type', $request->type))
-                        ->ignore($plan->id),
+                        ->ignore($plan->id)
                 ],
                 'price' => [
                     'required', 
@@ -70,7 +70,7 @@ class PlanController extends Controller
             ->with('swal', [
                 'icon'  => 'success',
                 'title' => '¡Plan actualizado!',
-                'text'  => 'Los cambios se guardaron correctamente.',
+                'text'  => 'Los cambios se guardaron correctamente.'
             ]);
     }
 }

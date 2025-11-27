@@ -35,7 +35,7 @@ class EntryController extends Controller
         $phone = trim($request->input('q', ''));
 
         $entries = Transaction::query()
-            ->with(['user:id,name,email,phone_number',])
+            ->with(['user:id,name,email,phone_number'])
             ->whereIn('id_qr_reader', $readerIds)
             ->where(function ($where)
             {
@@ -79,12 +79,14 @@ class EntryController extends Controller
             return back()->with('error', 'No autorizado para liberar esta transacción.');
         }
 
-        try {
-            DB::transaction(function () use ($transaction, $parking, $request) {
-
+        try 
+        {
+            DB::transaction(function () use ($transaction, $parking, $request) 
+            {
                 $t = Transaction::whereKey($transaction->id)->lockForUpdate()->first();
 
-                if (! is_null($t->departure_date)) {
+                if (! is_null($t->departure_date)) 
+                {
                     abort(409, 'La transacción ya fue liberada o cerrada.');
                 }
 
@@ -133,8 +135,7 @@ class EntryController extends Controller
                     {
                         $pct = min(100, max(0, (float) $ct->amount));
                         $charge -= round($charge * ($pct / 100), 2);
-                    }
-                    elseif ((int) $ct->discount_type === 1) 
+                    } elseif ((int) $ct->discount_type === 1) 
                     {
                         $charge -= (float) $ct->amount;
                     }
@@ -142,16 +143,13 @@ class EntryController extends Controller
 
                 $charge = round(max(0, $charge), 2);
 
-                $t->update([
-                    'amount'         => $charge,
-                    'departure_date' => $releasedAt,
-                ]);
+                $t->update(['amount' => $charge,'departure_date' => $releasedAt,]);
             });
 
             return back()->with('ok', 'Salida liberada correctamente. Monto calculado con decimales y descuentos.');
-        } catch (\Throwable $e) {
+        } catch (\Throwable $e) 
+        {
             return back()->with('error', 'Ocurrió un error al liberar la salida.');
         }
     }
-
 }

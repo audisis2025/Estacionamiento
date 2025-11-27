@@ -149,7 +149,7 @@ function initPlansCheckout(config)
                     {
                         icon: 'error',
                         title: 'Error',
-                        text: err.message || 'No se pudo crear la orden',
+                        text: err.message || 'No se pudo crear la orden'
                     });
 
                     throw err;
@@ -218,7 +218,7 @@ function initPlansCheckout(config)
                     {
                         icon: 'error',
                         title: 'Error de conexión',
-                        text: 'No se pudo conectar con el servidor. Por favor intenta nuevamente.',
+                        text: 'No se pudo conectar con el servidor. Por favor intenta nuevamente.'
                     });
                 });
             },
@@ -229,7 +229,7 @@ function initPlansCheckout(config)
                 {
                     icon: 'error',
                     title: 'Pago cancelado',
-                    text: 'Has cancelado el proceso de pago',
+                    text: 'Has cancelado el proceso de pago'
                 });
             },
 

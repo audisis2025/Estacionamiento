@@ -8,6 +8,12 @@
 * Fecha de liberación        : 06/11/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
 */
 
 namespace App\Http\Controllers;
@@ -39,7 +45,7 @@ class ScanController extends Controller
     {
         $this->ensureOwnership($reader);
 
-        $data = $request->validate(['qr' => ['required', 'string'],]);
+        $data = $request->validate(['qr' => ['required', 'string']]);
 
         $raw = trim($data['qr']);
         $raw = preg_replace(
@@ -66,7 +72,7 @@ class ScanController extends Controller
                 $user,
                 'Parking+',
                 'Fecha/hora inválida en el código QR.',
-                ['event' => 'qr_error','code' => 'date_invalid',]
+                ['event' => 'qr_error','code' => 'date_invalid']
             );
 
             return $this->fail('Fecha/hora inválida en el QR.');
@@ -78,7 +84,7 @@ class ScanController extends Controller
                 $user,
                 'Parking+',
                 'QR expirado. Vuelve a generar el código en la app (15s).',
-                ['event' => 'qr_error','code'  => 'expired',]
+                ['event' => 'qr_error','code'  => 'expired']
             );
 
             return $this->fail('QR expirado. Vuelve a generar el código (15s).');
@@ -92,13 +98,13 @@ class ScanController extends Controller
         $parking = auth()->user()->parking;
         $readerIds = $parking->qrReaders()->pluck('id');
 
-         if (! isset($payload['lat'], $payload['lng'])) 
+        if (! isset($payload['lat'], $payload['lng'])) 
         {
             $this->notifyUser(
                 $user,
                 'Parking+',
                 'El QR no contiene información de ubicación del dispositivo.',
-                ['event' => 'qr_error','code'  => 'no_location',]
+                ['event' => 'qr_error','code'  => 'no_location']
             );
 
             return $this->fail('El QR no contiene información de ubicación del dispositivo.');
@@ -128,7 +134,7 @@ class ScanController extends Controller
                     [
                         'event'    => 'qr_error',
                         'code'     => 'too_far',
-                        'distance' => (string) round($distanceKm, 2),
+                        'distance' => (string) round($distanceKm, 2)
                     ]
                 );
 
@@ -148,7 +154,7 @@ class ScanController extends Controller
                 $user,
                 'Parking+',
                 'Este lector es de salida y no tienes una entrada abierta.',
-                ['event' => 'error','code'  => 'no_open_entry',]
+                ['event' => 'error','code'  => 'no_open_entry']
             );
 
             return $this->fail('Este lector es de salida y el usuario no tiene entrada abierta.');
@@ -160,7 +166,7 @@ class ScanController extends Controller
                 $user,
                 'Parking+',
                 'Este lector es de entrada y ya tienes una estancia abierta.',
-                ['event' => 'error','code'  => 'already_open_entry',]
+                ['event' => 'error','code'  => 'already_open_entry']
             );
 
             return $this->fail('Este lector es de entrada y el usuario ya tiene una estancia abierta.');
@@ -202,27 +208,27 @@ class ScanController extends Controller
                     'Parking+',
                     'Elige cómo deseas que se cobre',
                     [
-                        'event'        => 'choose_billing_mode',
-                        'parking_id'   => (string) $parking->id,
+                        'event' => 'choose_billing_mode',
+                        'parking_id' => (string) $parking->id,
                         'qr_reader_id' => (string) $reader->id,
                         'qr_timestamp' => $qrTime->toDateTimeString(),
-                        'price_hour'   => (string) ($parking->price ?? 0),
-                        'price_flat'   => (string) ($parking->price_flat ?? $parking->price ?? 0),
+                        'price_hour' => (string) ($parking->price ?? 0),
+                        'price_flat' => (string) ($parking->price_flat ?? $parking->price ?? 0)
                     ]
                 );
 
-                return $this->ok('Entrada pendiente de confirmación por el usuario.', ['event' => 'entry_pending',]);
+                return $this->ok('Entrada pendiente de confirmación por el usuario.', ['event' => 'entry_pending']);
             }
 
             $billingMode = $parkingType === 0 ? 'flat' : 'hour';
 
             $tx = Transaction::create([
-                'amount'         => null,
-                'entry_date'     => now(),
+                'amount' => null,
+                'entry_date' => now(),
                 'departure_date' => null,
-                'id_qr_reader'   => $reader->id,
-                'id_user'        => $user->id,
-                'billing_mode'   => $billingMode,
+                'id_qr_reader' => $reader->id,
+                'id_user' => $user->id,
+                'billing_mode' => $billingMode
             ]);
 
             $this->notifyUser(
@@ -230,17 +236,17 @@ class ScanController extends Controller
                 'Parking+',
                 'Entrada registrada correctamente.',
                 [
-                    'event'   => 'entry',
-                    'tx_id'   => (string) $tx->id,
-                    'mode'    => $billingMode,
-                    'parking' => (string) $parking->id,
+                    'event' => 'entry',
+                    'tx_id' => (string) $tx->id,
+                    'mode' => $billingMode,
+                    'parking' => (string) $parking->id
                 ]
             );
 
             return $this->ok('Entrada registrada', [
-                'event'          => 'entry',
+                'event' => 'entry',
                 'transaction_id' => $tx->id,
-                'when'           => $tx->entry_date->toDateTimeString(),
+                'when' => $tx->entry_date->toDateTimeString()
             ]);
         }
 
@@ -266,7 +272,7 @@ class ScanController extends Controller
                 $user,
                 'Parking+',
                 'Saldo insuficiente para completar el pago.',
-                ['event'  => 'no_funds','charge' => (string) $charge,]
+                ['event'  => 'no_funds','charge' => (string) $charge]
             );
 
             return $this->fail('Saldo insuficiente para completar el pago.');
@@ -292,7 +298,7 @@ class ScanController extends Controller
                 $openTx->update([
                     'amount' => round($charge, 2),
                     'departure_date' => now(),
-                    'id_qr_reader'   => $reader->id,
+                    'id_qr_reader'   => $reader->id
                 ]);
             });
         } catch (\RuntimeException $exception) 
@@ -303,7 +309,7 @@ class ScanController extends Controller
                     $user,
                     'Parking+',
                     'Saldo insuficiente para completar el pago.',
-                    ['event' => 'no_funds','charge' => (string) $charge,]
+                    ['event' => 'no_funds','charge' => (string) $charge]
                 );
 
                 return $this->fail('Saldo insuficiente para completar el pago.');
@@ -316,18 +322,18 @@ class ScanController extends Controller
             'Parking+',
             'Salida registrada. Monto cobrado: $' . number_format($charge, 2),
             [
-                'event'   => 'exit',
-                'tx_id'   => (string) $openTx->id,
+                'event' => 'exit',
+                'tx_id' => (string) $openTx->id,
                 'charged' => (string) $charge,
-                'minutes' => (string) $minutes,
+                'minutes' => (string) $minutes
             ]
         );
 
         return $this->ok('Salida registrada', [
-            'event'          => 'exit',
+            'event' => 'exit',
             'transaction_id' => $openTx->id,
-            'charged'        => $charge,
-            'minutes'        => $minutes,
+            'charged' => $charge,
+            'minutes' => $minutes
         ]);
     }
 
@@ -337,10 +343,11 @@ class ScanController extends Controller
 
         $authorized = $parking && $reader->id_parking === $parking->id;
 
-        if (! $authorized) {
+        if (! $authorized) 
+        {
             if (request()->expectsJson()) 
             {
-                abort(response()->json(['ok' => false,'message' => 'No autorizado.',], 403));
+                abort(response()->json(['ok' => false,'message' => 'No autorizado.'], 403));
             }
 
             abort(403, 'No autorizado.');
@@ -409,7 +416,7 @@ class ScanController extends Controller
         return response()->json([
             'ok'      => true,
             'message' => $msg,
-            'data'    => $data,
+            'data'    => $data
         ]);
     }
 
@@ -418,13 +425,13 @@ class ScanController extends Controller
         return response()->json([
             'ok'     => true,
             'silent' => true,
-            'reason' => $reason,
+            'reason' => $reason
         ]);
     }
 
     private function fail(string $msg, int $code = 422): JsonResponse
     {
-        return response()->json(['ok' => false, 'message' => $msg,], $code);
+        return response()->json(['ok' => false, 'message' => $msg], $code);
     }
 
 

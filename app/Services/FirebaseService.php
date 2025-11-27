@@ -1,5 +1,19 @@
 <?php
-
+/*
+* Nombre de la clase         : FirebaseService.php
+* Descripción de la clase    : Servicio para el envio de notificacion a la app de flutter
+* Fecha de creación          : 20/11/2025
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 20/11/2025
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0 
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
+*/
 namespace App\Services;
 
 use Google\Client as GoogleClient;
@@ -18,7 +32,7 @@ class FirebaseService
         $this->proyectId = json_decode(file_get_contents($this->credentials))->project_id;
     }
 
-    public function getAccesToken()
+    public function getAccesToken() : string
     {
         $client = new GoogleClient();
         $client-> setAuthConfig($this->credentials);
@@ -29,7 +43,7 @@ class FirebaseService
         return $token['access_token'];
     }
 
-    public function sendNotification(string $token, string $title, string $body, array $data)
+    public function sendNotification(string $token, string $title, string $body, array $data) : array
     {
         $accessToken = $this->getAccesToken();
 
@@ -38,11 +52,8 @@ class FirebaseService
         $payload = [
             'message' => [
                 'token' => $token,
-                'notification' => [
-                    'title' => $title,
-                    'body' => $body,
-                ],
-                'data' => $data,
+                'notification' => ['title' => $title, 'body' => $body],
+                'data' => $data
             ],
         ];
 

@@ -1,4 +1,19 @@
 <?php
+/*
+* Nombre de la clase         : PaypalService.php
+* Descripción de la clase    : Servicio para validar las credenciales del usuario
+* Fecha de creación          : 03/11/2025
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 04/11/2025
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0 
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
+*/
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
@@ -27,9 +42,7 @@ class PayPalService
         {
             $resp = Http::asForm()
                 ->withBasicAuth($this->clientId, $this->secret)
-                ->post("{$this->base}/v1/oauth2/token", [
-                    'grant_type' => 'client_credentials'
-                ]);
+                ->post("{$this->base}/v1/oauth2/token", ['grant_type' => 'client_credentials']);
 
             if (!$resp->successful()) 
             {
@@ -56,11 +69,14 @@ class PayPalService
             'intent' => 'CAPTURE',
             'purchase_units' => [[
                 'reference_id' => $reference,
-                'amount' => [
-                    'currency_code' => $this->currency,
-                    'value' => number_format($amount, 2, '.', ''),
-                ],
-            ]],
+                'amount' => [ 'currency_code' => $this->currency, 'value' => number_format(
+                    $amount,
+                    2, 
+                    '.',
+                    ''
+                )
+                ]
+            ]]
         ];
 
         try 
@@ -75,10 +91,7 @@ class PayPalService
 
             if (!$resp->successful()) 
             {
-                Log::error('PayPal createOrder failed', [
-                    'status' => $resp->status(),
-                    'debug_id' => $resp->json()['debug_id'] ?? null
-                ]);
+                Log::error('PayPal createOrder failed', [ 'status' => $resp->status(),'debug_id' => $resp->json()['debug_id'] ?? null]);
             }
 
             return ['status' => $resp->status(), 'body' => $resp->json()];
@@ -160,10 +173,7 @@ class PayPalService
 
             if (!$resp->successful()) 
             {
-                Log::error('PayPal getOrder failed', [
-                    'orderId' => $orderId,
-                    'status' => $resp->status()
-                ]);
+                Log::error('PayPal getOrder failed', ['orderId' => $orderId,'status' => $resp->status()]);
             }
 
             return ['status' => $resp->status(), 'body' => $resp->json()];

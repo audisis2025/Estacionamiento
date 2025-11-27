@@ -1,9 +1,26 @@
 <?php
-
+/*
+* Nombre de la clase         : UserClientType.php
+* Descripción de la clase    : Modelo Eloquent para la tabla 'user_client_types', que registra la relación de un 
+                               usuario con un tipo de cliente específico.
+* Fecha de creación          : 02/11/2025
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 02/11/2025
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0 
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
+*/
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class UserClientType extends Model
 {
@@ -14,13 +31,10 @@ class UserClientType extends Model
         'approval',
         'expiration_date', 
         'id_user',
-        'id_client_type',
+        'id_client_type'
     ];
 
-    protected $casts = [
-        'approval'        => 'integer',
-        'expiration_date' => 'date',
-    ];
+    protected $casts = ['approval' => 'integer', 'expiration_date' => 'date'];
 
     public function user(): BelongsTo
     {
@@ -32,16 +46,16 @@ class UserClientType extends Model
         return $this->belongsTo(ClientType::class, 'id_client_type', 'id');
     }
 
-    public function parking()
+    public function parking(): ?HasOneThrough
     {
         return $this->clientType?->parking();
     }
 
-    public function scopePending($q)
+    public function scopePending($q): Builder
     {
         return $q->where('approval', 0);
     }
-    public function scopeApproved($q)
+    public function scopeApproved($q): Builder
     {
         return $q->where('approval', 1);
     }

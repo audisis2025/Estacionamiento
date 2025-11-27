@@ -7,6 +7,12 @@
 * Fecha de liberación        : 06/11/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0 
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
 */
 
 namespace App\Http\Controllers;

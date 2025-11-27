@@ -36,7 +36,7 @@ class QrReaderController extends Controller
                 ->with('swal', [
                     'icon'  => 'warning',
                     'title' => 'Configura tu estacionamiento',
-                    'text'  => 'Debes dar de alta tu estacionamiento antes de administrar lectores.',
+                    'text'  => 'Debes dar de alta tu estacionamiento antes de administrar lectores.'
                 ]);
         }
 
@@ -64,7 +64,7 @@ class QrReaderController extends Controller
                     'string',
                     'max:50',
                     Rule::unique('qr_readers', 'serial_number')
-                        ->where( fn ($query) => $query->where('id_parking', $parking->id)),
+                        ->where( fn ($query) => $query->where('id_parking', $parking->id))
                 ],
                 'sense' => [
                     'required',
@@ -73,21 +73,20 @@ class QrReaderController extends Controller
                         0,
                         1,
                         2
-                    ]),
-                ],
+                    ])
+                ]
             ]);
 
-            $parking->qrReaders()->create(['serial_number' => $data['serial_number'],'sense' => $data['sense'],]);
+            $parking->qrReaders()->create(['serial_number' => $data['serial_number'],'sense' => $data['sense']]);
 
             return redirect()
                 ->route('parking.qr-readers.index')
                 ->with('swal', [
                     'icon'  => 'success',
                     'title' => 'Lector creado',
-                    'text'  => 'El lector QR se registró correctamente.',
+                    'text'  => 'El lector QR se registró correctamente.'
                 ]);
-        }
-        catch (ValidationException $exception)
+        } catch (ValidationException $exception)
         {
             $firstError = collect($exception->errors())
                 ->first()[0] ?? 'Error de validación';
@@ -96,7 +95,7 @@ class QrReaderController extends Controller
                 ->with('swal', [
                     'icon'  => 'error',
                     'title' => 'Error de validación',
-                    'text'  => $firstError,
+                    'text'  => $firstError
                 ])
                 ->withInput();
         }
@@ -124,7 +123,7 @@ class QrReaderController extends Controller
                     'max:50',
                     Rule::unique('qr_readers', 'serial_number')
                         ->where(fn ($query) => $query->where('id_parking', $parking->id))
-                        ->ignore($reader->id),
+                        ->ignore($reader->id)
                 ],
                 'sense' => [
                     'required',
@@ -133,8 +132,8 @@ class QrReaderController extends Controller
                         0, 
                         1, 
                         2
-                    ]),
-                ],
+                    ])
+                ]
             ]);
 
             $reader->update($data);
@@ -144,10 +143,9 @@ class QrReaderController extends Controller
                 ->with('swal', [
                     'icon'  => 'success',
                     'title' => 'Lector actualizado',
-                    'text'  => 'Se guardaron los cambios correctamente.',
+                    'text'  => 'Se guardaron los cambios correctamente.'
                 ]);
-        }
-        catch (ValidationException $exception)
+        } catch (ValidationException $exception)
         {
             $firstError = collect($exception->errors())
                 ->first()[0] ?? 'Error de validación';
@@ -156,7 +154,7 @@ class QrReaderController extends Controller
                 ->with('swal', [
                     'icon'  => 'error',
                     'title' => 'Error de validación',
-                    'text'  => $firstError,
+                    'text'  => $firstError
                 ])
                 ->withInput();
         }
@@ -173,7 +171,7 @@ class QrReaderController extends Controller
             ->with('swal', [
                 'icon'  => 'success',
                 'title' => 'Lector eliminado',
-                'text'  => 'El lector QR fue eliminado.',
+                'text'  => 'El lector QR fue eliminado.'
             ]);
     }
 

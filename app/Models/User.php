@@ -1,8 +1,26 @@
 <?php
-
+/*
+* Nombre de la clase         : User.php
+* Descripción de la clase    : Modelo principal para la gestión de usuarios, incluyendo autenticación, 
+                               roles y planes de suscripción.
+* Fecha de creación          : 02/11/2025
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 02/11/2025
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0 
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
+*/
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -30,7 +48,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'two_factor_secret',
-        'two_factor_recovery_codes',
+        'two_factor_recovery_codes'
     ];
 
     protected function casts(): array
@@ -39,7 +57,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'end_date' => 'datetime',
             'amount' => 'decimal:2',
-            'password' => 'hashed',
+            'password' => 'hashed'
         ];
     }
 
@@ -52,23 +70,37 @@ class User extends Authenticatable
             ->implode('');
     }
 
-    public function plan()
+    public function plan(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Plan::class, 'id_plan');
+        return $this->belongsTo(Plan::class, 'id_plan');
     }
 
     public function hasActivePlan(): bool
     {
-        if (!$this->id_plan || !$this->end_date) return false;
-        return now()->lessThanOrEqualTo(\Carbon\Carbon::parse($this->end_date));
+       if (! $this->id_plan) 
+        {
+            return false;
+        }
+
+        if ((int) $this->id_plan === 4) 
+        {
+            return true;
+        }
+
+        if (! $this->end_date) 
+        {
+            return false;
+        }
+
+        return now()->lessThanOrEqualTo($this->end_date);
     }
 
-    public function parking()
+    public function parking(): HasOne
     {
         return $this->hasOne(Parking::class, 'id_user', 'id');
     }
 
-    public function role()
+    public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class, 'id_role');
     }
@@ -87,18 +119,22 @@ class User extends Authenticatable
     {
         return (int) $this->id_role === 3;
     }
-    public function userClientTypes()
+
+    public function userClientTypes(): HasMany
     {
         return $this->hasMany(UserClientType::class, 'id_user', 'id');
     }
-    public function transactions()
+
+    public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class, 'id_user');
     }
+
     public function hasEnoughBalance(int|float $amount): bool
     {
         return (float)$this->amount >= (float)$amount;
     }
+    
     public function activeUserClientTypeForParking(int $parkingId): ?UserClientType
     {
         return $this->userClientTypes()

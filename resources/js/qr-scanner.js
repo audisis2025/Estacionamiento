@@ -84,7 +84,7 @@ export default function initQrScanner(routeUrl, csrfTok)
                         method      : 'POST',
                         headers     : { 'X-CSRF-TOKEN': csrfTok },
                         body        : fd,
-                        credentials : 'same-origin',
+                        credentials : 'same-origin'
                     });
 
                     const json = await res.json().catch(() => ({}));
@@ -100,11 +100,12 @@ export default function initQrScanner(routeUrl, csrfTok)
 
                         if (evt === 'entry' || evt === 'exit') 
                         {
-                            Swal.fire({
+                            Swal.fire(
+                            {
                                 icon : 'success',
                                 title : json.message || (evt === 'entry' ? 'Entrada registrada' : 'Salida registrada'),
                                 timer : 2000,
-                                showConfirmButton: false,
+                                showConfirmButton: false
                             });
                         } else if (evt === 'entry_pending') 
                         {
@@ -114,11 +115,10 @@ export default function initQrScanner(routeUrl, csrfTok)
                                 title: 'Entrada pendiente',
                                 text: 'El usuario debe confirmar en la app si pagará por hora o por tiempo libre.',
                                 timer: 4000,
-                                showConfirmButton: false,
+                                showConfirmButton: false
                             });
                         }
                     }
-
 
                     if (! res.ok || (json && json.ok === false))
                     {
@@ -127,7 +127,7 @@ export default function initQrScanner(routeUrl, csrfTok)
                             icon : 'error',
                             title : (json && json.message) ? json.message : `Error ${res.status}`,
                             timer : 3000,
-                            showConfirmButton: false,
+                            showConfirmButton: false
                         });
                     }
                 } catch (e)

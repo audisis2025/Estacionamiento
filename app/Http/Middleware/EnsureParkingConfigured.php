@@ -1,14 +1,29 @@
 <?php
-
+/*
+* Nombre de la clase         : EnsureParkingConfigured.php
+* Descripción de la clase    : Asegura que el usuario tenga un estacionamiento configurado y con horario antes de acceder a ciertas rutas.
+* Fecha de creación          : 06/11/2025
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 06/11/2025
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0 
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
+*/
 namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\RedirectResponse;
 
 class EnsureParkingConfigured
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response|RedirectResponse
     {
         $user = $request->user();
         $parking = $user?->parking;
@@ -20,7 +35,7 @@ class EnsureParkingConfigured
                 ->with('swal', [
                     'icon'  => 'warning',
                     'title' => 'Configura tu estacionamiento',
-                    'text'  => 'Debes dar de alta tu estacionamiento antes de registrar lectores.',
+                    'text'  => 'Debes dar de alta tu estacionamiento antes de registrar lectores.'
                 ]);
         }
 
@@ -32,10 +47,9 @@ class EnsureParkingConfigured
                 ->with('swal', [
                     'icon'  => 'warning',
                     'title' => 'Falta tu horario',
-                    'text'  => 'Configura el horario del estacionamiento antes de registrar lectores.',
+                    'text'  => 'Configura el horario del estacionamiento antes de registrar lectores.'
                 ]);
         }
-
         return $next($request);
     }
 }

@@ -20,11 +20,12 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) 
     {
         $middleware->alias([
-        'ensure.active.plan' => \App\Http\Middleware\EnsureActivePlan::class,
-        'ensure.parking.configured'=> \App\Http\Middleware\EnsureParkingConfigured::class,
-        'ensure.billing.access' => \App\Http\Middleware\EnsureBillingAccess::class,
+            'ensure.active.plan' => \App\Http\Middleware\EnsureActivePlan::class,
+            'ensure.parking.configured'=> \App\Http\Middleware\EnsureParkingConfigured::class,
+            'ensure.billing.access' => \App\Http\Middleware\EnsureBillingAccess::class
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions) {
+    ->withExceptions(function (Exceptions $exceptions) 
+    {
         //
     })->create();

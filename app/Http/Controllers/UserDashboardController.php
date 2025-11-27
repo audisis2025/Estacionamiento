@@ -17,6 +17,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateNotificationTokenRequest;
+use App\Models\User;
 use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -76,17 +77,17 @@ class UserDashboardController extends Controller
             $kpis = [
                 'revenue'       => 0,
                 'users_normal'  => 0,
-                'users_dynamic' => 0,
+                'users_dynamic' => 0
             ];
 
             return view('user.dashboard', [
-                'range'        => $range,
-                'revenue'      => $revenue,
-                'users_normal'  => $usersNormal,
+                'range' => $range,
+                'revenue' => $revenue,
+                'users_normal' => $usersNormal,
                 'users_dynamic' => $usersDynamic,
-                'kpis'         => $kpis,
-                'has_parking'   => $hasParking,
-                'readers_count' => $hasParking ? $parking->qrReaders()->count() : 0,
+                'kpis' => $kpis,
+                'has_parking' => $hasParking,
+                'readers_count' => $hasParking ? $parking->qrReaders()->count() : 0
             ]);
         }
 
@@ -99,7 +100,12 @@ class UserDashboardController extends Controller
             ->get();
 
         $usersNormal = DB::table('transactions as t')
-            ->join('users as u', 'u.id', '=', 't.id_user')
+            ->join(
+                'users as u', 
+                'u.id', 
+                '=', 
+                't.id_user'
+            )
             ->selectRaw("$label AS label, COUNT(DISTINCT t.id_user) AS total")
             ->whereIn('t.id_qr_reader', $readerIds)
             ->whereBetween('t.entry_date', [$from, $to])
@@ -109,8 +115,18 @@ class UserDashboardController extends Controller
             ->get();
 
         $usersDynamic = DB::table('transactions as t')
-            ->join('users as u', 'u.id', '=', 't.id_user')
-            ->join('user_client_types as uct', 'uct.id_user', '=', 'u.id')
+            ->join(
+                'users as u', 
+                'u.id', 
+                '=', 
+                't.id_user'
+            )
+            ->join(
+                'user_client_types as uct', 
+                'uct.id_user', 
+                '=', 
+                'u.id'
+            )
             ->selectRaw("$label AS label, COUNT(DISTINCT t.id_user) AS total")
             ->whereIn('t.id_qr_reader', $readerIds)
             ->whereBetween('t.entry_date', [$from, $to])
@@ -126,7 +142,12 @@ class UserDashboardController extends Controller
                 ->sum('amount'),
 
             'users_normal' => (int) DB::table('transactions as t')
-                ->join('users as u', 'u.id', '=', 't.id_user')
+                ->join(
+                    'users as u', 
+                    'u.id', 
+                    '=', 
+                    't.id_user'
+                )
                 ->whereIn('t.id_qr_reader', $readerIds)
                 ->whereBetween('t.entry_date', [$from, $to])
                 ->where('u.id_role', 3)
@@ -134,8 +155,18 @@ class UserDashboardController extends Controller
                 ->count('t.id_user'),
 
             'users_dynamic' => (int) DB::table('transactions as t')
-                ->join('users as u', 'u.id', '=', 't.id_user')
-                ->join('user_client_types as uct', 'uct.id_user', '=', 'u.id')
+                ->join(
+                    'users as u', 
+                    'u.id', 
+                    '=', 
+                    't.id_user'
+                )
+                ->join(
+                    'user_client_types as uct', 
+                    'uct.id_user', 
+                    '=', 
+                    'u.id'
+                )
                 ->whereIn('t.id_qr_reader', $readerIds)
                 ->whereBetween('t.entry_date', [$from, $to])
                 ->whereNull('u.id_role')
@@ -150,7 +181,7 @@ class UserDashboardController extends Controller
             'users_dynamic' => $usersDynamic,
             'kpis'         => $kpis,
             'has_parking'   => true,
-            'readers_count' => $parking->qrReaders()->count(),
+            'readers_count' => $parking->qrReaders()->count()
         ]);
     }
 
@@ -168,7 +199,7 @@ class UserDashboardController extends Controller
 
         $token = $request->input('notification_token');
 
-        \App\Models\User::where('notification_token', $token)
+        User::where('notification_token', $token)
             ->where('id', '!=', $user->id)
             ->update(['notification_token' => null]);
 
@@ -176,9 +207,6 @@ class UserDashboardController extends Controller
             'notification_token' => $token,
         ]);
 
-        return response()->json([
-            'ok' => true,
-            'message' => 'Notification token actualizado.',
-        ]);
+        return response()->json(['ok' => true,'message' => 'Notification token actualizado.']);
     }
 }

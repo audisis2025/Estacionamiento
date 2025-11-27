@@ -27,11 +27,6 @@ use Illuminate\View\View;
 
 class ParkingController extends Controller
 {
-    /**
-     * Muestra el formulario de creación de estacionamiento.
-     *
-     * @return View|RedirectResponse
-     */
     public function create(): View|RedirectResponse
     {
         if (Auth::user()->parking)
@@ -56,7 +51,7 @@ class ParkingController extends Controller
             'longitude_coordinate' => $data['lng'],
             'type' => (int) $data['type'],
             'price' => (int)$data['type'] === 0 ? ($data['price_flat'] ?? 0) : ($data['price_hour'] ?? 0),
-            'price_flat' => $data['price_flat'] ?? null,
+            'price_flat' => $data['price_flat'] ?? null
         ]);
 
         $this->saveSchedules($parking, $request);
@@ -66,7 +61,7 @@ class ParkingController extends Controller
             ->with('swal', [
                 'icon'  => 'success',
                 'title' => '¡Estacionamiento creado!',
-                'text'  => 'El estacionamiento y su horario se guardaron correctamente.',
+                'text'  => 'El estacionamiento y su horario se guardaron correctamente.'
             ]);
     }
 
@@ -102,7 +97,7 @@ class ParkingController extends Controller
             'longitude_coordinate' => $data['lng'],
             'type'                 => (int) $data['type'],
             'price'                => (int)$data['type'] === 0 ? ($data['price_flat'] ?? 0) : ($data['price_hour'] ?? 0),
-            'price_flat'           => $data['price_flat'] ?? null,
+            'price_flat'           => $data['price_flat'] ?? null
         ]);
 
         $this->saveSchedules($parking, $request);
@@ -110,59 +105,56 @@ class ParkingController extends Controller
         return back()->with('swal', [
             'icon'  => 'success',
             'title' => '¡Actualizado!',
-            'text'  => 'Estacionamiento y horario actualizados correctamente.',
+            'text'  => 'Estacionamiento y horario actualizados correctamente.'
         ]);
     }
 
     protected function validateParking(Request $request): array
-{
-    return $request->validate([
-        'name' => [
-            'required',
-            'string',
-            'max:30'
-        ],
-        'lat' => [
-            'required',
-            'numeric',
-            'between:-90,90'
-        ],
-        'lng' => [
-            'required',
-            'numeric',
-            'between:-180,180'
-        ],
-
-        'type'  => [
-            'required',
-            'integer',
-            'in:0,1,2'
-        ],
-
-        'price_hour' => [
-            'required_if:type,1,2',
-            'nullable',
-            'numeric',
-            'min:0'
-        ],
-        'price_flat' => 
-        [
-            'required_if:type,0,2',
-            'nullable',
-            'numeric',
-            'min:0'
-        ],
-    ], [
-        'required' => 'El campo :attribute es obligatorio.',
-        'required_if' => 'El campo :attribute es obligatorio para el tipo seleccionado.',
-        'numeric' => 'El campo :attribute debe ser numérico.',
-        'min' => 'El campo :attribute debe ser mayor o igual a 0.',
-        'in'  => 'Tipo de estacionamiento inválido.',
-    ], [
-        'price_hour' => 'precio por hora',
-        'price_flat' => 'precio fijo',
-    ]);
-}
+    {
+        return $request->validate([
+                'name' => [
+                    'required',
+                    'string',
+                    'max:30'
+                ],
+                'lat' => [
+                    'required',
+                    'numeric',
+                    'between:-90,90'
+                ],
+                'lng' => [
+                    'required',
+                    'numeric',
+                    'between:-180,180'
+                ],
+                'type'  => [
+                    'required',
+                    'integer',
+                    'in:0,1,2'
+                ],
+                'price_hour' => [
+                    'required_if:type,1,2',
+                    'nullable',
+                    'numeric',
+                    'min:0'
+                ],
+                'price_flat' => 
+                [
+                    'required_if:type,0,2',
+                    'nullable',
+                    'numeric',
+                    'min:0'
+                ],
+            ], [
+                'required' => 'El campo :attribute es obligatorio.',
+                'required_if' => 'El campo :attribute es obligatorio para el tipo seleccionado.',
+                'numeric' => 'El campo :attribute debe ser numérico.',
+                'min' => 'El campo :attribute debe ser mayor o igual a 0.',
+                'in'  => 'Tipo de estacionamiento inválido.'
+            ], 
+            ['price_hour' => 'precio por hora','price_flat' => 'precio fijo']
+        );
+    }
 
 
     protected function saveSchedules(Parking $parking, Request $request): RedirectResponse|null
@@ -198,7 +190,7 @@ class ParkingController extends Controller
                 $rows[$day->id] = [
                     'open'   => $open,
                     'close'  => $close,
-                    'closed' => false,
+                    'closed' => false
                 ];
             }
         }
@@ -242,7 +234,7 @@ class ParkingController extends Controller
                 continue;
             }
 
-            Schedule::updateOrCreate(['id_parking' => $parking->id,'id_day' => $dayId,],['opening_time' => $open,'closing_time' => $close,]);
+            Schedule::updateOrCreate(['id_parking' => $parking->id,'id_day' => $dayId],['opening_time' => $open,'closing_time' => $close]);
         }
 
         return null;
@@ -273,8 +265,7 @@ class ParkingController extends Controller
             try
             {
                 return Carbon::parse($t)->format('H:i');
-            }
-            catch (\Throwable $e)
+            } catch (\Throwable $e)
             {
                 return $t;
             }
@@ -310,33 +301,32 @@ class ParkingController extends Controller
 
         if ($request->boolean('same_schedule'))
         {
-            $rules['schedules.all.open'] = ['required','date_format:H:i',];
+            $rules['schedules.all.open'] = ['required','date_format:H:i'];
 
             $rules['schedules.all.close'] = [
                 'required',
                 'date_format:H:i',
-                'after:schedules.all.open',
+                'after:schedules.all.open'
             ];
-        }
-        else
+        } else
         {
             foreach ($days as $day)
             {
                 $prefix = "schedules.{$day->id}";
 
-                $rules["{$prefix}.closed"] = ['nullable','in:0,1',];
+                $rules["{$prefix}.closed"] = ['nullable','in:0,1'];
 
                 $rules["{$prefix}.open"] = [
                     'exclude_if:' . $prefix . '.closed,1',
                     'required',
-                    'date_format:H:i',
+                    'date_format:H:i'
                 ];
 
                 $rules["{$prefix}.close"] = [
                     'exclude_if:' . $prefix . '.closed,1',
                     'required',
                     'date_format:H:i',
-                    "after:{$prefix}.open",
+                    "after:{$prefix}.open"
                 ];
             }
         }
@@ -345,10 +335,10 @@ class ParkingController extends Controller
             'required'     => 'El campo :attribute es obligatorio.',
             'date_format'  => 'El campo :attribute debe tener el formato HH:MM.',
             'after'        => 'La hora de cierre debe ser mayor que la de apertura.',
-            'in'           => 'Valor inválido.',
+            'in'           => 'Valor inválido.'
         ];
 
-        $attributes = ['schedules.all.open'  => 'apertura (todos los días)','schedules.all.close' => 'cierre (todos los días)',];
+        $attributes = ['schedules.all.open'  => 'apertura (todos los días)','schedules.all.close' => 'cierre (todos los días)'];
 
         foreach ($days as $day)
         {

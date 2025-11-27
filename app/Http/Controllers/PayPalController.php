@@ -26,7 +26,6 @@ use Illuminate\Support\Facades\Log;
 
 class PayPalController extends Controller
 {
-
     public function __construct(private PayPalService $paypal)
     {
     }
@@ -37,7 +36,7 @@ class PayPalController extends Controller
             'plan_id' => [
                 'required',
                 'integer',
-                'exists:plans,id',
+                'exists:plans,id'
             ],
         ]);
 
@@ -54,13 +53,13 @@ class PayPalController extends Controller
             Log::error('PayPal CREATE error', [
                 'plan_id'  => $plan->id,
                 'status'   => $order['status'] ?? 500,
-                'response' => $order['body'] ?? null,
+                'response' => $order['body'] ?? null
             ]);
 
-            return response()->json(['message' => 'Error al crear la orden en PayPal','details' => $order['body']['message'] ?? 'Error desconocido',],422);
+            return response()->json(['message' => 'Error al crear la orden en PayPal','details' => $order['body']['message'] ?? 'Error desconocido'],422);
         }
 
-        return response()->json(['id' => $order['body']['id'],]);
+        return response()->json(['id' => $order['body']['id']]);
     }
 
     public function capture(Request $request, string $orderId): JsonResponse
@@ -72,10 +71,10 @@ class PayPalController extends Controller
             Log::error('PayPal getOrder failed', [
                 'orderId'  => $orderId,
                 'status'   => $orderInfo['status'] ?? 500,
-                'response' => $orderInfo['body'] ?? null,
+                'response' => $orderInfo['body'] ?? null
             ]);
 
-            return response()->json(['message'  => 'No se pudo verificar el estado de la orden','debug_id' => $orderInfo['body']['debug_id'] ?? null,],422);
+            return response()->json(['message'  => 'No se pudo verificar el estado de la orden','debug_id' => $orderInfo['body']['debug_id'] ?? null],422);
         }
 
         $orderStatus = $orderInfo['body']['status'] ?? null;
@@ -85,24 +84,24 @@ class PayPalController extends Controller
         {
             Log::warning('Order not in APPROVED state', [
                 'orderId' => $orderId,
-                'status'  => $orderStatus,
-                'order'   => $orderBody,
+                'status' => $orderStatus,
+                'order' => $orderBody
             ]);
 
             $message = match ($orderStatus)
             {
                 'COMPLETED' => 'Esta orden ya fue procesada anteriormente',
-                'CREATED'   => 'El pago aún no ha sido aprobado por el usuario',
-                'VOIDED'    => 'Esta orden fue cancelada',
-                'SAVED'     => 'La orden está guardada pero no aprobada',
-                default     => "Estado de orden inválido: {$orderStatus}",
+                'CREATED' => 'El pago aún no ha sido aprobado por el usuario',
+                'VOIDED' => 'Esta orden fue cancelada',
+                'SAVED' => 'La orden está guardada pero no aprobada',
+                default => "Estado de orden inválido: {$orderStatus}"
             };
 
             return response()->json(
                 [
-                    'message'  => $message,
-                    'status'   => $orderStatus,
-                    'order_id' => $orderId,
+                    'message' => $message,
+                    'status' => $orderStatus,
+                    'order_id' => $orderId
                 ],
                 422
             );
@@ -121,14 +120,14 @@ class PayPalController extends Controller
                 'name'         => $captureBody['name'] ?? null,
                 'message'      => $captureBody['message'] ?? null,
                 'details'      => $captureBody['details'] ?? null,
-                'full_response'=> $captureBody,
+                'full_response'=> $captureBody
             ]);
 
             return response()->json(
                 [
                     'message'  => $captureBody['message'] ?? 'Error al capturar el pago',
                     'debug_id' => $captureBody['debug_id'] ?? null,
-                    'details'  => $captureBody['details'] ?? null,
+                    'details'  => $captureBody['details'] ?? null
                 ],
                 422
             );
@@ -142,10 +141,10 @@ class PayPalController extends Controller
             Log::warning('Capture not completed', [
                 'orderId'  => $orderId,
                 'status'   => $captureStatus,
-                'response' => $captureBody,
+                'response' => $captureBody
             ]);
 
-            return response()->json(['message' => 'La captura del pago no se completó','status'  => $captureStatus,],422);
+            return response()->json(['message' => 'La captura del pago no se completó','status'  => $captureStatus],422);
         }
 
         $reference = data_get($captureBody, 'purchase_units.0.reference_id', '');
@@ -155,15 +154,10 @@ class PayPalController extends Controller
             Log::error('Invalid reference in capture', [
                 'orderId'   => $orderId,
                 'reference' => $reference,
-                'capture'   => $captureBody,
+                'capture'   => $captureBody
             ]);
 
-            return response()->json(
-                [
-                    'message' => 'Referencia de plan inválida',
-                ],
-                422
-            );
+            return response()->json(['message' => 'Referencia de plan inválida'], 422);
         }
 
         [, $planId, $userIdFromRef] = $matches;
@@ -177,7 +171,7 @@ class PayPalController extends Controller
             Log::error('Plan not found in capture', [
                 'orderId'   => $orderId,
                 'plan_id'   => $planId,
-                'reference' => $reference,
+                'reference' => $reference
             ]);
 
             return response()->json(['message' => 'Plan no encontrado',],404);
@@ -190,10 +184,10 @@ class PayPalController extends Controller
             Log::error('User mismatch in capture', [
                 'orderId'          => $orderId,
                 'authenticated_user' => $user->id,
-                'reference_user'   => $userIdFromRef,
+                'reference_user'   => $userIdFromRef
             ]);
 
-            return response()->json(['message' => 'Usuario no autorizado para esta transacción',],403);
+            return response()->json(['message' => 'Usuario no autorizado para esta transacción'],403);
         }
 
         try
@@ -217,21 +211,20 @@ class PayPalController extends Controller
                 'orderId'  => $orderId,
                 'user_id'  => $user->id,
                 'plan_id'  => $plan->id,
-                'end_date' => $user->end_date,
+                'end_date' => $user->end_date
             ]);
 
-            return response()->json(['message'  => 'Pago completado exitosamente','redirect' => route('dashboard'),]);
-        }
-        catch (\Exception $e)
+            return response()->json(['message'  => 'Pago completado exitosamente','redirect' => route('dashboard')]);
+        } catch (\Exception $e)
         {
             Log::error('Error saving plan to user', [
                 'orderId' => $orderId,
                 'user_id' => $user->id,
                 'plan_id' => $plan->id,
-                'error'   => $e->getMessage(),
+                'error'   => $e->getMessage()
             ]);
 
-            return response()->json(['message' => 'Error al activar el plan. Contacta soporte.','error'   => $e->getMessage(),],500);
+            return response()->json(['message' => 'Error al activar el plan. Contacta soporte.','error' => $e->getMessage()],500);
         }
     }
 }

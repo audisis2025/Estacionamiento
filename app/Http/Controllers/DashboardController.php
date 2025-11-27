@@ -30,16 +30,22 @@ class DashboardController extends Controller
 
         $activeParking = User::query()
             ->whereNotNull('id_plan')
-            ->whereDate('end_date', '>=', $today)
+            ->whereDate(
+                'end_date', 
+                '>=', 
+                $today
+            )
             ->whereHas('plan', fn ($query) => $query->where('type', 'parking'))
             ->count();
 
         $activeUser = User::query()
             ->whereNotNull('id_plan')
             ->whereHas('plan', fn ($query) => $query->where('type', 'user'))
-            ->where(function ($q) use ($today) {
+            ->where(function ($q) use ($today) 
+            {
                 $q->whereDate('end_date', '>=', $today)
-                ->orWhere(function ($q2) {
+                ->orWhere(function ($q2) 
+                {
                     $q2->where('id_plan', 4)
                         ->whereNull('end_date');
                 });
@@ -54,7 +60,8 @@ class DashboardController extends Controller
         $planFilter = $request->input('plan', '');
         $search     = trim($request->input('q', ''));
 
-        if ($planFilter !== '') {
+        if ($planFilter !== '') 
+        {
             $selectedPlan = Plan::find((int) $planFilter);
 
             if (! $selectedPlan) 
@@ -90,11 +97,25 @@ class DashboardController extends Controller
                 ->where('id_plan', (int) $planFilter);
         }
 
-        if ($search !== '') {
-            $usersQuery->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone_number', 'like', "%{$search}%");
+        if ($search !== '') 
+        {
+            $usersQuery->where(function ($q) use ($search) 
+            {
+                $q->where(
+                    'name', 
+                    'like', 
+                    "%{$search}%"
+                )
+                  ->orWhere(
+                    'email', 
+                    'like', 
+                    "%{$search}%"
+                )
+                  ->orWhere(
+                    'phone_number', 
+                    'like', 
+                    "%{$search}%"
+                );
             });
         }
 
@@ -106,9 +127,11 @@ class DashboardController extends Controller
         $plansQuery = Plan::query()
             ->whereIn('type', ['parking', 'user']);
 
-        if ($roleFilter === '2') {
+        if ($roleFilter === '2') 
+        {
             $plansQuery->where('type', 'parking');
-        } elseif ($roleFilter === '3') {
+        } elseif ($roleFilter === '3') 
+        {
             $plansQuery->where('type', 'user');
         }
 
@@ -126,7 +149,7 @@ class DashboardController extends Controller
             'plans'          => $plans,
             'role_filter'    => $roleFilter,
             'plan_filter'    => $planFilter,
-            'search'         => $search,
+            'search'         => $search
         ]);
     }
 }

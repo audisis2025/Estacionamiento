@@ -45,8 +45,7 @@ export default function initParkingForm(formId)
                 {
                     gOpen.setAttribute('required', 'required');
                     gClose.setAttribute('required', 'required');
-                }
-                else 
+                } else 
                 {
                     gOpen.removeAttribute('required');
                     gClose.removeAttribute('required');
@@ -86,9 +85,7 @@ export default function initParkingForm(formId)
         {
             if (!priceInp || !typeSel) return;
 
-            priceInp.placeholder = parseInt(typeSel.value, 10) === 1
-                ? 'Ej. 25.00 (por hora)'
-                : 'Ej. 50.00 (tarifa fija)';
+            priceInp.placeholder = parseInt(typeSel.value, 10) === 1 ? 'Ej. 25.00 (por hora)': 'Ej. 50.00 (tarifa fija)';
         };
 
         updatePriceUi();
@@ -104,9 +101,7 @@ export default function initParkingForm(formId)
 
         $('btn-geo')?.addEventListener('click', () => 
         {
-            const isSecure = location.protocol === 'https:'
-                || location.hostname === 'localhost'
-                || location.hostname === '127.0.0.1';
+            const isSecure = location.protocol === 'https:' || location.hostname === 'localhost'|| location.hostname === '127.0.0.1';
 
             if (!isSecure) 
             {
@@ -209,7 +204,7 @@ export default function initParkingForm(formId)
                             {
                                 icon: 'error',
                                 title: 'No se pudo obtener tu ubicación',
-                                text: 'Intenta nuevamente o establece la ubicación manualmente en el mapa.',
+                                text: 'Intenta nuevamente o establece la ubicación manualmente en el mapa.'
                             });
                     }
 
@@ -218,7 +213,7 @@ export default function initParkingForm(formId)
                 {
                     enableHighAccuracy: true,
                     timeout: 20000,
-                    maximumAge: 0,
+                    maximumAge: 0
                 }
             );
 
@@ -227,17 +222,15 @@ export default function initParkingForm(formId)
                 if (isFinite(best.acc)) 
                 {
                     setInputs(best.lat, best.lng, true);
-                }
-                else 
+                } else 
                 {
                     Swal.fire(
                         {
                             icon: 'error',
                             title: 'Ubicación no determinada',
-                            text: 'No se pudo determinar tu ubicación con precisión. Establece el punto manualmente.',
+                            text: 'No se pudo determinar tu ubicación con precisión. Establece el punto manualmente.'
                         });
                 }
-
                 stop();
             }, 12000);
         });
@@ -263,10 +256,10 @@ export default function initParkingForm(formId)
         if (pan && map) 
         {
             map.setCenter(
-                {
-                    lat: Number(lat),
-                    lng: Number(lng),
-                });
+            {
+                lat: Number(lat),
+                lng: Number(lng),
+            });
         }
     }
 
@@ -343,6 +336,5 @@ export default function initParkingForm(formId)
     {
         runWhenDom();
     }
-
     document.addEventListener('livewire:navigated', runWhenDom);
 }

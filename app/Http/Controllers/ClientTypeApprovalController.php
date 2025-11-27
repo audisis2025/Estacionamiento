@@ -53,16 +53,16 @@ class ClientTypeApprovalController extends Controller
 			'expiration_date' => [
 				'required',
 				'date',
-				'after:today',
-			],
+				'after:today'
+			]
 		]);
 
-		$userClientType->update(['approval' => 1, 'expiration_date' => $data['expiration_date'],]);
+		$userClientType->update(['approval' => 1, 'expiration_date' => $data['expiration_date']]);
 
 		return back()->with('swal', [
 			'icon'  => 'success',
 			'title' => 'Solicitud aprobada',
-			'text'  => 'El usuario queda habilitado hasta ' . $data['expiration_date'] . '.',
+			'text'  => 'El usuario queda habilitado hasta ' . $data['expiration_date'] . '.'
 		]);
 	}
 
@@ -75,7 +75,7 @@ class ClientTypeApprovalController extends Controller
 		return back()->with('swal', [
 			'icon'  => 'success',
 			'title' => 'Solicitud rechazada',
-			'text'  => 'Se eliminó la solicitud.',
+			'text'  => 'Se eliminó la solicitud.'
 		]);
 	}
 
