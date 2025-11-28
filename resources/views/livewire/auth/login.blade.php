@@ -27,6 +27,7 @@ use Laravel\Fortify\Features;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
+use Carbon\Carbon;
 
 new #[Layout('components.layouts.auth')] class extends Component 
 {
@@ -42,6 +43,18 @@ new #[Layout('components.layouts.auth')] class extends Component
     {
         $this->validate();
         $this->ensureIsNotRateLimited();
+
+        $now = Carbon::now();
+
+        $affected = User::query()
+            ->whereNotNull('id_plan')
+            ->where('id_plan', '!=', 4)
+            ->whereNotNull('end_date')
+            ->where('end_date', '<', $now)
+            ->update([
+                'id_plan'  => null,
+                'end_date' => null,
+            ]);
 
         $user = $this->validateCredentials();
 

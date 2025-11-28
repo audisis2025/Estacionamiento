@@ -280,14 +280,10 @@ class ScanController extends Controller
 
         try 
         {
-            DB::transaction(function () use ($user, $charge, $openTx, $reader) 
+            DB::transaction(function () use ($user, $charge, $openTx, $reader, $parking) 
             {
                 $affected = User::whereKey($user->id)
-                    ->where(
-                        'amount', 
-                        '>=', 
-                        $charge
-                    )
+                    ->where('amount', '>=', $charge)
                     ->decrement('amount', $charge);
 
                 if ($affected !== 1) 
@@ -295,10 +291,13 @@ class ScanController extends Controller
                     throw new \RuntimeException('NO_FUNDS');
                 }
 
+                User::whereKey($parking->id_user)
+                    ->increment('amount', $charge);
+
                 $openTx->update([
                     'amount' => round($charge, 2),
                     'departure_date' => now(),
-                    'id_qr_reader'   => $reader->id
+                    'id_qr_reader' => $reader->id
                 ]);
             });
         } catch (\RuntimeException $exception) 

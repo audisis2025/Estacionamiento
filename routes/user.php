@@ -12,8 +12,6 @@ use App\Http\Controllers\ScanController;
 use App\Http\Controllers\UserDashboardController;
 use Illuminate\Support\Facades\Route;
 
-
-
 Route::middleware(['auth'])->group(function () 
 {
     Route::get('/plans/choose', [PlanPurchaseController::class, 'choose'])->name('plans.choose');
@@ -34,7 +32,7 @@ Route::middleware(['auth','verified','ensure.active.plan'])
         Route::get('/dashboard/data', [UserDashboardController::class, 'data'])->name('dashboard.data');
     });
 
-Route::middleware(['auth'])->prefix('parking')->name('parking.')->group(function () 
+Route::middleware(['auth','ensure.active.plan'])->prefix('parking')->name('parking.')->group(function () 
 {
     Route::get('create', [ParkingController::class, 'create'])->name('create');
     Route::post('/', [ParkingController::class, 'store'])->name('store');
