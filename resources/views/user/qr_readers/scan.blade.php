@@ -29,10 +29,7 @@
                 </flux:text>
             </div>
 
-            <div
-                class="inline-flex items-center gap-2 rounded-full border border-zinc-200 dark:border-zinc-700
-                       bg-white dark:bg-zinc-900 px-3 py-1.5"
-            >
+            <div class="inline-flex items-center gap-2 rounded-full border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-1.5">
                 <span class="relative flex h-2.5 w-2.5">
                     <span
                         class="animate-ping absolute inline-flex h-full w-full rounded-full bg-custom-green opacity-75"
@@ -44,40 +41,39 @@
                     Listo para escanear
                 </flux:text>
             </div>
+
+            <div class="flex items-center justify-between mb-6">
+                <flux:button variant="ghost" icon="arrow-long-left" icon-variant="outline" :href="route('parking.qr-readers.index')" wire:navigate>
+                    Regresar
+                </flux:button>
+            </div>
         </div>
 
         <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4">
             <flux:text class="text-sm text-black/70 dark:text-white/70">
-                Coloca el cursor en <strong>“Capturar”</strong> y escanea el código QR desde el lector USB.
+                Coloca el cursor en <strong>“Capturar”</strong> si se perdio y escanea el código QR desde el lector USB.
             </flux:text>
         </div>
 
-        <form id="scan-form" class="flex items-center gap-3" onsubmit="return false;">
-            @csrf
+        <div class="mt-3 flex justify-end">
+            <form id="scan-form" class="flex items-center gap-3" onsubmit="return false;">
+                @csrf
 
-            <input type="hidden" id="csrf-token" value="{{ csrf_token() }}">
-            <input id="scan-input" type="text" autocomplete="off" class="sr-only" />
+                <input type="hidden" id="csrf-token" value="{{ csrf_token() }}">
+                <input id="scan-input" type="text" autocomplete="off" class="sr-only" />
 
-            <flux:button
-                id="focus-btn"
-                type="button"
-                variant="primary"
-                icon="qr-code"
-                icon-variant="outline"
-                class="bg-custom-blue hover:bg-custom-blue-dark text-white text-sm"
-            >
-                Capturar
-            </flux:button>
-
-            <flux:link
-                :href="route('parking.qr-readers.index')"
-                icon="arrow-long-left"
-                icon-variant="outline"
-                class="text-sm text-custom-blue hover:text-custom-blue-dark"
-            >
-                Regresar a lectores
-            </flux:link>
-        </form>
+                <flux:button
+                    id="focus-btn"
+                    type="button"
+                    variant="primary"
+                    icon="computer-desktop"
+                    icon-variant="outline"
+                    class="bg-black hover:bg-custom-gray text-white text-sm"
+                >
+                    Capturar
+                </flux:button>
+            </form>
+        </div>
 
         <div class="hidden rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4">
             <flux:heading level="3" size="md" class="text-sm !font-black mb-3 text-black dark:text-white">

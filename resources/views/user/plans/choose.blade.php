@@ -32,7 +32,7 @@
             @foreach ($plans as $plan)
                 <label
                     class="plan-card bg-white dark:bg-zinc-800 rounded-xl shadow-md p-6 flex flex-col cursor-pointer 
-                           border-2 border-transparent transition-all duration-150 ease-out hover:border-zinc-200 dark:hover:border-zinc-700"
+                           border-2  transition-all duration-150 ease-out hover:border-zinc-200 dark:hover:border-zinc-700"
                     data-plan-id="{{ $plan->id }}"
                 >
                     <input type="radio" name="plan_id" value="{{ $plan->id }}" class="sr-only">

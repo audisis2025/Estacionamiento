@@ -39,12 +39,12 @@
 
                 <nav class="space-x-4">
                     <flux:button icon="user-circle" icon-variant="outline" variant="primary" :href="route('login')"
-                        class="px-4 py-2 bg-custom-blue text-white rounded-lg hover:bg-custom-blue-dark">
+                        class="px-4 py-2 bg-black text-white rounded-lg hover:bg-custom-gray">
                         Iniciar sesión
                     </flux:button>
 
                     <flux:button icon="user-plus" icon-variant="outline" variant="primary" :href="route('register')"
-                        class="px-4 py-2 bg-custom-blue text-white rounded-lg hover:bg-custom-blue-dark">
+                        class="px-4 py-2 bg-black text-white rounded-lg hover:bg-custom-gray">
                         Registrarse
                     </flux:button>
                 </nav>
@@ -99,15 +99,15 @@
             </div>
         </main>
 
-        <footer class="bg-white dark:bg-zinc-800 border-t border-zinc-200 dark:border-zinc-700 text-center py-6 mt-auto">
-            <flux:text variant="subtle" class="text-black/70 dark:text-white/70 text-sm">
+        <footer class="bg-custom-blue dark:bg-zinc-800 border-t border-zinc-200 dark:border-zinc-700 text-center py-6 mt-auto">
+            <flux:text variant="subtle" class="text-white dark:text-white/70 text-sm">
                 © {{ date('Y') }} Parking+. Todos los derechos reservados.
             </flux:text>
 
             <p class="mt-2">
                 <flux:link
                     href="{{ route('terms') }}"
-                    class="text-custom-blue hover:text-custom-blue-dark text-sm underline-offset-4 hover:underline"
+                    class="text-white hover:text-white text-sm underline-offset-4 hover:underline"
                     target="_blank" rel="noopener noreferrer"
                 >
                     Términos y Condiciones

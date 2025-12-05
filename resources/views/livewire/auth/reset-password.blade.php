@@ -44,28 +44,28 @@ new #[Layout('components.layouts.auth')] class extends Component {
         $this->validate([
             'token'    => ['required'],
             'email'    => [
-                            'required', 
-                            'string', 
-                            'email'
-                        ],
+                'required', 
+                'string', 
+                'email'
+            ],
             'password' => [
-                            'required',
-                            'string',
-                            'confirmed', 
-                            Rules\Password::defaults()
-                        ],
+                'required',
+                'string',
+                'confirmed', 
+                Rules\Password::defaults()
+            ],
         ]);
 
         $status = Password::reset(
             $this->only(
-                            'email', 
-                            'password', 
-                            'password_confirmation', 
-                            'token'
-                        ),
+                'email', 
+                'password', 
+                'password_confirmation', 
+                'token'
+            ),
             function ($user) 
             {
-                $user->forceFill(['password'       => Hash::make($this->password),'remember_token' => Str::random(60),])->save();
+                $user->forceFill(['password' => Hash::make($this->password),'remember_token' => Str::random(60)])->save();
 
                 event(new PasswordReset($user));
             }
@@ -112,7 +112,6 @@ new #[Layout('components.layouts.auth')] class extends Component {
         :description="__('Por favor, ingresa tu nueva contraseña')"
     />
 
-
     <form method="POST" wire:submit="resetPassword" class="flex flex-col gap-6">
         <flux:input
             wire:model="email"
@@ -148,7 +147,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 variant="primary"
                 icon="key"
                 icon-variant="outline"
-                class="w-full bg-custom-blue hover:bg-custom-blue-dark text-white"
+                class="w-full bg-black hover:bg-custom-gray text-white"
                 data-test="reset-password-button"
             >
                 {{ __('Restablecer contraseña') }}

@@ -27,11 +27,11 @@ new #[Layout('components.layouts.auth')] class extends Component
     public function sendPasswordResetLink(): void
     {
         $this->validate(['email' => [
-                                        'required', 
-                                        'string', 
-                                        'email'
-                                    ],
-                        ]);
+                'required', 
+                'string', 
+                'email'
+            ],
+        ]);
     
         $status = Password::sendResetLink($this->only('email'));
 
@@ -96,7 +96,7 @@ new #[Layout('components.layouts.auth')] class extends Component
             variant="primary"
             icon="paper-airplane"
             icon-variant="outline"
-            class="w-full bg-custom-blue hover:bg-custom-blue-dark text-white"
+            class="w-full bg-black hover:bg-custom-gray text-white"
             data-test="email-password-reset-link-button"
         >
             {{ __('Enviar enlace') }}

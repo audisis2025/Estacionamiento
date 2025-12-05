@@ -1,6 +1,6 @@
 <?php
 /*
-* Nombre de la clase         : EnsureActivePlan.php
+* Nombre de la clase         : EnsureActivePlanMiddleware.php
 * Descripción de la clase    : Protege las rutas para los planes, asegurando que el usuario tenga un plan activo o sea administrador.
 * Fecha de creación          : 06/11/2025
 * Elaboró                    : Elian Pérez
@@ -19,7 +19,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
-class EnsureActivePlan
+class EnsureActivePlanMiddleware
 {
     public function handle(Request $request, Closure $next):mixed
     {

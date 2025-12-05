@@ -1,5 +1,20 @@
 <?php
-
+/*
+* Nombre de la clase         : app.php
+* Descripción de la clase    : Archivo de configuración principal de la aplicación Laravel, 
+                               que establece rutas, middleware y manejo de excepciones.
+* Fecha de creación          : 
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0 
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
+*/
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -20,9 +35,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) 
     {
         $middleware->alias([
-            'ensure.active.plan' => \App\Http\Middleware\EnsureActivePlan::class,
-            'ensure.parking.configured'=> \App\Http\Middleware\EnsureParkingConfigured::class,
-            'ensure.billing.access' => \App\Http\Middleware\EnsureBillingAccess::class
+            'ensure.active.plan' => \App\Http\Middleware\EnsureActivePlanMiddleware::class,
+            'ensure.parking.configured'=> \App\Http\Middleware\EnsureParkingConfiguredMiddleware::class,
+            'ensure.billing.access' => \App\Http\Middleware\EnsureBillingAccessMiddleware::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) 

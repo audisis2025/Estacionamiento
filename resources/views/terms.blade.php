@@ -6,12 +6,12 @@
 * Fecha de liberación          : 03/11/2025
 * Autorizó                     : Angel Davila
 * Version                      : 1.0
-* Fecha de mantenimiento       : 
+* Fecha de mantenimiento       : 27/11/2025
 * Folio de mantenimiento       : 
 * Tipo de mantenimiento        :
-* Descripción del mantenimiento: 
-* Responsable                  : 
-* Revisor                      : 
+* Descripción del mantenimiento: Se actualizaron los terminos y condiciones
+* Responsable                  : Elian Pérez
+* Revisor                      : Angel Davila
 --}}
 
 <!DOCTYPE html>
@@ -32,7 +32,7 @@
             <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-700 pb-4">
                 <div class="flex items-center gap-3">
                     <div class="h-10 w-10 rounded-xl bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center">
-                        <x-heroicon-o-clock class="h-6 w-6 text-custom-blue" />
+                        <x-heroicon-o-document-text class="h-6 w-6 text-custom-blue" />
                     </div>
 
                     <div>
@@ -53,9 +53,9 @@
                 </flux:heading>
 
                 <flux:text class="text-sm leading-relaxed text-black/80 dark:text-white/80">
-                    Al acceder o utilizar la aplicación <strong>Parking+</strong>, el usuario acepta los presentes
-                    términos y condiciones, incluyendo privacidad de datos, administración de estacionamientos, emisión
-                    de facturas y uso de planes de suscripción.
+                    Al acceder o utilizar la aplicación <strong>Parking+</strong> (web o móvil), el usuario acepta estos
+                    términos y condiciones, así como las políticas de privacidad, facturación y uso de los servicios
+                    incluidos en la plataforma.
                 </flux:text>
             </section>
 
@@ -65,13 +65,18 @@
                 </flux:heading>
 
                 <flux:text class="text-sm leading-relaxed text-black/80 dark:text-white/80">
-                    <strong>Parking+</strong> recopila los datos necesarios para operar (nombre, correo, teléfono,
-                    ubicación de estacionamientos). Los datos se almacenan de forma segura y se manejan conforme a la
-                    normatividad aplicable.
+                    <strong>Parking+</strong> recopila datos necesarios para operar correctamente, tales como nombre,
+                    correo electrónico, número de teléfono, información de estacionamientos y ubicación del dispositivo.
                 </flux:text>
 
                 <flux:text class="text-sm leading-relaxed text-black/80 dark:text-white/80">
-                    No se venderán ni transferirán a terceros sin consentimiento, salvo requerimiento legal.
+                    La ubicación obtenida desde la app móvil o desde la versión web se utiliza únicamente para funciones
+                    internas de la aplicación (por ejemplo: validar cercanía, navegación o funciones vinculadas al
+                    estacionamiento) y no es compartida con terceros ni con otras plataformas externas.
+                </flux:text>
+
+                <flux:text class="text-sm leading-relaxed text-black/80 dark:text-white/80">
+                    Los datos se almacenan de forma segura y no serán transferidos sin consentimiento, salvo obligación legal.
                 </flux:text>
             </section>
 
@@ -81,14 +86,29 @@
                 </flux:heading>
 
                 <flux:text class="text-sm leading-relaxed text-black/80 dark:text-white/80">
-                    Los administradores pueden contratar planes con diferentes niveles de funciones (lectores QR,
-                    reportes, clientes dinámicos y soporte).
+                    Parking+ ofrece distintos planes tanto para estacionamientos como para usuarios finales y cada plan
+                    incluye diferentes funciones.
                 </flux:text>
 
+                <flux:heading level="3" size="md" class="text-sm font-semibold mt-3">
+                    Duración y características
+                </flux:heading>
+
                 <ul class="list-disc pl-6 text-sm text-black/80 dark:text-white/80">
-                    <li>Pagos procesados por plataformas seguras (p. ej., PayPal).</li>
-                    <li>Las suscripciones no se renuevan automáticamente.</li>
+                    <li>Todos los planes de pago tienen una duración fija de 30 días.</li>
+                    <li>El plan gratuito para usuarios de la app móvill tiene acceso limitado a funciones.</li>
+                    <li>Los planes no se renuevan automáticamente.</li>
+                    <li>No existen reembolsos una vez realizada la compra del plan.</li>
                 </ul>
+
+                <flux:heading level="3" size="md" class="text-sm font-semibold mt-3">
+                    Pagos
+                </flux:heading>
+
+                <flux:text class="text-sm leading-relaxed text-black/80 dark:text-white/80">
+                    Los pagos son procesados mediante plataformas seguras como PayPal. La confirmación
+                    del pago activa el plan seleccionado de manera inmediata.
+                </flux:text>
             </section>
 
             <section class="space-y-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5">
@@ -97,8 +117,9 @@
                 </flux:heading>
 
                 <flux:text class="text-sm leading-relaxed text-black/80 dark:text-white/80">
-                    El usuario debe usar responsablemente las herramientas, mantener datos actualizados y evitar usos
-                    indebidos. El administrador del estacionamiento es responsable de los registros bajo su cuenta.
+                    El usuario se compromete a utilizar la plataforma de forma responsable, mantener sus datos
+                    actualizados y evitar cualquier uso indebido. Los administradores de estacionamientos son responsables
+                    de los registros e información generada bajo su cuenta.
                 </flux:text>
             </section>
 
@@ -108,7 +129,7 @@
                 </flux:heading>
 
                 <flux:text class="text-sm text-black/80 dark:text-white/80">
-                    Soporte:
+                    Para soporte o aclaraciones:
                     <flux:link
                         href="mailto:admgenineral@gmail.com"
                         class="text-custom-blue hover:text-custom-blue-dark underline underline-offset-4"
@@ -122,13 +143,9 @@
                 <flux:text class="text-xs text-black/60 dark:text-white/60">
                     &copy; {{ now()->year }} Parking+. Todos los derechos reservados.
                 </flux:text>
-
-                <flux:text class="text-xs text-black/60 dark:text-white/60">
-                    El logotipo y nombre "SAT" pertenecen a la SHCP; se incluyen con fines ilustrativos.
-                </flux:text>
             </div>
-
         </main>
+
 
     </body>
 

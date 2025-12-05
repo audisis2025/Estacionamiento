@@ -1,3 +1,18 @@
+/*
+* Nombre de la clase         : qr-escanner.js
+* Descripción de la clase    : Archivo de JavaScript para gestionar la lectura de códigos QR.
+* Fecha de creación          : 
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0 
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
+*/
 export default function initQrScanner(routeUrl, csrfTok)
 {
     (function ()

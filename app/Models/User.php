@@ -66,7 +66,11 @@ class User extends Authenticatable
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn($word) => Str::substr($word, 0, 1))
+            ->map(fn($word) => Str::substr(
+                $word, 
+                0, 
+                1
+            ))
             ->implode('');
     }
 
@@ -77,7 +81,7 @@ class User extends Authenticatable
 
     public function hasActivePlan(): bool
     {
-       if (! $this->id_plan) 
+        if (! $this->id_plan) 
         {
             return false;
         }
@@ -97,7 +101,11 @@ class User extends Authenticatable
 
     public function parking(): HasOne
     {
-        return $this->hasOne(Parking::class, 'id_user', 'id');
+        return $this->hasOne(
+            Parking::class, 
+            'id_user', 
+            'id'
+        );
     }
 
     public function role(): BelongsTo
@@ -122,7 +130,11 @@ class User extends Authenticatable
 
     public function userClientTypes(): HasMany
     {
-        return $this->hasMany(UserClientType::class, 'id_user', 'id');
+        return $this->hasMany(
+            UserClientType::class, 
+            'id_user', 
+            'id'
+        );
     }
 
     public function transactions(): HasMany
@@ -139,7 +151,11 @@ class User extends Authenticatable
     {
         return $this->userClientTypes()
             ->where('approval', 1)
-            ->whereDate('expiration_date', '>=', now()->toDateString())
+            ->whereDate(
+                'expiration_date', 
+                '>=', 
+                now()->toDateString()
+            )
             ->whereHas('clientType', fn($q) => $q->where('id_parking', $parkingId))
             ->latest('id')
             ->first();

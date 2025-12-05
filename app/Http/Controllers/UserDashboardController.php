@@ -193,7 +193,7 @@ class UserDashboardController extends Controller
 
     public function updateNotificationToken(Request $request)
     {
-        $request->validate(['notification_token' => ['required', 'string'],]);
+        $request->validate(['notification_token' => ['required', 'string']]);
 
         $user = $request->user();
 
@@ -203,9 +203,7 @@ class UserDashboardController extends Controller
             ->where('id', '!=', $user->id)
             ->update(['notification_token' => null]);
 
-        $user->update([
-            'notification_token' => $token,
-        ]);
+        $user->update(['notification_token' => $token]);
 
         return response()->json(['ok' => true,'message' => 'Notification token actualizado.']);
     }

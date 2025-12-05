@@ -28,6 +28,10 @@ class Day extends Model
 
     public function schedules(): HasMany
     {
-        return $this->hasMany(Schedule::class, 'id_day', 'id');
+        return $this->hasMany(
+            Schedule::class, 
+            'id_day', 
+            'id'
+        );
     }
 }

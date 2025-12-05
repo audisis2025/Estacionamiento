@@ -16,46 +16,28 @@ class RegisterProviderApiController extends Controller
     public function registerProvider(Request $request)
     {
         $data = $request->validate([
-            'name'           => ['required', 'string', 'max:255'],
-            'email'          => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password'       => ['required', Password::min(8)],
-            'phone_number'   => ['required', 'digits:10', 'unique:users,phone_number'],
-            'id_client_type' => ['required', 'integer', 'exists:client_types,id'],
+            'name'         => ['required', 'string', 'max:255'],
+            'email'        => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password'     => ['required', Password::min(8)],
+            'phone_number' => ['required', 'digits:10', 'unique:users,phone_number'],
         ]);
-
-    
-        $defaultPlan = Plan::updateOrCreate(
-            ['type' => 'user', 'name' => 'Plan Básico'],
-            [
-                'price' => 0,
-                'duration_days' => 30,
-                'description' => 'Acciones limitadas para usuarios gratuitos.',
-            ]
-        );
 
         $user = User::create([
             'name'         => $data['name'],
             'email'        => $data['email'],
             'password'     => Hash::make($data['password']),
             'phone_number' => $data['phone_number'],
-            'id_plan'      => $defaultPlan->id,
-        ]);
-
-        UserClientType::create([
-            'approval'        => 0, // pendiente
-            'expiration_date' => null,
-            'id_user'         => $user->id,
-            'id_client_type'  => $data['id_client_type'],
+            'id_plan'      => null,
+            'role'         => null,
         ]);
 
         return response()->json([
             'message' => 'provider_registered_pending',
             'user' => [
-                'id'          => $user->id,
-                'name'        => $user->name,
-                'email'       => $user->email,
-                'role'        => 'usuario',
-                'plan'        => $defaultPlan->name,
+                'id'    => $user->id,
+                'name'  => $user->name,
+                'email' => $user->email,
+                'role'  => null,
             ],
             'status' => 'awaiting_approval',
         ], 201);

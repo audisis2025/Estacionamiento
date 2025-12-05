@@ -44,7 +44,7 @@
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <flux:button type="submit" variant="primary" icon="arrow-right-start-on-rectangle" icon-variant="outline"
-                            class="bg-custom-blue hover:bg-custom-blue-dark text-white">
+                            class="bg-black hover:bg-custom-gray text-white">
                             Cerrar sesión
                         </flux:button>
                     </form>
@@ -57,8 +57,8 @@
             {{ $slot }}
         </main>
 
-        <footer class="bg-white dark:bg-zinc-800 text-center py-6 mt-auto border-t border-zinc-200 dark:border-zinc-700">
-            <flux:text class="text-sm text-black/70 dark:text-white/70">
+        <footer class="bg-custom-blue text-center py-6 mt-auto border-t border-zinc-200 dark:border-zinc-700">
+            <flux:text class="text-sm text-white dark:text-white/70">
                 © {{ date('Y') }} Parking+. Todos los derechos reservados.
             </flux:text>
         </footer>

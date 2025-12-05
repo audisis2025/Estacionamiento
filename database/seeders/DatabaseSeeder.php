@@ -1,5 +1,20 @@
 <?php
-
+/*
+* Nombre de la clase         : DatabaseSeeder.php
+* Descripción de la clase    : Seeder para crear datos iniciales en la base de datos, 
+                               incluyendo roles, días, planes y un usuario administrador.
+* Fecha de creación          : 
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0 
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
+*/
 namespace Database\Seeders;
 
 use App\Models\User;

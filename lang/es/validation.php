@@ -1,5 +1,19 @@
 <?php
-
+/*
+* Nombre de la clase         : validation.php
+* Descripción de la clase    : Archivo de traducción que contiene los mensajes de validación para la aplicación.
+* Fecha de creación          : 
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0 
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
+*/
 declare(strict_types=1);
 
 return [

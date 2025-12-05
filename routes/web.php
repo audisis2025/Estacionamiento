@@ -1,4 +1,21 @@
 <?php
+/*
+* Nombre de la clase         : web.php
+* Descripción de la clase    : Archivo de rutas web de Laravel que define las rutas principales de la aplicación, 
+                               incluyendo la página de inicio, configuración del usuario 
+                               y términos de servicio.
+* Fecha de creación          : 
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0 
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
+*/
 
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;

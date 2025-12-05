@@ -49,7 +49,7 @@
             </a>
 
             <flux:navlist variant="outline">
-                <flux:navlist.group :heading="__('Menu')" class="grid">
+                <flux:navlist.group :heading="__('Menú')" class="grid">
                     <flux:navlist.item icon="home" :href="route('admin.dashboard')" :current="request()->routeIs('admin.dashboard')" wire:navigate>{{ __('Inicio') }}</flux:navlist.item>
 
                     <flux:navlist.item icon="eye" :href="route('admin.plans.index')" :current="request()->routeIs('admin.plans.index')" wire:navigate>{{ __('Planes') }}</flux:navlist.item>
@@ -59,7 +59,6 @@
             </flux:navlist>
             <flux:spacer />
 
-            <!-- Desktop User Menu -->
             <flux:dropdown class="hidden lg:block" position="bottom" align="start">
                 <flux:profile
                     :name="auth()->user()->name"
@@ -106,7 +105,6 @@
             </flux:dropdown>
         </flux:sidebar>
 
-        <!-- Mobile User Menu -->
         <flux:header class="lg:hidden">
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 

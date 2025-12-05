@@ -1,4 +1,20 @@
-
+/*
+* Nombre de la clase         : parking-form.js
+* Descripción de la clase    : Módulo de JavaScript para inicializar y gestionar el formulario de creación/edición 
+                               de estacionamientos, incluyendo la integración con Google Maps 
+                               y la gestión de horarios.
+* Fecha de creación          : 
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0 
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
+*/
 export default function initParkingForm(formId) 
 {
     const $ = (suffix) => document.getElementById(`${formId}-${suffix}`);
@@ -106,36 +122,26 @@ export default function initParkingForm(formId)
             if (!isSecure) 
             {
                 Swal.fire(
-                    {
-                        icon: 'warning',
-                        title: 'Geolocalización no disponible',
-                        text: 'Para usar tu ubicación, abre el sitio en HTTPS o usa http://localhost.',
-                    });
+                {
+                    icon: 'warning',
+                    title: 'Geolocalización no disponible',
+                    text: 'Para usar tu ubicación, abre el sitio en HTTPS o usa http://localhost.',
+                });
                 return;
             }
 
             if (!navigator.geolocation) 
             {
                 Swal.fire(
-                    {
-                        icon: 'error',
-                        title: 'Geolocalización no soportada',
-                        text: 'Tu navegador no soporta geolocalización.',
-                    });
+                {
+                    icon: 'error',
+                    title: 'Geolocalización no soportada',
+                    text: 'Tu navegador no soporta geolocalización.',
+                });
                 return;
             }
 
             const btn = $('btn-geo');
-            const original = btn?.textContent || 'Usar mi ubicación';
-
-            const setBtn = (dis, text) => 
-            {
-                if (!btn) return;
-                btn.disabled = !!dis;
-                if (text) btn.textContent = text;
-            };
-
-            setBtn(true, 'Buscando…');
 
             let best =
             {
@@ -152,7 +158,6 @@ export default function initParkingForm(formId)
                 {
                     navigator.geolocation.clearWatch(watchId);
                 }
-                setBtn(false, original);
             };
 
             const apply = (pos, pan = false) => 
@@ -300,7 +305,7 @@ export default function initParkingForm(formId)
             setInputs(e.latLng.lat(), e.latLng.lng(), true);
         });
 
-        marker.addEventListener('dragend', () => 
+        marker.addListener('dragend', () => 
         {
             const pos = marker.getPosition();
             setInputs(pos.lat(), pos.lng(), false);

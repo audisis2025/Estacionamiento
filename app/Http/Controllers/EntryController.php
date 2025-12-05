@@ -71,7 +71,7 @@ class EntryController extends Controller
 
     public function release(Request $request, Transaction $transaction): RedirectResponse
     {
-        $user    = Auth::user();
+        $user = Auth::user();
         $parking = $user->parking;
 
         if (! $parking || ! $parking->qrReaders()->where('id', $transaction->id_qr_reader)->exists()) 
@@ -95,8 +95,14 @@ class EntryController extends Controller
 
                 $priceHour = (float) ($parking->price ?? 0);
                 $priceFlat = (float) ($parking->price_flat ?? $parking->price ?? 0);
-                $type      = (int) $parking->type;
-                $modeUI    = $request->input('billing_mode');
+                $type = (int) $parking->type;
+
+                $txMode = $t->billing_mode;
+
+                if (! in_array($txMode, ['hour', 'flat'], true))
+                {
+                    $txMode = $type === 0 ? 'flat' : 'hour';
+                }
 
                 $charge = 0.0;
 
@@ -105,20 +111,17 @@ class EntryController extends Controller
                     case 0:
                         $charge = $priceFlat;
                         break;
-
                     case 1:
-                        $hours = max(1, ceil($minutes / 60));
+                        $hours  = max(1, ceil($minutes / 60));
                         $charge = $hours * $priceHour;
                         break;
-
                     case 2:
-                        $effective = $modeUI === 'flat' ? 'flat' : 'hour';
-                        if ($effective === 'flat') 
+                        if ($txMode === 'flat') 
                         {
                             $charge = $priceFlat;
-                        } else 
+                        } else
                         {
-                            $hours = max(1, ceil($minutes / 60));
+                            $hours  = max(1, ceil($minutes / 60));
                             $charge = $hours * $priceHour;
                         }
                         break;
@@ -128,7 +131,6 @@ class EntryController extends Controller
 
                 if ($uct && $uct->clientType) 
                 {
-
                     $ct = $uct->clientType;
 
                     if ((int) $ct->discount_type === 0) 
@@ -143,9 +145,11 @@ class EntryController extends Controller
 
                 $charge = round(max(0, $charge), 2);
 
-                $t->update(['amount' => $charge,'departure_date' => $releasedAt,]);
+                $t->update([
+                    'amount'         => $charge,
+                    'departure_date' => $releasedAt,
+                ]);
             });
-
             return back()->with('ok', 'Salida liberada correctamente. Monto calculado con decimales y descuentos.');
         } catch (\Throwable $e) 
         {

@@ -22,6 +22,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class ClientTypeController extends Controller
@@ -173,7 +174,11 @@ class ClientTypeController extends Controller
     {
         $this->ensureOwnership($clientType);
 
-        $clientType->delete();
+        DB::transaction(function () use ($clientType)
+        {
+            $clientType->userClientTypes()->delete();
+            $clientType->delete();
+        });
 
         return redirect()->route('parking.client-types.index')->with('swal', [
             'icon'  => 'success',

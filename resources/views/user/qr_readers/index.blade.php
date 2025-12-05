@@ -134,7 +134,7 @@
                                             icon-variant="outline"
                                             variant="primary"
                                             :href="route('parking.qr-readers.scan', $reader)"
-                                            class="text-white bg-custom-blue hover:bg-custom-blue-dark dark:text-white"
+                                            class="text-white bg-black hover:bg-custom-gray dark:text-white"
                                         >
                                             Escanear
                                         </flux:button>

@@ -33,11 +33,19 @@ class Schedule extends Model
 
     public function parking(): BelongsTo
     {
-        return $this->belongsTo(Parking::class, 'id_parking', 'id');
+        return $this->belongsTo(
+            Parking::class, 
+            'id_parking', 
+            'id'
+        );
     }
 
     public function day(): BelongsTo
     {
-        return $this->belongsTo(Day::class, 'id_day', 'id');
+        return $this->belongsTo(
+            Day::class, 
+            'id_day',
+            'id'
+        );
     }
 }

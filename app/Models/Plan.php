@@ -36,14 +36,15 @@ class Plan extends Model
         'type'
     ];
 
-    protected $casts = [
-        'price'    => 'decimal:2',
-        'duration_days' => 'integer',
-    ];
+    protected $casts = ['price' => 'decimal:2', 'duration_days' => 'integer'];
     
     public function users(): HasMany
     {
-        return $this->hasMany(User::class, 'id_plan', 'id');
+        return $this->hasMany(
+            User::class, 
+            'id_plan', 
+            'id'
+        );
     }
 
     public function scopeParking($q): Builder

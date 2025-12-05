@@ -219,6 +219,8 @@
                             showCancelButton: true,
                             confirmButtonText: 'Aprobar',
                             cancelButtonText: 'Cancelar',
+                            cancelButtonColor: '#EE0000',
+                            confirmButtonColor: '#3182ce'
                         });
 
                         if (date)

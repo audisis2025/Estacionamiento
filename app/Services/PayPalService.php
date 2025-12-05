@@ -74,8 +74,7 @@ class PayPalService
                     2, 
                     '.',
                     ''
-                )
-                ]
+                )]
             ]]
         ];
 

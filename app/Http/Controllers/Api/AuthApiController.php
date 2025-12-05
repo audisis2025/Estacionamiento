@@ -1,7 +1,7 @@
 <?php
-
+ 
 namespace App\Http\Controllers\Api;
-
+ 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -10,7 +10,7 @@ use App\Models\Plan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
-
+ 
 class AuthApiController extends Controller
 {
     public function register(Request $request)
@@ -22,13 +22,13 @@ class AuthApiController extends Controller
             'phone_number' => ['required', 'digits:10', 'unique:users,phone_number'],
             'type'         => ['nullable', 'string', 'in:usuario,admin,adminEstacionamiento,proveedor'],
         ]);
-
+ 
         $roleName = $data['type'] ?? 'usuario';
-
+ 
         $role = Role::firstOrCreate(['name' => $roleName], [
             'description' => ucfirst($roleName) . ' del sistema',
         ]);
-
+ 
         $defaultPlan = Plan::updateOrCreate(
             ['type' => 'user', 'name' => 'Plan Básico'],
             [
@@ -37,7 +37,7 @@ class AuthApiController extends Controller
                 'description' => 'Acciones limitadas para usuarios gratuitos.',
             ]
         );
-
+ 
         // 🔹 Crear el usuario
         $user = User::create([
             'name'         => $data['name'],
@@ -47,7 +47,7 @@ class AuthApiController extends Controller
             'id_role'      => $role->id,
             'id_plan'      => $defaultPlan->id,
         ]);
-
+ 
         return response()->json([
             'message' => 'registered',
             'user'    => [
@@ -61,22 +61,22 @@ class AuthApiController extends Controller
             ],
         ], 201);
     }
-
+ 
     public function login(Request $request)
     {
         $credentials = $request->validate([
             'email'    => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
-
+ 
         if (!Auth::attempt($credentials)) {
             return response()->json(['message' => 'invalid_credentials'], 422);
         }
-
+ 
         $user = User::where('email', $credentials['email'])->first();
         $device = $request->header('X-Device-Name') ?: 'flutter-app';
         $token  = $user->createToken($device, ['*'])->plainTextToken;
-
+ 
         return response()->json([
             'message' => 'authenticated',
             'token'   => $token,
@@ -92,11 +92,11 @@ class AuthApiController extends Controller
             ],
         ]);
     }
-
+ 
     public function me(Request $request)
     {
         $user = $request->user()->load('plan', 'role');
-
+ 
         return response()->json([
             'user' => [
                 'id'         => $user->id,
@@ -104,12 +104,17 @@ class AuthApiController extends Controller
                 'email'      => $user->email,
                 'role_id'    => $user->id_role,
                 'role_name'  => $user->role->name ?? 'usuario',
-                'plan_id'    => $user->plan->id ?? null,
-                'plan_name'  => $user->plan->name ?? 'Gratis',
+                'plan_id'       => $user->plan->id ?? null,
+                'plan_name'     => $user->plan->name ?? 'Gratis',
+                'plan_price'    => $user->plan->price ?? 0,
+                'duration_days' => $user->plan->duration_days ?? 0,
+                'end_date'   => optional($user->end_date)->format('Y-m-d'),
+                'is_active'  => $user->hasActivePlan(),
             ]
         ]);
     }
-
+ 
+ 
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

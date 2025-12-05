@@ -17,16 +17,16 @@
 
     @if (! $has_parking)
         <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5 mb-6">
-            <h3 class="font-semibold text-black dark:text-white">
-                Configura tu estacionamiento
-            </h3>
+            <flux:heading level="3" size="md" class="font-semibold text-black dark:text-white">
+                    Configura tu estacionamiento
+            </flux:heading>
 
-            <p class="text-sm text-black/70 dark:text-white/70 mt-1">
-                Aún no has registrado los datos de tu estacionamiento. Para ver estadísticas y comenzar a operar,
-                primero crea tu estacionamiento.
-            </p>
+            <flux:text class="text-sm text-black/70 dark:text-white/70 mt-1">
+                    Aún no has registrado los datos de tu estacionamiento. Para ver estadísticas y comenzar a operar,
+                    primero crea tu estacionamiento.
+            </flux:text>
 
-            <div class="mt-3">
+            <div class="mt-3 flex justify-end">
                 <flux:button icon="cog-6-tooth" :href="route('parking.create')" variant="filled">
                     Configuración
                 </flux:button>
@@ -34,16 +34,16 @@
         </div>
     @elseif ($readers_count === 0)
         <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5 mb-6">
-            <h3 class="font-semibold text-black dark:text-white">
-                Agrega tus lectores QR
-            </h3>
+            <flux:heading level="3" size="md" class="font-semibold text-black dark:text-white">
+                    Agrega tus lectores QR
+            </flux:heading>
 
-            <p class="text-sm text-black/70 dark:text-white/70 mt-1">
-                Ya tienes un estacionamiento configurado, pero no has creado lectores QR. Crea al menos un lector
-                para registrar entradas/salidas y habilitar tus estadísticas.
-            </p>
+            <flux:text class="text-sm text-black/70 dark:text-white/70 mt-1">
+                    Ya tienes un estacionamiento configurado, pero no has creado lectores QR. Crea al menos un lector
+                    para registrar entradas/salidas y habilitar tus estadísticas.
+            </flux:text>
 
-            <div class="mt-3 flex flex-wrap gap-2">
+            <div class="mt-3 flex flex-wrap gap-2 justify-end">
                 <flux:button icon="plus" icon-variant="outline" :href="route('parking.qr-readers.create')" variant="primary" class="bg-blue-600 hover:bg-blue-700 text-white text-sm">
                     Crear lector
                 </flux:button>

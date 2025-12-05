@@ -1,5 +1,19 @@
 <?php
-
+/*
+* Nombre de la clase         : DaySeeder.php
+* Descripción de la clase    : Seeder para crear datos iniciales en la tabla de días.
+* Fecha de creación          : 
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0 
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
+*/
 namespace Database\Seeders;
 
 use Illuminate\Support\Facades\DB;
@@ -19,11 +33,9 @@ class DaySeeder extends Seeder
             'Domingo'
         ];
 
-        foreach ($days as $day) {
-            DB::table('days')->updateOrInsert(
-                ['name' => $day],
-                ['name' => $day]
-            );
+        foreach ($days as $day) 
+        {
+            DB::table('days')->updateOrInsert(['name' => $day], ['name' => $day]);
         }
     }
 }

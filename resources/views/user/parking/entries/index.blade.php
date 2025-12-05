@@ -120,10 +120,10 @@
                                     <flux:button
                                         type="submit"
                                         size="sm"
-                                        icon="arrow-right-start-on-rectangle"
+                                        icon="lock-open"
                                         icon-variant="outline"
                                         variant="primary"
-                                        class="bg-custom-green hover:bg-custom-green-dark text-white text-xs md:text-sm"
+                                        class="bg-green-600 hover:bg-green-700 text-white text-xs md:text-sm"
                                     >
                                         Liberar salida
                                     </flux:button>
@@ -153,13 +153,11 @@
     <script>
         (function ()
         {
-            const parkingType = {{ (int) (auth()->user()->parking->type ?? 0) }};
-
             function bindReleaseForms()
             {
                 document.querySelectorAll('.form-release').forEach((form) =>
                 {
-                    if (form.dataset.bound === '1') 
+                    if (form.dataset.bound === '1')
                     {
                         return;
                     }
@@ -170,63 +168,22 @@
                     {
                         e.preventDefault();
 
-                        if (parkingType === 0 || parkingType === 1) 
+                        const result = await Swal.fire(
                         {
-                            const result = await Swal.fire(
-                            {
-                                title: '¿Liberar salida?',
-                                text: 'Se calculará automáticamente el monto según el tiempo y la tarifa.',
-                                icon: 'warning',
-                                showCancelButton: true,
-                                confirmButtonText: 'Sí, liberar',
-                                cancelButtonText: 'Cancelar',
-                                confirmButtonColor: '#3182ce',
-                                cancelButtonColor: '#EE0000',
-                            });
-
-                            if (!result.isConfirmed) 
-                            {
-                                return;
-                            }
-
-                            form.submit();
-                            return;
-                        }
-
-                        const modeResult = await Swal.fire(
-                        {
-                            title: '¿Cómo deseas cobrar la salida?',
-                            text: 'Selecciona el tipo de cobro que aplicarás al cliente.',
-                            icon: 'question',
+                            title: '¿Liberar salida?',
+                            text: 'Se calculará automáticamente el monto según el tiempo, el tipo de cobro y el modo elegido por el usuario en la app.',
+                            icon: 'warning',
                             showCancelButton: true,
-                            showDenyButton: true,
-                            confirmButtonText: 'Por hora',
-                            denyButtonText: 'Tiempo libre',
+                            confirmButtonText: 'Sí, liberar',
                             cancelButtonText: 'Cancelar',
-                            confirmButtonColor: '#2563EB',
-                            denyButtonColor: '#16A34A',
+                            confirmButtonColor: '#3182ce',
+                            cancelButtonColor: '#EE0000',
                         });
 
-                        if (!modeResult.isConfirmed && !modeResult.isDenied) 
+                        if (! result.isConfirmed)
                         {
                             return;
                         }
-
-                        let mode = 'hour'; 
-                        if (modeResult.isDenied) 
-                        {
-                            mode = 'flat';
-                        }
-
-                        let modeInput = form.querySelector('input[name="billing_mode"]');
-                        if (!modeInput) 
-                        {
-                            modeInput = document.createElement('input');
-                            modeInput.type = 'hidden';
-                            modeInput.name = 'billing_mode';
-                            form.appendChild(modeInput);
-                        }
-                        modeInput.value = mode;
 
                         form.submit();
                     });

@@ -111,14 +111,14 @@
             </div>
         </div>
 
-        <div class="flex justify-center-safe flex-wrap gap-3 ">
+        <div class="flex flex-wrap gap-3 justify-end-safe">
             <flux:button
                 type="button"
                 id="{{ $formId }}-btn-geo"
                 icon="map-pin"
                 variant="primary"
                 icon-variant="outline"
-                class="bg-custom-blue hover:bg-custom-blue-dark text-white text-sm"
+                class="bg-black hover:bg-custom-gray text-white text-sm"
             >
                 Usar mi ubicación
             </flux:button>
@@ -129,7 +129,7 @@
                 icon="cursor-arrow-rays"
                 icon-variant="outline"
                 variant="primary"
-                class="bg-custom-blue hover:bg-custom-blue-dark text-white text-sm"
+                class="bg-black hover:bg-custom-gray text-white text-sm"
             >
                 Centrar mapa
             </flux:button>
@@ -228,7 +228,7 @@
         </flux:text>
     </div>
 
-    <div class="flex justify-center-safe">
+    <div class="flex justify-end-safe">
         <flux:button
             type="submit"
             variant="primary"

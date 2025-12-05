@@ -92,12 +92,12 @@ class ParkingController extends Controller
         $this->validateSchedules($request);
 
         $parking->update([
-            'name'                 => $data['name'],
-            'latitude_coordinate'  => $data['lat'],
+            'name' => $data['name'],
+            'latitude_coordinate' => $data['lat'],
             'longitude_coordinate' => $data['lng'],
-            'type'                 => (int) $data['type'],
-            'price'                => (int)$data['type'] === 0 ? ($data['price_flat'] ?? 0) : ($data['price_hour'] ?? 0),
-            'price_flat'           => $data['price_flat'] ?? null
+            'type' => (int) $data['type'],
+            'price' => (int)$data['type'] === 0 ? ($data['price_flat'] ?? 0) : ($data['price_hour'] ?? 0),
+            'price_flat' => $data['price_flat'] ?? null
         ]);
 
         $this->saveSchedules($parking, $request);
@@ -332,10 +332,10 @@ class ParkingController extends Controller
         }
 
         $messages = [
-            'required'     => 'El campo :attribute es obligatorio.',
-            'date_format'  => 'El campo :attribute debe tener el formato HH:MM.',
-            'after'        => 'La hora de cierre debe ser mayor que la de apertura.',
-            'in'           => 'Valor inválido.'
+            'required' => 'El campo :attribute es obligatorio.',
+            'date_format' => 'El campo :attribute debe tener el formato HH:MM.',
+            'after' => 'La hora de cierre debe ser mayor que la de apertura.',
+            'in' => 'Valor inválido.'
         ];
 
         $attributes = ['schedules.all.open'  => 'apertura (todos los días)','schedules.all.close' => 'cierre (todos los días)'];

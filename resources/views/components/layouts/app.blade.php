@@ -56,12 +56,12 @@
             </a>
 
             <flux:navlist variant="outline">
-                <flux:navlist.group :heading="__('Menu')" class="grid">
+                <flux:navlist.group :heading="__('Menú')" class="grid">
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')">
                         Inicio
                     </flux:navlist.item>
 
-                    <flux:navlist.item icon="plus" :href="route('parking.edit')"
+                    <flux:navlist.item icon="bars-4" :href="route('parking.edit')"
                         :current="request()->routeIs('parking.create')">
                         Mi estacionamiento
                     </flux:navlist.item>

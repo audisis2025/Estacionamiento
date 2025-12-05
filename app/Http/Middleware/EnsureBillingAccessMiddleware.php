@@ -1,6 +1,6 @@
 <?php
 /*
-* Nombre de la clase         : EnsureBillingAccess.php
+* Nombre de la clase         : EnsureBillingAccessMiddleware.php
 * Descripción de la clase    : Protege las rutas de facturación, limitando el acceso solo a usuarios con rol y plan específico.
 * Fecha de creación          : 05/11/2025
 * Elaboró                    : Elian Pérez
@@ -20,7 +20,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EnsureBillingAccess
+class EnsureBillingAccessMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {

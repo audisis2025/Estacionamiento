@@ -1,5 +1,21 @@
 <?php
-
+/*
+* Nombre de la clase         : user.php
+* Descripción de la clase    : Define las rutas web relacionadas con las funcionalidades del usuario,
+                               incluyendo la gestión de estacionamientos, lectores QR, tipos de clientes, 
+                               entradas y facturación.
+* Fecha de creación          : 
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0 
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
+*/
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\ClientTypeApprovalController;
 use App\Http\Controllers\ClientTypeController;

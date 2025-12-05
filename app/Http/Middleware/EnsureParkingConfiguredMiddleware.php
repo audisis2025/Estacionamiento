@@ -1,6 +1,6 @@
 <?php
 /*
-* Nombre de la clase         : EnsureParkingConfigured.php
+* Nombre de la clase         : EnsureParkingConfiguredMiddleware.php
 * Descripción de la clase    : Asegura que el usuario tenga un estacionamiento configurado y con horario antes de acceder a ciertas rutas.
 * Fecha de creación          : 06/11/2025
 * Elaboró                    : Elian Pérez
@@ -21,7 +21,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\RedirectResponse;
 
-class EnsureParkingConfigured
+class EnsureParkingConfiguredMiddleware
 {
     public function handle(Request $request, Closure $next): Response|RedirectResponse
     {

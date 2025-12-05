@@ -38,11 +38,19 @@ class ClientType extends Model
 
     public function parking(): BelongsTo
     {
-        return $this->belongsTo(Parking::class, 'id_parking', 'id');
+        return $this->belongsTo(
+            Parking::class, 
+            'id_parking', 
+            'id'
+        );
     }
 
     public function userClientTypes(): HasMany
     {
-        return $this->hasMany(UserClientType::class, 'id_client_type', 'id');
+        return $this->hasMany(
+            UserClientType::class, 
+            'id_client_type', 
+            'id'
+        );
     }
 }

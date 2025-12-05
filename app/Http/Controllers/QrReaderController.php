@@ -17,6 +17,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\QrReader;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Validation\Rule;
@@ -141,9 +142,9 @@ class QrReaderController extends Controller
             return redirect()
                 ->route('parking.qr-readers.index')
                 ->with('swal', [
-                    'icon'  => 'success',
+                    'icon' => 'success',
                     'title' => 'Lector actualizado',
-                    'text'  => 'Se guardaron los cambios correctamente.'
+                    'text' => 'Se guardaron los cambios correctamente.'
                 ]);
         } catch (ValidationException $exception)
         {
@@ -152,9 +153,9 @@ class QrReaderController extends Controller
 
             return back()
                 ->with('swal', [
-                    'icon'  => 'error',
+                    'icon' => 'error',
                     'title' => 'Error de validación',
-                    'text'  => $firstError
+                    'text' => $firstError
                 ])
                 ->withInput();
         }
@@ -164,15 +165,33 @@ class QrReaderController extends Controller
     {
         $this->ensureOwnership($reader);
 
-        $reader->delete();
+        try 
+        {
+            $reader->delete();
 
-        return redirect()
-            ->route('parking.qr-readers.index')
-            ->with('swal', [
-                'icon'  => 'success',
-                'title' => 'Lector eliminado',
-                'text'  => 'El lector QR fue eliminado.'
-            ]);
+            return redirect()
+                ->route('parking.qr-readers.index')
+                ->with('swal', [
+                    'icon'  => 'success',
+                    'title' => 'Lector eliminado',
+                    'text'  => 'El lector QR fue eliminado.',
+                ]);
+        }
+        catch (QueryException $e) 
+        {
+            if ($e->getCode() === '23000') 
+            {
+                return redirect()
+                    ->route('parking.qr-readers.index')
+                    ->with('swal', [
+                        'icon'  => 'error',
+                        'title' => 'No se puede eliminar',
+                        'text'  => 'Este lector tiene registros de entradas/salidas.',
+                    ]);
+            }
+
+            throw $e;
+        }
     }
 
     private function ensureOwnership(QrReader $reader): void

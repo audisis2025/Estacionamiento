@@ -145,7 +145,7 @@ new #[Layout('components.layouts.auth')] class extends Component
                 autocomplete="current-password" :placeholder="__('Contraseña')" viewable />
 
             @if (Route::has('password.request'))
-                <flux:link class="absolute top-0 text-sm end-0" :href="route('password.request')" wire:navigate>
+                <flux:link class="absolute top-0 text-sm end-0 text-custom-blue hover:text-custom-blue-dark" :href="route('password.request')" wire:navigate>
                     {{ __('¿Olvidaste tu contraseña?') }}
                 </flux:link>
             @endif
@@ -154,8 +154,8 @@ new #[Layout('components.layouts.auth')] class extends Component
         <flux:checkbox wire:model="remember" :label="__('Recordarme')" />
 
         <div class="flex items-center justify-end">
-            <flux:button icon="arrow-right-start-on-rectangle" icon-variant="outline" variant="primary" type="submit"
-                class="w-full bg-custom-blue hover:bg-custom-blue-dark text-white" data-test="login-button">
+            <flux:button icon="user-circle" icon-variant="outline" variant="primary" type="submit"
+                class="w-full bg-black hover:bg-custom-gray text-white" data-test="login-button">
                 {{ __('Iniciar sesión') }}
             </flux:button>
         </div>

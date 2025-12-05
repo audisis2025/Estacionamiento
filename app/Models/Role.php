@@ -31,7 +31,11 @@ class Role extends Model
 
     public function users(): HasMany
     {
-        return $this->hasMany(User::class, 'id_role', 'id');
+        return $this->hasMany(
+            User::class, 
+            'id_role', 
+            'id'
+        );
     }
 
     public function isAdmin(): bool

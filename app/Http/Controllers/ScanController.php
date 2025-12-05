@@ -103,7 +103,7 @@ class ScanController extends Controller
             $this->notifyUser(
                 $user,
                 'Parking+',
-                'El QR no contiene información de ubicación del dispositivo.',
+                'Enciende la ubicación en el dispositivo',
                 ['event' => 'qr_error','code'  => 'no_location']
             );
 
@@ -130,8 +130,7 @@ class ScanController extends Controller
                 $this->notifyUser(
                     $user,
                     'Parking+',
-                    'El código se generó lejos del estacionamiento.',
-                    [
+                    'El código se generó lejos del estacionamiento.',[
                         'event'    => 'qr_error',
                         'code'     => 'too_far',
                         'distance' => (string) round($distanceKm, 2)
@@ -206,8 +205,7 @@ class ScanController extends Controller
                 $this->notifyUser(
                     $user,
                     'Parking+',
-                    'Elige cómo deseas que se cobre',
-                    [
+                    'Elige cómo deseas que se cobre',[
                         'event' => 'choose_billing_mode',
                         'parking_id' => (string) $parking->id,
                         'qr_reader_id' => (string) $reader->id,
@@ -234,8 +232,7 @@ class ScanController extends Controller
             $this->notifyUser(
                 $user,
                 'Parking+',
-                'Entrada registrada correctamente.',
-                [
+                'Entrada registrada correctamente.',[
                     'event' => 'entry',
                     'tx_id' => (string) $tx->id,
                     'mode' => $billingMode,
@@ -249,7 +246,6 @@ class ScanController extends Controller
                 'when' => $tx->entry_date->toDateTimeString()
             ]);
         }
-
 
         if ($openTx->entry_date->diffInSeconds(now()) < 5) 
         {
@@ -283,7 +279,11 @@ class ScanController extends Controller
             DB::transaction(function () use ($user, $charge, $openTx, $reader, $parking) 
             {
                 $affected = User::whereKey($user->id)
-                    ->where('amount', '>=', $charge)
+                    ->where(
+                        'amount', 
+                        '>=', 
+                        $charge
+                    )
                     ->decrement('amount', $charge);
 
                 if ($affected !== 1) 
@@ -319,8 +319,7 @@ class ScanController extends Controller
         $this->notifyUser(
             $user,
             'Parking+',
-            'Salida registrada. Monto cobrado: $' . number_format($charge, 2),
-            [
+            'Salida registrada. Monto cobrado: $' . number_format($charge, 2), [
                 'event' => 'exit',
                 'tx_id' => (string) $openTx->id,
                 'charged' => (string) $charge,
@@ -432,7 +431,6 @@ class ScanController extends Controller
     {
         return response()->json(['ok' => false, 'message' => $msg], $code);
     }
-
 
     private function notifyUser(?User $user, string $title, string $body, array $data = []): void
     {

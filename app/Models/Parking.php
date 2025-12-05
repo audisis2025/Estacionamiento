@@ -48,7 +48,11 @@ class Parking extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'id_user', 'id');
+        return $this->belongsTo(
+            User::class, 
+            'id_user', 
+            'id'
+        );
     }
 
     public function getLatAttribute(): ?float
@@ -62,7 +66,11 @@ class Parking extends Model
     }
     public function schedules(): HasMany
     {
-        return $this->hasMany(Schedule::class, 'id_parking', 'id')->orderBy('id_day');
+        return $this->hasMany(
+            Schedule::class, 
+            'id_parking', 
+            'id'
+            )->orderBy('id_day');
     }
     public function qrReaders(): HasMany
     {
@@ -70,7 +78,11 @@ class Parking extends Model
     }
     public function clientTypes(): HasMany
     {
-        return $this->hasMany(ClientType::class, 'id_parking', 'id');
+        return $this->hasMany(
+            ClientType::class, 
+            'id_parking', 
+            'id'
+        );
     }
 
     public function userClientTypes(): HasManyThrough

@@ -97,8 +97,7 @@ class PayPalController extends Controller
                 default => "Estado de orden inválido: {$orderStatus}"
             };
 
-            return response()->json(
-                [
+            return response()->json([
                     'message' => $message,
                     'status' => $orderStatus,
                     'order_id' => $orderId
@@ -123,8 +122,7 @@ class PayPalController extends Controller
                 'full_response'=> $captureBody
             ]);
 
-            return response()->json(
-                [
+            return response()->json([
                     'message'  => $captureBody['message'] ?? 'Error al capturar el pago',
                     'debug_id' => $captureBody['debug_id'] ?? null,
                     'details'  => $captureBody['details'] ?? null
@@ -182,9 +180,9 @@ class PayPalController extends Controller
         if ($user->id != $userIdFromRef)
         {
             Log::error('User mismatch in capture', [
-                'orderId'          => $orderId,
+                'orderId' => $orderId,
                 'authenticated_user' => $user->id,
-                'reference_user'   => $userIdFromRef
+                'reference_user' => $userIdFromRef
             ]);
 
             return response()->json(['message' => 'Usuario no autorizado para esta transacción'],403);
@@ -221,7 +219,7 @@ class PayPalController extends Controller
                 'orderId' => $orderId,
                 'user_id' => $user->id,
                 'plan_id' => $plan->id,
-                'error'   => $e->getMessage()
+                'error' => $e->getMessage()
             ]);
 
             return response()->json(['message' => 'Error al activar el plan. Contacta soporte.','error' => $e->getMessage()],500);
