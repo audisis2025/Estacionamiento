@@ -6,13 +6,13 @@
 * Elaboró                    : Elian Pérez
 * Fecha de liberación        : 06/11/2025
 * Autorizó                   : Angel Davila
-* Versión                    : 1.0
-* Fecha de mantenimiento     : 
+* Versión                    : 1.1
+* Fecha de mantenimiento     : 09/12/2025
 * Folio de mantenimiento     : 
-* Tipo de mantenimiento      : 
-* Descripción del mantenimiento : 
-* Responsable                : 
-* Revisor                    : 
+* Tipo de mantenimiento      : Correctivo
+* Descripción del mantenimiento : Corrección de race condition en eliminación
+* Responsable                : Elian Pérez
+* Revisor                    : Angel Davila
 */
 
 namespace App\Http\Controllers;
@@ -25,68 +25,120 @@ use Illuminate\View\View;
 
 class ClientTypeApprovalController extends Controller
 {
-	public function index(): View
-	{
-		$parking = Auth::user()->parking;
+    public function index(Request $request): View
+    {
+        $parking = Auth::user()->parking;
 
-		$pending = $parking->userClientTypes()
-			->with(['user:id,name,email,phone_number','clientType:id,type_name,discount_type,amount,id_parking'])
-			->where('approval', 0)
-			->orderByDesc('id')
-			->get();
+        $phone = trim($request->input('phone', ''));
 
-		$approved = $parking->userClientTypes()
-			->with(['user:id,name,email,phone_number','clientType:id,type_name,discount_type,amount,id_parking'])
-			->where('approval', 1)
-			->orderByDesc('id')
-			->limit(30)
-			->get();
+        $relations = ['user:id,name,email,phone_number', 'clientType:id,type_name,discount_type,amount,id_parking'];
 
-		return view('user.client_approvals.index', compact('pending', 'approved'));
-	}
+        $pendingQuery = $parking->userClientTypes()
+            ->with($relations)
+            ->where('approval', 0);
 
-	public function approve(Request $request, UserClientType $userClientType): RedirectResponse
-	{
-		$this->ensureOwnership($userClientType);
+        $approvedQuery = $parking->userClientTypes()
+            ->with($relations)
+            ->where('approval', 1);
 
-		$data = $request->validate([
-			'expiration_date' => [
-				'required',
-				'date',
-				'after:today'
-			]
-		]);
+        if ($phone !== '') {
+            $filterUser = function ($q) use ($phone) {
+                $q->where('phone_number', 'like', "%{$phone}%")
+                  ->orWhere('name', 'like', "%{$phone}%")
+                  ->orWhere('email', 'like', "%{$phone}%");
+            };
 
-		$userClientType->update(['approval' => 1, 'expiration_date' => $data['expiration_date']]);
+            $pendingQuery->whereHas('user', $filterUser);
+            $approvedQuery->whereHas('user', $filterUser);
+        }
 
-		return back()->with('swal', [
-			'icon'  => 'success',
-			'title' => 'Solicitud aprobada',
-			'text'  => 'El usuario queda habilitado hasta ' . $data['expiration_date'] . '.'
-		]);
-	}
+        $pending = $pendingQuery
+            ->orderByDesc('id')
+            ->get();
 
-	public function reject(UserClientType $userClientType): RedirectResponse
-	{
-		$this->ensureOwnership($userClientType);
+        $approved = $approvedQuery
+            ->orderByDesc('id')
+            ->limit(30)
+            ->get();
 
-		$userClientType->delete();
+        return view('user.client_approvals.index', [
+            'pending'  => $pending,
+            'approved' => $approved,
+            'phone'    => $phone
+        ]);
+    }
 
-		return back()->with('swal', [
-			'icon'  => 'success',
-			'title' => 'Solicitud rechazada',
-			'text'  => 'Se eliminó la solicitud.'
-		]);
-	}
+    public function approve(Request $request, $id): RedirectResponse
+    {
+        $parking = Auth::user()->parking;
+        
+        // Buscar el registro - evita 404 automático
+        $userClientType = UserClientType::with('clientType')->find($id);
+        
+        if (!$userClientType) {
+            return back()->with('swal', [
+                'icon'  => 'warning',
+                'title' => 'No encontrado',
+                'text'  => 'La solicitud ya no existe o fue eliminada.',
+                'confirmButtonColor' => '#494949'
+            ]);
+        }
+        
+        // Verificar propiedad
+        if (!$parking || !$userClientType->clientType || $userClientType->clientType->id_parking !== $parking->id) {
+            return back()->with('swal', [
+                'icon'  => 'error',
+                'title' => 'No autorizado',
+                'text'  => 'No tienes permiso para aprobar esta solicitud.',
+                'confirmButtonColor' => '#494949'
+            ]);
+        }
 
-	private function ensureOwnership(UserClientType $userClientType): void
-	{
-		$parking = Auth::user()->parking;
+        $userClientType->update(['approval' => 1]);
 
-		abort_unless(
-			$parking && $userClientType->clientType && $userClientType->clientType->id_parking === $parking->id,
-			403,
-			'No autorizado.'
-		);
-	}
+        return back()->with('swal', [
+            'icon'  => 'success',
+            'title' => 'Solicitud aprobada',
+            'text'  => 'El usuario ahora tiene el descuento activo hasta que lo canceles.',
+            'confirmButtonColor' => '#494949'
+        ]);
+    }
+
+    public function reject($id): RedirectResponse
+    {
+        $parking = Auth::user()->parking;
+        
+        // Buscar el registro - devuelve null si no existe (evita el 404 automático)
+        $userClientType = UserClientType::with('clientType')->find($id);
+        
+        // Verificar si existe
+        if (!$userClientType) {
+            return back()->with('swal', [
+                'icon'  => 'warning',
+                'title' => 'Ya eliminado',
+                'text'  => 'La solicitud ya fue eliminada previamente.',
+                'confirmButtonColor' => '#494949'
+            ]);
+        }
+        
+        // Verificar propiedad
+        if (!$parking || !$userClientType->clientType || $userClientType->clientType->id_parking !== $parking->id) {
+            return back()->with('swal', [
+                'icon'  => 'error',
+                'title' => 'No autorizado',
+                'text'  => 'No tienes permiso para eliminar esta solicitud.',
+                'confirmButtonColor' => '#494949'
+            ]);
+        }
+        
+        // Eliminar
+        $userClientType->delete();
+        
+        return back()->with('swal', [
+            'icon'  => 'success',
+            'title' => 'Solicitud eliminada',
+            'text'  => 'Se eliminó el beneficio para este usuario.',
+            'confirmButtonColor' => '#494949'
+        ]);
+    }
 }

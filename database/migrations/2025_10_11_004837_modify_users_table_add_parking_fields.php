@@ -34,7 +34,7 @@ return new class extends Migration
             $table->string('phone_number', 10)->unique()->after('amount');
             $table->string('notification_token', 255)->nullable();
             $table->unsignedBigInteger('id_plan')->nullable()->after('phone_number');
-            $table->unsignedInteger('id_role')->nullable()->after('id_plan');
+            $table->unsignedBigInteger('id_role')->nullable()->after('id_plan');
 
             $table->foreign('id_plan')->references('id')->on('plans');
             $table->foreign('id_role')->references('id')->on('roles');

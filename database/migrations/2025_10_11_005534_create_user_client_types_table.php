@@ -26,7 +26,6 @@ return new class extends Migration
         {
             $table->id();
             $table->integer('approval');
-            $table->date('expiration_date')->nullable();
             $table->unsignedBigInteger('id_user')->nullable();
             $table->unsignedBigInteger('id_client_type')->nullable();
 

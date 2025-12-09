@@ -16,8 +16,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UpdateNotificationTokenRequest;
-use App\Models\User;
 use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -41,20 +39,20 @@ class UserDashboardController extends Controller
         {
             $from = (clone $now)->startOfWeek();
             $to = (clone $now)->endOfWeek();
-            $group = "YEARWEEK(entry_date, 1)";
-            $label = "CONCAT(YEAR(entry_date), '-W', LPAD(WEEK(entry_date,1),2,'0'))";
+            $group = "DATE(entry_date)";
+            $label = "DATE_FORMAT(entry_date, '%Y-%m-%d')";
         } elseif ($range === 'month')
         {
             $from = (clone $now)->startOfMonth();
             $to = (clone $now)->endOfMonth();
-            $group = "DATE_FORMAT(entry_date, '%Y-%m')";
-            $label = $group;
+            $group = "DATE(entry_date)";
+            $label = "DATE_FORMAT(entry_date, '%Y-%m-%d')";
         } else
         {
             $from = (clone $now)->startOfDay();
             $to = (clone $now)->endOfDay();
-            $group = 'DATE(entry_date)';
-            $label = $group;
+            $group = 'HOUR(entry_date)';
+            $label = 'HOUR(entry_date)';
         }
 
         $parking = $user->parking;
@@ -123,7 +121,7 @@ class UserDashboardController extends Controller
             )
             ->join(
                 'user_client_types as uct', 
-                'uct.id_user', 
+                'uct.id_user',
                 '=', 
                 'u.id'
             )
@@ -171,40 +169,17 @@ class UserDashboardController extends Controller
                 ->whereBetween('t.entry_date', [$from, $to])
                 ->whereNull('u.id_role')
                 ->distinct('t.id_user')
-                ->count('t.id_user'),
+                ->count('t.id_user')
         ];
 
         return view('user.dashboard', [
-            'range'        => $range,
-            'revenue'      => $revenue,
-            'users_normal'  => $usersNormal,
+            'range' => $range,
+            'revenue' => $revenue,
+            'users_normal' => $usersNormal,
             'users_dynamic' => $usersDynamic,
-            'kpis'         => $kpis,
-            'has_parking'   => true,
+            'kpis' => $kpis,
+            'has_parking' => true,
             'readers_count' => $parking->qrReaders()->count()
         ]);
-    }
-
-    //Se agrego esto 
-    // public function updateNotificationToken(int $id, UpdateNotificationTokenRequest $request)
-    // {
-    //     $response = $this->service->updateNotificationToken($id, $request->validated());
-    // }
-
-    public function updateNotificationToken(Request $request)
-    {
-        $request->validate(['notification_token' => ['required', 'string']]);
-
-        $user = $request->user();
-
-        $token = $request->input('notification_token');
-
-        User::where('notification_token', $token)
-            ->where('id', '!=', $user->id)
-            ->update(['notification_token' => null]);
-
-        $user->update(['notification_token' => $token]);
-
-        return response()->json(['ok' => true,'message' => 'Notification token actualizado.']);
     }
 }

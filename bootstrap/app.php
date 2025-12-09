@@ -7,13 +7,13 @@
 * Elaboró                    : Elian Pérez
 * Fecha de liberación        : 
 * Autorizó                   : Angel Davila
-* Versión                    : 1.0 
-* Fecha de mantenimiento     : 
+* Versión                    : 2.0 
+* Fecha de mantenimiento     : 08/12/2025
 * Folio de mantenimiento     : 
-* Tipo de mantenimiento      : 
-* Descripción del mantenimiento : 
-* Responsable                : 
-* Revisor                    : 
+* Tipo de mantenimiento      : Correctivo
+* Descripción del mantenimiento : Agregado middleware para redirección automática según rol
+* Responsable                : Elian Pérez
+* Revisor                    : Angel Davila
 */
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -34,6 +34,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) 
     {
+        $middleware->web(append: [ \App\Http\Middleware\RedirectAuthenticatedUsersMiddleware::class]);
+        
         $middleware->alias([
             'ensure.active.plan' => \App\Http\Middleware\EnsureActivePlanMiddleware::class,
             'ensure.parking.configured'=> \App\Http\Middleware\EnsureParkingConfiguredMiddleware::class,

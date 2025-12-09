@@ -23,6 +23,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class ParkingController extends Controller
@@ -37,32 +38,49 @@ class ParkingController extends Controller
         return view('user.parking.create',['days' => Day::orderBy('id')->get()]);
     }
 
-    public function store(Request $request): RedirectResponse
+   public function store(Request $request): RedirectResponse
     {
-        $data = $this->validateParking($request);
+        try 
+        {
+            $data = $this->validateParking($request);
 
-        $this->normalizeScheduleTimes($request);
-        $this->validateSchedules($request);
+            $this->normalizeScheduleTimes($request);
+            $this->validateSchedules($request);
 
-        $parking = Parking::create([
-            'id_user' => Auth::id(),
-            'name' => $data['name'],
-            'latitude_coordinate' => $data['lat'],
-            'longitude_coordinate' => $data['lng'],
-            'type' => (int) $data['type'],
-            'price' => (int)$data['type'] === 0 ? ($data['price_flat'] ?? 0) : ($data['price_hour'] ?? 0),
-            'price_flat' => $data['price_flat'] ?? null
-        ]);
-
-        $this->saveSchedules($parking, $request);
-
-        return redirect()
-            ->route('parking.edit')
-            ->with('swal', [
-                'icon'  => 'success',
-                'title' => '¡Estacionamiento creado!',
-                'text'  => 'El estacionamiento y su horario se guardaron correctamente.'
+            $parking = Parking::create([
+                'id_user' => Auth::id(),
+                'name' => $data['name'],
+                'latitude_coordinate' => $data['lat'],
+                'longitude_coordinate'  => $data['lng'],
+                'type' => (int) $data['type'],
+                'price' => (int) $data['type'] === 0 ? ($data['price_flat'] ?? 0) : ($data['price_hour'] ?? 0),
+                'price_flat' => $data['price_flat'] ?? null
             ]);
+
+            $this->saveSchedules($parking, $request);
+
+            return redirect()
+                ->route('parking.edit')
+                ->with('swal', [
+                    'icon' => 'success',
+                    'title' => '¡Estacionamiento creado!',
+                    'text' => 'El estacionamiento y su horario se guardaron correctamente.',
+                    'confirmButtonColor' => '#494949'
+                ]);
+        } 
+        catch (ValidationException $e) 
+        {
+            $first = collect($e->errors())->flatten()->first() ?? 'Error de validación.';
+
+            return back()
+                ->with('swal', [
+                    'icon' => 'error',
+                    'title' => 'Error de validación',
+                    'text' => $first,
+                    'confirmButtonColor' => '#494949'
+                ])
+                ->withInput();
+        }
     }
 
     public function edit(): View|RedirectResponse
@@ -81,33 +99,50 @@ class ParkingController extends Controller
     {
         $parking = Auth::user()->parking;
 
-        if (!$parking)
+        if (! $parking) 
         {
             return redirect()->route('parking.create');
         }
 
-        $data = $this->validateParking($request);
+        try 
+        {
+            $data = $this->validateParking($request);
 
-        $this->normalizeScheduleTimes($request);
-        $this->validateSchedules($request);
+            $this->normalizeScheduleTimes($request);
+            $this->validateSchedules($request);
 
-        $parking->update([
-            'name' => $data['name'],
-            'latitude_coordinate' => $data['lat'],
-            'longitude_coordinate' => $data['lng'],
-            'type' => (int) $data['type'],
-            'price' => (int)$data['type'] === 0 ? ($data['price_flat'] ?? 0) : ($data['price_hour'] ?? 0),
-            'price_flat' => $data['price_flat'] ?? null
-        ]);
+            $parking->update([
+                'name' => $data['name'],
+                'latitude_coordinate' => $data['lat'],
+                'longitude_coordinate' => $data['lng'],
+                'type' => (int) $data['type'],
+                'price' => (int) $data['type'] === 0 ? ($data['price_flat'] ?? 0) : ($data['price_hour'] ?? 0),
+                'price_flat' => $data['price_flat'] ?? null
+            ]);
 
-        $this->saveSchedules($parking, $request);
+            $this->saveSchedules($parking, $request);
 
-        return back()->with('swal', [
-            'icon'  => 'success',
-            'title' => '¡Actualizado!',
-            'text'  => 'Estacionamiento y horario actualizados correctamente.'
-        ]);
+            return back()->with('swal', [
+                'icon'  => 'success',
+                'title' => '¡Actualizado!',
+                'text'  => 'Estacionamiento y horario actualizados correctamente.',
+                'confirmButtonColor' => '#494949'
+            ]);
+        } catch (ValidationException $e) 
+        {
+            $first = collect($e->errors())->flatten()->first() ?? 'Error de validación.';
+
+            return back()
+                ->with('swal', [
+                    'icon'  => 'error',
+                    'title' => 'Error de validación',
+                    'text'  => $first,
+                    'confirmButtonColor' => '#494949',
+                ])
+                ->withInput();
+        }
     }
+
 
     protected function validateParking(Request $request): array
     {
@@ -136,14 +171,14 @@ class ParkingController extends Controller
                     'required_if:type,1,2',
                     'nullable',
                     'numeric',
-                    'min:0'
+                    'min:1'
                 ],
                 'price_flat' => 
                 [
                     'required_if:type,0,2',
                     'nullable',
                     'numeric',
-                    'min:0'
+                    'min:1'
                 ],
             ], [
                 'required' => 'El campo :attribute es obligatorio.',
@@ -157,7 +192,7 @@ class ParkingController extends Controller
     }
 
 
-    protected function saveSchedules(Parking $parking, Request $request): RedirectResponse|null
+    protected function saveSchedules(Parking $parking, Request $request): ?RedirectResponse
     {
         $rows = $request->input('schedules', []);
         $sameForAll = $request->boolean('same_schedule');
@@ -166,21 +201,21 @@ class ParkingController extends Controller
         {
             $globalSchedule = $rows['all'];
 
-            $open = $globalSchedule['open'] ?? null;
+            $open  = $globalSchedule['open']  ?? null;
             $close = $globalSchedule['close'] ?? null;
 
-            if (!$open || !$close)
+            if (! $open || ! $close)
             {
-                return back()
-                    ->withErrors(['schedules.all.open' => 'Debes especificar hora de apertura y cierre.'])
-                    ->withInput();
+                throw ValidationException::withMessages([
+                    'schedules.all.open' => 'Debes especificar hora de apertura y cierre.',
+                ]);
             }
 
             if ($open >= $close)
             {
-                return back()
-                    ->withErrors(['schedules.all.close' => 'La hora de cierre debe ser mayor que la de apertura.'])
-                    ->withInput();
+                throw ValidationException::withMessages([
+                    'schedules.all.close' => 'La hora de cierre debe ser mayor que la de apertura.',
+                ]);
             }
 
             unset($rows['all']);
@@ -190,30 +225,28 @@ class ParkingController extends Controller
                 $rows[$day->id] = [
                     'open'   => $open,
                     'close'  => $close,
-                    'closed' => false
+                    'closed' => false,
                 ];
             }
         }
 
         foreach ($rows as $dayId => $row)
         {
-            if (!is_numeric($dayId))
-            {
+            if (! is_numeric($dayId)) {
                 continue;
             }
 
             $dayId = (int) $dayId;
 
-            if (!Day::find($dayId))
-            {
+            if (! Day::find($dayId)) {
                 continue;
             }
 
-            $closed = !empty($row['closed']);
-            $open = $row['open'] ?? null;
-            $close = $row['close'] ?? null;
+            $closed = ! empty($row['closed']);
+            $open   = $row['open']  ?? null;
+            $close  = $row['close'] ?? null;
 
-            if ($closed || !$open || !$close)
+            if ($closed || ! $open || ! $close)
             {
                 Schedule::where('id_parking', $parking->id)
                     ->where('id_day', $dayId)
@@ -224,22 +257,24 @@ class ParkingController extends Controller
 
             if ($open >= $close)
             {
-                if (!$sameForAll)
+                if (! $sameForAll)
                 {
-                    return back()
-                        ->withErrors(["schedules.$dayId.close" => 'La hora de cierre debe ser mayor que la de apertura.'])
-                        ->withInput();
+                    throw ValidationException::withMessages([
+                        "schedules.$dayId.close" => 'La hora de cierre debe ser mayor que la de apertura.',
+                    ]);
                 }
 
                 continue;
             }
 
-            Schedule::updateOrCreate(['id_parking' => $parking->id,'id_day' => $dayId],['opening_time' => $open,'closing_time' => $close]);
+            Schedule::updateOrCreate(
+                ['id_parking' => $parking->id,'id_day' => $dayId],
+                ['opening_time' => $open,'closing_time' => $close]
+            );
         }
 
         return null;
     }
-
 
     protected function normalizeScheduleTimes(Request $request): void
     {
@@ -288,9 +323,7 @@ class ParkingController extends Controller
             $schedules[$key]['close'] = $norm($row['close'] ?? null);
         }
 
-        $request->merge([
-            'schedules' => $schedules,
-        ]);
+        $request->merge(['schedules' => $schedules]);
     }
 
     protected function validateSchedules(Request $request): void

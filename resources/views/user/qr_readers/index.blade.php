@@ -26,7 +26,7 @@
                 icon-variant="outline"
                 :href="route('parking.qr-readers.create')"
                 wire:navigate
-                class="bg-blue-600 hover:bg-blue-700 text-white"
+                class="bg-green-600 hover:bg-green-700 text-white"
             >
                 Crear lector
             </flux:button>
@@ -118,6 +118,18 @@
                                     <div class="flex items-center justify-center gap-3">
                                         <flux:button
                                             size="sm"
+                                            icon="qr-code"
+                                            icon-variant="outline"
+                                            variant="primary"
+                                            :href="route('parking.qr-readers.scan', $reader)"
+                                            class="text-white bg-gray-500 hover:bg-gray-600 dark:text-white"
+                                        >
+                                            Escanear
+                                        
+                                        </flux:button>
+
+                                        <flux:button
+                                            size="sm"
                                             icon="pencil-square"
                                             icon-variant="outline"
                                             variant="primary"
@@ -127,18 +139,7 @@
                                         >
                                             Editar
                                         </flux:button>
-
-                                        <flux:button
-                                            size="sm"
-                                            icon="qr-code"
-                                            icon-variant="outline"
-                                            variant="primary"
-                                            :href="route('parking.qr-readers.scan', $reader)"
-                                            class="text-white bg-black hover:bg-custom-gray dark:text-white"
-                                        >
-                                            Escanear
-                                        </flux:button>
-
+                                        
                                         <form method="POST" action="{{ route('parking.qr-readers.destroy', $reader) }}" class="delete-form">
                                             @csrf
                                             @method('DELETE')
@@ -182,10 +183,10 @@
                             text: 'Esta acción no se puede deshacer.',
                             icon: 'warning',
                             showCancelButton: true,
-                            confirmButtonColor: '#3182ce', 
+                            confirmButtonColor: '#42A958', 
                             cancelButtonColor: '#EE0000',
-                            confirmButtonText: 'Sí, eliminar',
-                            cancelButtonText: 'Cancelar',
+                            confirmButtonText: 'Confirmar',
+                            cancelButtonText: 'Cancelar'
                         })
                         .then((result) =>
                         {

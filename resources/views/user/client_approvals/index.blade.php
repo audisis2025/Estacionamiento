@@ -1,23 +1,45 @@
-{{--
+{{-- 
 * Nombre de la vista           : index.blade.php
 * Descripción de la vista      : Pantalla para gestionar las solicitudes de aprobación de clientes.
 * Fecha de creación            : 05/11/2025
 * Elaboró                      : Elian Pérez
 * Fecha de liberación          : 06/11/2025
 * Autorizó                     : Angel Davila
-* Version                      : 2.0
-* Fecha de mantenimiento       : 16/11/2025
+* Version                      : 3.0
+* Fecha de mantenimiento       : 09/12/2025
 * Folio de mantenimiento       : 
 * Tipo de mantenimiento        : Correctivo
-* Descripción del mantenimiento: Se realizaron ajustes en la interfaz
+* Descripción del mantenimiento: Descuento sin fecha de expiración y cancelación manual.
 * Responsable                  : Elian Pérez
 * Revisor                      : Angel Davila
 --}}
+
 <x-layouts.app :title="__('Solicitudes de clientes')">
     <div class="p-6 w-full max-w-6xl mx-auto space-y-8">
 
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between mb-2">
             <flux:heading level="2" size="xl" class="text-2xl !font-black text-black dark:text-white">
+                Solicitudes de clientes
+            </flux:heading>
+        </div>
+
+        <form id="client-approvals-filter-form" method="GET" class="max-w-xs mb-6">
+            <flux:label for="filter-phone" class="text-xs font-medium text-black dark:text-white">
+                Filtrar por número de teléfono
+            </flux:label>
+
+            <flux:input
+                id="filter-phone"
+                name="phone"
+                type="text"
+                placeholder="Ej. 5550001111"
+                class="mt-1 text-xs md:text-sm"
+                value="{{ $phone ?? '' }}"
+            />
+        </form>
+
+        <div class="flex items-center justify-between">
+            <flux:heading level="2" size="lg" class="text-xl !font-black text-black dark:text-white">
                 Solicitudes pendientes
             </flux:heading>
         </div>
@@ -32,29 +54,16 @@
                     <thead class="bg-zinc-100 dark:bg-zinc-800">
                         <tr>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-black dark:text-white">
-                                <flux:text class="text-sm font-semibold text-black dark:text-white">
-                                    Usuario
-                                </flux:text>
+                                Usuario
                             </th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-black dark:text-white">
-                                <flux:text class="text-sm font-semibold text-black dark:text-white">
-                                    Correo
-                                </flux:text>
+                                Tipo
                             </th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-black dark:text-white">
-                                <flux:text class="text-sm font-semibold text-black dark:text-white">
-                                    Teléfono
-                                </flux:text>
-                            </th>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-black dark:text-white">
-                                <flux:text class="text-sm font-semibold text-black dark:text-white">
-                                    Tipo solicitado
-                                </flux:text>
+                                Estado
                             </th>
                             <th class="px-4 py-3 text-center text-sm font-semibold text-black dark:text-white">
-                                <flux:text class="text-sm font-semibold text-black dark:text-white">
-                                    Acciones
-                                </flux:text>
+                                Acciones
                             </th>
                         </tr>
                     </thead>
@@ -63,35 +72,35 @@
                         @foreach ($pending as $r)
                             <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition">
                                 <td class="px-4 py-3 text-sm text-black dark:text-white">
-                                    {{ $r->user->name }}
+                                    <div class="font-medium">
+                                        {{ $r->user->name }}
+                                    </div>
+                                    <div class="text-xs text-black/60 dark:text-white/60">
+                                        {{ $r->user->phone_number }}
+                                    </div>
                                 </td>
 
                                 <td class="px-4 py-3 text-sm text-black/80 dark:text-white/80">
-                                    {{ $r->user->email }}
-                                </td>
-
-                                <td class="px-4 py-3 text-sm text-black/80 dark:text-white/80">
-                                    {{ $r->user->phone_number }}
-                                </td>
-
-                                <td class="px-4 py-3 text-sm text-black dark:text-white">
                                     {{ $r->clientType->type_name }}
-                                    —
-                                    {{ $r->clientType->discount_type
-                                        ? '$' . number_format($r->clientType->amount, 2)
-                                        : number_format($r->clientType->amount, 2) . ' %' }}
                                 </td>
 
                                 <td class="px-4 py-3 text-sm">
+                                    <span
+                                        class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium
+                                               bg-custom-orange text-white">
+                                        Pendiente
+                                    </span>
+                                </td>
+
+                                <td class="px-4 py-3 text-sm text-center">
                                     <div class="flex items-center justify-center gap-3">
 
                                         <form
                                             method="POST"
                                             action="{{ route('parking.client-approvals.approve', $r) }}"
-                                            class="approve-form"
+                                            class="inline-block"
                                         >
                                             @csrf
-                                            <input type="hidden" name="expiration_date" value="">
 
                                             <flux:button
                                                 size="sm"
@@ -109,7 +118,7 @@
                                         <form
                                             method="POST"
                                             action="{{ route('parking.client-approvals.reject', $r) }}"
-                                            class="reject-form"
+                                            class="reject-form inline-block"
                                         >
                                             @csrf
                                             @method('DELETE')
@@ -123,7 +132,7 @@
                                                 type="submit"
                                                 class="text-xs md:text-sm"
                                             >
-                                                Eliminar
+                                                Rechazar
                                             </flux:button>
                                         </form>
                                     </div>
@@ -135,9 +144,9 @@
             </div>
         @endif
 
-        <div class="flex items-center justify-between mt-4">
-            <flux:heading level="2" size="xl" class="text-2xl !font-black text-black dark:text-white">
-                Aprobados recientes
+        <div class="flex items-center justify-between mt-8">
+            <flux:heading level="2" size="lg" class="text-xl !font-black text-black dark:text-white">
+                Aprobados
             </flux:heading>
         </div>
 
@@ -146,19 +155,16 @@
                 <thead class="bg-zinc-100 dark:bg-zinc-800">
                     <tr>
                         <th class="px-4 py-3 text-left text-sm font-semibold text-black dark:text-white">
-                            <flux:text class="text-sm font-semibold text-black dark:text-white">
-                                Usuario
-                            </flux:text>
+                            Usuario
                         </th>
                         <th class="px-4 py-3 text-left text-sm font-semibold text-black dark:text-white">
-                            <flux:text class="text-sm font-semibold text-black dark:text-white">
-                                Tipo
-                            </flux:text>
+                            Tipo
                         </th>
                         <th class="px-4 py-3 text-left text-sm font-semibold text-black dark:text-white">
-                            <flux:text class="text-sm font-semibold text-black dark:text-white">
-                                Expira
-                            </flux:text>
+                            Estado
+                        </th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold text-black dark:text-white">
+                            Acciones
                         </th>
                     </tr>
                 </thead>
@@ -167,70 +173,97 @@
                     @forelse ($approved as $r)
                         <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition">
                             <td class="px-4 py-3 text-sm text-black dark:text-white">
-                                {{ $r->user->name }}
+                                <div class="font-medium">
+                                    {{ $r->user->name }}
+                                </div>
+                                <div class="text-xs text-black/60 dark:text-white/60">
+                                    {{ $r->user->phone_number }}
+                                </div>
                             </td>
 
                             <td class="px-4 py-3 text-sm text-black/80 dark:text-white/80">
                                 {{ $r->clientType->type_name }}
                             </td>
 
-                            <td class="px-4 py-3 text-sm text-black/80 dark:text-white/80">
-                                {{ optional($r->expiration_date)->format('Y-m-d') }}
+                            <td class="px-4 py-3 text-sm">
+                                <span
+                                    class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium
+                                           bg-custom-green/15 text-custom-green
+                                           dark:bg-custom-green/20 dark:text-custom-green">
+                                    Activo
+                                </span>
+                            </td>
+
+                            <td class="px-4 py-3 text-sm text-center">
+                                <form
+                                    method="POST"
+                                    action="{{ route('parking.client-approvals.reject', $r) }}"
+                                    class="reject-form inline-block"
+                                >
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <flux:button
+                                        size="sm"
+                                        icon="x-circle"
+                                        icon-variant="outline"
+                                        variant="danger"
+                                        as="button"
+                                        type="submit"
+                                        class="text-xs md:text-sm"
+                                    >
+                                        Cancelar beneficio
+                                    </flux:button>
+                                </form>
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                            <td
-                                class="px-4 py-6 text-center text-sm text-black/60 dark:text-white/60"
-                                colspan="3"
-                            >
+                        <td colspan="4" class="px-4 py-4 justify-center text-center">
+                            <flux:text class="text-xs text-black/60 dark:text-white/60">
                                 Sin registros
-                            </td>
-                        </tr>
+                            </flux:text>
+                        </td>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
 
+    <script>
+        (function () 
+        {
+            const form = document.getElementById('client-approvals-filter-form');
+            if (!form) return;
+
+            const phoneInput = document.getElementById('filter-phone');
+            let timer = null;
+
+            if (phoneInput) {
+                phoneInput.addEventListener('input', () => 
+                {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => {
+                        form.requestSubmit();
+                    }, 500);
+                });
+
+                phoneInput.addEventListener('keypress', (e) => 
+                {
+                    if (e.key === 'Enter') 
+                    {
+                        e.preventDefault();
+                        clearTimeout(timer);
+                        form.requestSubmit();
+                    }
+                });
+            }
+        })();
+    </script>
+
     @push('js')
         <script>
             function bindApprovalUI()
             {
-                document.querySelectorAll('.approve-form').forEach((form) =>
-                {
-                    if (form.dataset.bound) return;
-                    form.dataset.bound = '1';
-
-                    form.addEventListener('submit', async (e) =>
-                    {
-                        e.preventDefault();
-
-                        const min = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
-
-                        const { value: date } = await Swal.fire(
-                        {
-                            title: 'Fecha de expiración',
-                            input: 'date',
-                            inputAttributes:
-                            {
-                                min: min,
-                            },
-                            showCancelButton: true,
-                            confirmButtonText: 'Aprobar',
-                            cancelButtonText: 'Cancelar',
-                            cancelButtonColor: '#EE0000',
-                            confirmButtonColor: '#3182ce'
-                        });
-
-                        if (date)
-                        {
-                            form.querySelector('input[name="expiration_date"]').value = date;
-                            form.submit();
-                        }
-                    });
-                });
-
                 document.querySelectorAll('.reject-form').forEach((form) =>
                 {
                     if (form.dataset.bound) return;
@@ -242,13 +275,13 @@
 
                         Swal.fire(
                         {
-                            title: '¿Rechazar solicitud?',
-                            text: 'Esta acción eliminará la solicitud.',
+                            title: '¿Eliminar beneficio?',
+                            text: 'Esta acción eliminará la solicitud / beneficio.',
                             icon: 'warning',
                             showCancelButton: true,
-                            confirmButtonColor: '#3182ce',
+                            confirmButtonColor: '#42A958',
                             cancelButtonColor: '#EE0000',
-                            confirmButtonText: 'Sí, rechazar',
+                            confirmButtonText: 'Confirmar',
                             cancelButtonText: 'Cancelar',
                         }).then((res) =>
                         {
@@ -265,4 +298,21 @@
             document.addEventListener('livewire:navigated', bindApprovalUI);
         </script>
     @endpush
+
+    @if (session('swal'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function ()
+            {
+                const data = @json(session('swal'));
+
+                Swal.fire(
+                {
+                    icon: data.icon ?? 'info',
+                    title: data.title ?? 'Mensaje',
+                    text: data.text ?? '',
+                    confirmButtonColor: '#494949'
+                });
+            });
+        </script>
+    @endif
 </x-layouts.app>

@@ -68,7 +68,7 @@
                     variant="primary"
                     icon="computer-desktop"
                     icon-variant="outline"
-                    class="bg-black hover:bg-custom-gray text-white text-sm"
+                    class="bg-gray-500 hover:bg-gray-600 text-white text-sm"
                 >
                     Capturar
                 </flux:button>

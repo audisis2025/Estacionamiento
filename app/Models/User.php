@@ -40,8 +40,8 @@ class User extends Authenticatable
         'id_role',
         'end_date',
         'amount',
-        'id_role',
-        'notification_token'
+        'notification_token',
+        'is_active'
     ];
 
     protected $hidden = [
@@ -57,7 +57,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'end_date' => 'datetime',
             'amount' => 'decimal:2',
-            'password' => 'hashed'
+            'password' => 'hashed',
+            'is_active' => 'boolean'
         ];
     }
 
@@ -151,13 +152,18 @@ class User extends Authenticatable
     {
         return $this->userClientTypes()
             ->where('approval', 1)
-            ->whereDate(
-                'expiration_date', 
-                '>=', 
-                now()->toDateString()
-            )
             ->whereHas('clientType', fn($q) => $q->where('id_parking', $parkingId))
             ->latest('id')
             ->first();
+    }
+
+    public function isActive(): bool
+    {
+        return (bool) $this->is_active;
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }

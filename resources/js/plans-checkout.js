@@ -116,6 +116,7 @@ function initPlansCheckout(config)
                         icon: 'warning',
                         title: 'Plan no seleccionado',
                         text: 'Por favor selecciona un plan antes de continuar',
+                        confirmButtonColor: '#494949'
                     });
 
                     return actions.reject();
@@ -163,7 +164,8 @@ function initPlansCheckout(config)
                     {
                         icon: 'error',
                         title: 'Error',
-                        text: err.message || 'No se pudo crear la orden'
+                        text: err.message || 'No se pudo crear la orden',
+                        confirmButtonColor: '#494949'
                     });
 
                     throw err;
@@ -205,6 +207,7 @@ function initPlansCheckout(config)
                             title: 'Error al procesar el pago',
                             text: json.message || 'Ocurrió un error inesperado',
                             footer: json.debug_id ? `ID de seguimiento: ${json.debug_id}` : '',
+                            confirmButtonColor: '#494949'
                         });
 
                         return;
@@ -216,7 +219,8 @@ function initPlansCheckout(config)
                         title: '¡Pago completado!',
                         text: json.message || '¡Tu plan ha sido activado exitosamente!',
                         timer: 3000,
-                        timerProgressBar: true
+                        timerProgressBar: true,
+                        confirmButtonColor: '#494949'
                     })
                     .then(() =>
                     {
@@ -232,7 +236,8 @@ function initPlansCheckout(config)
                     {
                         icon: 'error',
                         title: 'Error de conexión',
-                        text: 'No se pudo conectar con el servidor. Por favor intenta nuevamente.'
+                        text: 'No se pudo conectar con el servidor. Por favor intenta nuevamente.',
+                        confirmButtonColor: '#494949'
                     });
                 });
             },
@@ -243,7 +248,8 @@ function initPlansCheckout(config)
                 {
                     icon: 'error',
                     title: 'Pago cancelado',
-                    text: 'Has cancelado el proceso de pago'
+                    text: 'Has cancelado el proceso de pago',
+                    confirmButtonColor: '#494949'
                 });
             },
 
@@ -253,7 +259,8 @@ function initPlansCheckout(config)
                 {
                     icon: 'error',
                     title: 'Error con PayPal',
-                    text: 'Ocurrió un error con el servicio de PayPal. Por favor intenta nuevamente.'
+                    text: 'Ocurrió un error con el servicio de PayPal. Por favor intenta nuevamente.',
+                    confirmButtonColor: '#494949'
                 });
             }
         })

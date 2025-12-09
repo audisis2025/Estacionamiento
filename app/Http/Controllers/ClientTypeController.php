@@ -36,7 +36,8 @@ class ClientTypeController extends Controller
             return redirect()->route('parking.edit')->with('swal', [
                 'icon'  => 'warning',
                 'title' => 'Configura tu estacionamiento',
-                'text'  => 'Debes registrar tu estacionamiento y su horario antes de administrar tipos de cliente.'
+                'text'  => 'Debes registrar tu estacionamiento y su horario antes de administrar tipos de cliente.',
+                'confirmButtonColor' => '#494949'
             ]);
         }
 
@@ -74,8 +75,15 @@ class ClientTypeController extends Controller
                 'amount' => [
                     'required',
                     'numeric',
-                    'min:1'
-                ],
+                    'min:1',
+                    function ($attribute, $value, $fail) use ($request) 
+                    {
+                        if ($request->discount_type == 0 && ($value < 1 || $value > 100)) 
+                        {
+                            $fail('El porcentaje de descuento debe estar entre 1 y 100.');
+                        }
+                    }
+                ]
             ]);
 
             $parking->clientTypes()->create($data);
@@ -83,9 +91,10 @@ class ClientTypeController extends Controller
             return redirect()->route('parking.client-types.index')->with('swal', [
                 'icon'  => 'success',
                 'title' => 'Tipo creado',
-                'text'  => 'El tipo de cliente se registró correctamente.'
+                'text'  => 'El tipo de cliente se registró correctamente.',
+                'confirmButtonColor' => '#494949'
             ]);
-        }catch (ValidationException $e)
+        } catch (ValidationException $e)
         {
             $allErrors = collect($e->errors())->flatten()->toArray();
 
@@ -99,9 +108,10 @@ class ClientTypeController extends Controller
             $errorList .= '</ul>';
 
             return back()->with('swal', [
-                'icon'  => 'error',
+                'icon' => 'error',
                 'title' => 'Errores en el formulario',
-                'html'  => $errorList
+                'html' => $errorList,
+                'confirmButtonColor' => '#494949'
             ])->withInput();
         }
     }
@@ -138,8 +148,15 @@ class ClientTypeController extends Controller
                 'amount' => [
                     'required',
                     'numeric',
-                    'min:1'
-                ],
+                    'min:1',
+                    function ($attribute, $value, $fail) use ($request) 
+                    {
+                        if ($request->discount_type == 0 && ($value < 1 || $value > 100)) 
+                        {
+                            $fail('El porcentaje de descuento debe estar entre 1 y 100.');
+                        }
+                    }
+                ]
             ]);
 
             $clientType->update($data);
@@ -147,7 +164,8 @@ class ClientTypeController extends Controller
             return redirect()->route('parking.client-types.index')->with('swal', [
                 'icon'  => 'success',
                 'title' => 'Tipo actualizado',
-                'text'  => 'Los cambios se guardaron correctamente.'
+                'text'  => 'Los cambios se guardaron correctamente.',
+                'confirmButtonColor' => '#494949'
             ]);
         } catch (ValidationException $e)
         {
@@ -165,7 +183,8 @@ class ClientTypeController extends Controller
             return back()->with('swal', [
                 'icon'  => 'error',
                 'title' => 'Errores en el formulario',
-                'html'  => $errorList
+                'html'  => $errorList,
+                'confirmButtonColor' => '#494949'
             ])->withInput();
         }
     }
@@ -181,9 +200,10 @@ class ClientTypeController extends Controller
         });
 
         return redirect()->route('parking.client-types.index')->with('swal', [
-            'icon'  => 'success',
+            'icon' => 'success',
             'title' => 'Tipo eliminado',
-            'text'  => 'El tipo de cliente fue eliminado.'
+            'text' => 'El tipo de cliente fue eliminado.',
+            'confirmButtonColor' => '#494949'
         ]);
     }
 

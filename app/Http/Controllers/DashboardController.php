@@ -43,12 +43,15 @@ class DashboardController extends Controller
             ->whereHas('plan', fn ($query) => $query->where('type', 'user'))
             ->where(function ($q) use ($today) 
             {
-                $q->whereDate('end_date', '>=', $today)
-                ->orWhere(function ($q2) 
-                {
-                    $q2->where('id_plan', 4)
-                        ->whereNull('end_date');
-                });
+                $q->whereDate(
+                    'end_date', 
+                    '>=',
+                    $today
+                ) ->orWhere(function ($q2) 
+                  {
+                      $q2->where('id_plan', 4)
+                         ->whereNull('end_date');
+                  });
             })
             ->count();
 
@@ -60,7 +63,12 @@ class DashboardController extends Controller
         $planFilter = $request->input('plan', '');
         $search     = trim($request->input('q', ''));
 
-        if ($planFilter !== '') 
+        if ($roleFilter === 'dynamic') 
+        {
+            $planFilter = '';
+        }
+
+        if ($roleFilter !== 'dynamic' && $planFilter !== '') 
         {
             $selectedPlan = Plan::find((int) $planFilter);
 
@@ -90,7 +98,7 @@ class DashboardController extends Controller
             $usersQuery->whereNull('id_role');
         }
 
-        if ($planFilter !== '') 
+        if ($planFilter !== '' && $roleFilter !== 'dynamic') 
         {
             $usersQuery
                 ->whereIn('id_role', [2, 3])
@@ -101,21 +109,9 @@ class DashboardController extends Controller
         {
             $usersQuery->where(function ($q) use ($search) 
             {
-                $q->where(
-                    'name', 
-                    'like', 
-                    "%{$search}%"
-                )
-                  ->orWhere(
-                    'email', 
-                    'like', 
-                    "%{$search}%"
-                )
-                  ->orWhere(
-                    'phone_number', 
-                    'like', 
-                    "%{$search}%"
-                );
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone_number', 'like', "%{$search}%");
             });
         }
 

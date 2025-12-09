@@ -126,6 +126,7 @@ export default function initParkingForm(formId)
                     icon: 'warning',
                     title: 'Geolocalización no disponible',
                     text: 'Para usar tu ubicación, abre el sitio en HTTPS o usa http://localhost.',
+                    confirmButtonColor: '#494949'
                 });
                 return;
             }
@@ -137,6 +138,7 @@ export default function initParkingForm(formId)
                     icon: 'error',
                     title: 'Geolocalización no soportada',
                     text: 'Tu navegador no soporta geolocalización.',
+                    confirmButtonColor: '#494949'
                 });
                 return;
             }
@@ -206,11 +208,12 @@ export default function initParkingForm(formId)
                     if (!isFinite(best.acc)) 
                     {
                         Swal.fire(
-                            {
-                                icon: 'error',
-                                title: 'No se pudo obtener tu ubicación',
-                                text: 'Intenta nuevamente o establece la ubicación manualmente en el mapa.'
-                            });
+                        {
+                            icon: 'error',
+                            title: 'No se pudo obtener tu ubicación',
+                            text: 'Intenta nuevamente o establece la ubicación manualmente en el mapa.',
+                            confirmButtonColor: '#494949'
+                        });
                     }
 
                     stop();
@@ -230,11 +233,12 @@ export default function initParkingForm(formId)
                 } else 
                 {
                     Swal.fire(
-                        {
-                            icon: 'error',
-                            title: 'Ubicación no determinada',
-                            text: 'No se pudo determinar tu ubicación con precisión. Establece el punto manualmente.'
-                        });
+                    {
+                        icon: 'error',
+                        title: 'Ubicación no determinada',
+                        text: 'No se pudo determinar tu ubicación con precisión. Establece el punto manualmente.',
+                        confirmButtonColor: '#494949'
+                    });
                 }
                 stop();
             }, 12000);

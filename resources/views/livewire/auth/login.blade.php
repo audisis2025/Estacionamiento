@@ -57,6 +57,15 @@ new #[Layout('components.layouts.auth')] class extends Component
             ]);
 
         $user = $this->validateCredentials();
+        
+        if (! $user->is_active) 
+        {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'Tu cuenta ha sido bloqueada. Contacta al administrador: admgenineral@gmail.com',
+            ]);
+        }
 
         if (Features::canManageTwoFactorAuthentication() && $user->hasEnabledTwoFactorAuthentication()) 
         {
@@ -128,6 +137,18 @@ new #[Layout('components.layouts.auth')] class extends Component
     {
         return Str::transliterate(Str::lower($this->email) . '|' . request()->ip());
     }
+
+    public function mount(): void
+    {
+        if (session()->has('swal')) {
+            $data = session('swal');
+            $this->dispatch('show-swal', 
+                icon: $data['icon'] ?? 'info',
+                title: $data['title'] ?? 'Mensaje',
+                text: $data['text'] ?? ''
+            );
+        }
+    }
 }; ?>
 
 
@@ -175,12 +196,12 @@ new #[Layout('components.layouts.auth')] class extends Component
             $wire.on('show-swal', (data) => 
             {
                 Swal.fire(
-                    {
-                        icon: data.icon,
-                        title: data.title,
-                        text: data.text,
-                    }
-                );
+                {
+                    icon: data.icon,
+                    title: data.title,
+                    text: data.text,
+                    confirmButtonColor: '#494949'
+                });
             });
         </script>
     @endscript

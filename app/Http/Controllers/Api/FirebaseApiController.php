@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Services\FirebaseService;
 use Illuminate\Http\Request;
 
@@ -29,5 +30,21 @@ class FirebaseApiController extends Controller
         );
 
         return response()-> json($response);
+    }
+
+    public function updateNotificationToken(Request $request)
+    {
+        $request->validate(['notification_token' => ['required', 'string']]);
+
+        $user = $request->user();
+        $token = $request->input('notification_token');
+
+        User::where('notification_token', $token)
+            ->where('id', '!=', $user->id)
+            ->update(['notification_token' => null]);
+
+        $user->update(['notification_token' => $token]);
+
+        return response()->json(['ok' => true,'message' => 'Notification token actualizado.']);
     }
 }

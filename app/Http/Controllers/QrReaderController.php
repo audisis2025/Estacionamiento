@@ -37,7 +37,8 @@ class QrReaderController extends Controller
                 ->with('swal', [
                     'icon'  => 'warning',
                     'title' => 'Configura tu estacionamiento',
-                    'text'  => 'Debes dar de alta tu estacionamiento antes de administrar lectores.'
+                    'text'  => 'Debes dar de alta tu estacionamiento antes de administrar lectores.',
+                    'confirmButtonColor' => '#494949'
                 ]);
         }
 
@@ -85,7 +86,8 @@ class QrReaderController extends Controller
                 ->with('swal', [
                     'icon'  => 'success',
                     'title' => 'Lector creado',
-                    'text'  => 'El lector QR se registró correctamente.'
+                    'text'  => 'El lector QR se registró correctamente.',
+                    'confirmButtonColor' => '#494949'
                 ]);
         } catch (ValidationException $exception)
         {
@@ -96,24 +98,53 @@ class QrReaderController extends Controller
                 ->with('swal', [
                     'icon'  => 'error',
                     'title' => 'Error de validación',
-                    'text'  => $firstError
+                    'text'  => $firstError,
+                    'confirmButtonColor' => '#494949'
                 ])
                 ->withInput();
         }
     }
 
-    public function edit(QrReader $reader): View
+    public function edit(int $reader): View|RedirectResponse
     {
-        $this->ensureOwnership($reader);
+        $qrReader = QrReader::find($reader);
 
-        return view('user.qr_readers.edit', compact('reader'));
+        if (! $qrReader)
+        {
+            return redirect()
+                ->route('parking.qr-readers.index')
+                ->with('swal', [
+                    'icon'  => 'error',
+                    'title' => 'Lector no encontrado',
+                    'text'  => 'Este lector no existe o fue eliminado.',
+                    'confirmButtonColor' => '#494949'
+                ]);
+        }
+
+        $this->ensureOwnership($qrReader);
+
+        return view('user.qr_readers.edit', ['reader' => $qrReader]);
     }
 
-    public function update(Request $request, QrReader $reader): RedirectResponse
+    public function update(Request $request, int $reader): RedirectResponse
     {
+        $qrReader = QrReader::find($reader);
+
+        if (! $qrReader)
+        {
+            return redirect()
+                ->route('parking.qr-readers.index')
+                ->with('swal', [
+                    'icon'  => 'error',
+                    'title' => 'Lector no encontrado',
+                    'text'  => 'Este lector no existe o fue eliminado.',
+                    'confirmButtonColor' => '#494949'
+                ]);
+        }
+
         try
         {
-            $this->ensureOwnership($reader);
+            $this->ensureOwnership($qrReader);
 
             $parking = auth()->user()->parking;
 
@@ -124,50 +155,61 @@ class QrReaderController extends Controller
                     'max:50',
                     Rule::unique('qr_readers', 'serial_number')
                         ->where(fn ($query) => $query->where('id_parking', $parking->id))
-                        ->ignore($reader->id)
+                        ->ignore($qrReader->id)
                 ],
                 'sense' => [
                     'required',
                     'integer',
-                    Rule::in([
-                        0, 
-                        1, 
-                        2
-                    ])
+                    Rule::in([0, 1, 2])
                 ]
             ]);
 
-            $reader->update($data);
+            $qrReader->update($data);
 
             return redirect()
                 ->route('parking.qr-readers.index')
                 ->with('swal', [
-                    'icon' => 'success',
+                    'icon'  => 'success',
                     'title' => 'Lector actualizado',
-                    'text' => 'Se guardaron los cambios correctamente.'
+                    'text'  => 'Se guardaron los cambios correctamente.',
+                    'confirmButtonColor' => '#494949'
                 ]);
         } catch (ValidationException $exception)
         {
-            $firstError = collect($exception->errors())
-                ->first()[0] ?? 'Error de validación';
+            $firstError = collect($exception->errors())->first()[0] ?? 'Error de validación';
 
             return back()
                 ->with('swal', [
-                    'icon' => 'error',
+                    'icon'  => 'error',
                     'title' => 'Error de validación',
-                    'text' => $firstError
+                    'text'  => $firstError,
+                    'confirmButtonColor' => '#494949'
                 ])
                 ->withInput();
         }
     }
 
-    public function destroy(QrReader $reader): RedirectResponse
+    public function destroy(int $reader): RedirectResponse
     {
-        $this->ensureOwnership($reader);
+        $qrReader = QrReader::find($reader);
+
+        if (! $qrReader)
+        {
+            return redirect()
+                ->route('parking.qr-readers.index')
+                ->with('swal', [
+                    'icon'  => 'error',
+                    'title' => 'Lector ya no existe',
+                    'text'  => 'El lector ya había sido eliminado.',
+                    'confirmButtonColor' => '#494949'
+                ]);
+        }
+
+        $this->ensureOwnership($qrReader);
 
         try 
         {
-            $reader->delete();
+            $qrReader->delete();
 
             return redirect()
                 ->route('parking.qr-readers.index')
@@ -175,9 +217,9 @@ class QrReaderController extends Controller
                     'icon'  => 'success',
                     'title' => 'Lector eliminado',
                     'text'  => 'El lector QR fue eliminado.',
+                    'confirmButtonColor' => '#494949'
                 ]);
-        }
-        catch (QueryException $e) 
+        } catch (QueryException $e) 
         {
             if ($e->getCode() === '23000') 
             {
@@ -187,12 +229,14 @@ class QrReaderController extends Controller
                         'icon'  => 'error',
                         'title' => 'No se puede eliminar',
                         'text'  => 'Este lector tiene registros de entradas/salidas.',
+                        'confirmButtonColor' => '#494949'
                     ]);
             }
 
             throw $e;
         }
     }
+
 
     private function ensureOwnership(QrReader $reader): void
     {

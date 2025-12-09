@@ -70,7 +70,8 @@ class PlanController extends Controller
             ->with('swal', [
                 'icon'  => 'success',
                 'title' => '¡Plan actualizado!',
-                'text'  => 'Los cambios se guardaron correctamente.'
+                'text'  => 'Los cambios se guardaron correctamente.',
+                'confirmButtonColor' => '#494949'
             ]);
     }
 }

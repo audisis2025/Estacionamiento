@@ -18,6 +18,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EnsureActivePlanMiddleware
 {
@@ -29,6 +30,23 @@ class EnsureActivePlanMiddleware
         {
             return $next($request);
         }
+
+        if ($user && ! $user->is_active) 
+        {
+            Auth::logout();
+
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            session()->flash('swal', [
+                'icon'  => 'error',
+                'title' => 'Acceso bloqueado',
+                'text'  => 'Tu cuenta ha sido bloqueada. Contacta al administrador: admgenineral@gmail.com',
+            ]);
+
+            return redirect()->route('login');
+        }
+
 
         if ($user && ! $user->hasActivePlan()) 
         {

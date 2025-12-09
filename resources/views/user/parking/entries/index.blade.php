@@ -174,10 +174,10 @@
                             text: 'Se calculará automáticamente el monto según el tiempo, el tipo de cobro y el modo elegido por el usuario en la app.',
                             icon: 'warning',
                             showCancelButton: true,
-                            confirmButtonText: 'Sí, liberar',
+                            confirmButtonText: 'Confirmar',
                             cancelButtonText: 'Cancelar',
-                            confirmButtonColor: '#3182ce',
-                            cancelButtonColor: '#EE0000',
+                            confirmButtonColor: '#42A958',
+                            cancelButtonColor: '#EE0000'
                         });
 
                         if (! result.isConfirmed)
@@ -199,6 +199,7 @@
                     icon: 'success',
                     title: '¡Éxito!',
                     text: "{{ session('ok') }}",
+                    confirmButtonColor: '#494949'
                 });
             @endif
 
@@ -208,6 +209,7 @@
                     icon: 'error',
                     title: 'Error',
                     text: "{{ session('error') }}",
+                    confirmButtonColor: '#494949'
                 });
             @endif
         })();

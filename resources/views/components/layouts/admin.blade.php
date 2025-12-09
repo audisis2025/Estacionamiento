@@ -52,8 +52,9 @@
                 <flux:navlist.group :heading="__('Menú')" class="grid">
                     <flux:navlist.item icon="home" :href="route('admin.dashboard')" :current="request()->routeIs('admin.dashboard')" wire:navigate>{{ __('Inicio') }}</flux:navlist.item>
 
-                    <flux:navlist.item icon="eye" :href="route('admin.plans.index')" :current="request()->routeIs('admin.plans.index')" wire:navigate>{{ __('Planes') }}</flux:navlist.item>
+                    <flux:navlist.item icon="rectangle-stack" :href="route('admin.plans.index')" :current="request()->routeIs('admin.plans.index')" wire:navigate>{{ __('Planes') }}</flux:navlist.item>
 
+                    <flux:navlist.item icon="wrench-screwdriver" :href="route('admin.subscriptions.index')" :current="request()->routeIs('admin.subscriptions.*')" wire:navigate> {{ __('Administrar suscripciones') }}</flux:navlist.item>
                 </flux:navlist.group>
 
             </flux:navlist>
@@ -86,12 +87,6 @@
                             </div>
                         </div>
                     </flux:menu.radio.group>
-
-                    <flux:menu.separator />
-
-                    {{-- <flux:menu.radio.group>
-                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>Configuración</flux:menu.item>
-                    </flux:menu.radio.group> --}}
 
                     <flux:menu.separator />
 
@@ -165,21 +160,6 @@
                 Swal.fire(@json(session('swal')));
             </script>
         @endif
-
-        {{-- @if ($errors->any())
-            <script>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    html: 
-                    `<ul> 
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>`,
-                });
-            </script>
-        @endif --}}
 
         @stack('js')
     </body>

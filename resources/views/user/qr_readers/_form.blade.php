@@ -68,19 +68,19 @@
                     variant="primary"
                     icon="check-circle"
                     icon-variant="outline"
-                    class="bg-blue-600 hover:bg-blue-600 text-white text-sm"
+                    class="bg-green-600 hover:bg-green-700 text-white text-sm"
                 >
-                    Guardar lector
+                    Guardar cambios
                 </flux:button>
             @else
                 <flux:button
                     type="submit"
                     variant="primary"
-                    icon="plus"
+                    icon="check-circle"
                     icon-variant="outline"
-                    class="bg-blue-600 hover:bg-blue-700 text-white text-sm"
+                    class="bg-green-600 hover:bg-green-700 text-white text-sm"
                 >
-                    Crear lector
+                    Guardar lector
                 </flux:button>
             @endif
         </div>
@@ -105,6 +105,7 @@
                     icon: "error",
                     title: "Errores en el formulario",
                     html: errorList,
+                    confirmButtonColor: '#494949'
                 });
             });
         </script>

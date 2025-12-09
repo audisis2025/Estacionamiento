@@ -186,6 +186,14 @@ return [
         'serial_number' => 'número de serie',
         'amount' => 'monto',
         'typename' => 'nombre del tipo',
-        'terms' => 'términos y condiciones'
+        'terms' => 'términos y condiciones',
+        'type_name' => 'nombre del tipo',
+        'discount_type' => 'descuento',
+        'name' => 'nombre',
+        'price_hour' => 'precio por hora',
+        'price_flat' => 'precio fijo',
+        'lat' => 'latitud',
+        'lng' => 'longitud',
+        'type' => 'tipo'
     ],
 ];

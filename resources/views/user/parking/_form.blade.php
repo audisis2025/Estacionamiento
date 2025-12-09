@@ -1,4 +1,4 @@
-{{--
+{{-- 
 * Nombre de la vista           : _form.blade.php
 * Descripción de la vista      : Página de formulario para la creación o edición de un estacionamiento.
 * Fecha de creación            : 04/11/2025
@@ -20,7 +20,7 @@
     $method = $method ?? 'POST';
 @endphp
 
-<form id="{{ $formId }}" method="POST" action="{{ $action }}" class="space-y-6">
+<form id="{{ $formId }}" method="POST" action="{{ $action }}" class="space-y-6" novalidate>
     @csrf
     @if ($method === 'PUT')
         @method('PUT')
@@ -30,6 +30,7 @@
         <flux:input
             name="name"
             :label="__('Nombre del estacionamiento')"
+            :error="null"
             value="{{ old('name', $parking->name ?? '') }}"
             required
             placeholder="Ej. Parking Centro"
@@ -42,6 +43,7 @@
                 type="number"
                 step="any"
                 :label="__('Latitud')"
+                :error="null"
                 value="{{ old('lat', $parking->latitude_coordinate ?? ($parking->lat ?? '')) }}"
                 required
             />
@@ -52,6 +54,7 @@
                 type="number"
                 step="any"
                 :label="__('Longitud')"
+                :error="null"
                 value="{{ old('lng', $parking->longitude_coordinate ?? ($parking->lng ?? '')) }}"
                 required
             />
@@ -69,6 +72,7 @@
                     id="{{ $formId }}-type"
                     name="type"
                     class="mt-1 block w-full"
+                    :error="null"
                 >
                     <option value="0" @selected($type === 0)>Tiempo libre (tarifa fija)</option>
                     <option value="1" @selected($type === 1)>Por hora</option>
@@ -83,6 +87,7 @@
                 step="0.01"
                 min="0"
                 :label="__('Precio por hora')"
+                :error="null"
                 placeholder="Ej. 25.00"
                 value="{{ old('price_hour', ($type === 1 || $type === 2) ? ($parking->price ?? '') : '') }}"
             />
@@ -96,6 +101,7 @@
                 step="0.01"
                 min="0"
                 :label="__('Precio fijo (tiempo libre)')"
+                :error="null"
                 placeholder="Ej. 50.00"
                 value="{{ old('price_flat', ($type === 0 || $type === 2) ? ($parking->price_flat ?? '') : '') }}"
             />
@@ -164,6 +170,7 @@
                 type="time"
                 name="schedules[all][open]"
                 label="Hora de apertura (todos los días)"
+                :error="null"
                 value="{{ old('schedules.all.open') }}"
             />
 
@@ -171,6 +178,7 @@
                 type="time"
                 name="schedules[all][close]"
                 label="Hora de cierre (todos los días)"
+                :error="null"
                 value="{{ old('schedules.all.close') }}"
             />
         </div>
@@ -207,6 +215,7 @@
                             type="time"
                             name="schedules[{{ $day->id }}][open]"
                             label="Apertura"
+                            :error="null"
                             value="{{ $openOld }}"
                             id="{{ $formId }}-day-{{ $day->id }}-open"
                         />
@@ -215,6 +224,7 @@
                             type="time"
                             name="schedules[{{ $day->id }}][close]"
                             label="Cierre"
+                            :error="null"
                             value="{{ $closeOld }}"
                             id="{{ $formId }}-day-{{ $day->id }}-close"
                         />
@@ -233,10 +243,10 @@
             type="submit"
             variant="primary"
             icon-variant="outline"
-            :icon="$method === 'PUT' ? 'check-circle' : 'plus'"
-            class="bg-blue-600 hover:bg-blue-700 text-white"
+            :icon="$method === 'PUT' ? 'check-circle' : 'check-circle'"
+            class="bg-green-600 hover:bg-green-700 text-white"
         >
-            {{ $method === 'PUT' ? 'Guardar cambios' : 'Crear' }}
+            {{ $method === 'PUT' ? 'Guardar cambios' : 'Guardar información' }}
         </flux:button>
     </div>
 </form>
@@ -301,11 +311,7 @@
                 const hint = $('price-hint');
                 if (hint) 
                 {
-                    hint.textContent = t === 0 
-                        ? 'La tarifa usada será la fija (tiempo libre).' 
-                        : t === 1 
-                        ? 'La tarifa usada será por hora.' 
-                        : 'En mixto se usan ambas: por hora y fija.';
+                    hint.textContent = t === 0 ? 'La tarifa usada será la fija (tiempo libre).' : t === 1 ? 'La tarifa usada será por hora.' : 'En mixto se usan ambas: por hora y fija.';
                 }
             }
 
@@ -368,6 +374,7 @@
                     icon: 'error',
                     title: 'Errores en el formulario',
                     html: errorList,
+                    confirmButtonColor: '#494949'
                 });
             });
         </script>

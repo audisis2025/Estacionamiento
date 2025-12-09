@@ -26,7 +26,7 @@
                 icon-variant="outline"
                 :href="route('parking.client-types.create')"
                 wire:navigate
-                class="bg-blue-600 hover:bg-blue-700 text-white text-sm"
+                class="bg-green-600 hover:bg-green-700 text-white text-sm"
             >
                 Crear nuevo tipo
             </flux:button>
@@ -127,46 +127,46 @@
         @endif
     </div>
 
-@push('js')
-    <script>
-        function attachDeleteListeners()
-        {
-            document.querySelectorAll('.delete-form').forEach((form) =>
+    @push('js')
+        <script>
+            function attachDeleteListeners()
             {
-                if (form.dataset.listenerAttached)
+                document.querySelectorAll('.delete-form').forEach((form) =>
                 {
-                    return;
-                }
-
-                form.dataset.listenerAttached = 'true';
-
-                form.addEventListener('submit', function (event)
-                {
-                    event.preventDefault();
-
-                    Swal.fire(
+                    if (form.dataset.listenerAttached)
                     {
-                        title: "¿Eliminar tipo de cliente?",
-                        text: "Esta acción no se puede deshacer.",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#3182ce",
-                        cancelButtonColor: "#EE0000",
-                        confirmButtonText: "Sí, eliminar",
-                        cancelButtonText: "Cancelar",
-                    }).then((result) =>
+                        return;
+                    }
+
+                    form.dataset.listenerAttached = 'true';
+
+                    form.addEventListener('submit', function (event)
                     {
-                        if (result.isConfirmed)
+                        event.preventDefault();
+
+                        Swal.fire(
                         {
-                            form.submit();
-                        }
+                            title: "¿Eliminar tipo de cliente?",
+                            text: "Esta acción no se puede deshacer.",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#42A958",
+                            cancelButtonColor: "#EE0000",
+                            confirmButtonText: "Confirmar",
+                            cancelButtonText: "Cancelar",
+                        }).then((result) =>
+                        {
+                            if (result.isConfirmed)
+                            {
+                                form.submit();
+                            }
+                        });
                     });
                 });
-            });
-        }
+            }
 
-        document.addEventListener('DOMContentLoaded', attachDeleteListeners);
-        document.addEventListener('livewire:navigated', attachDeleteListeners);
-    </script>
-@endpush
+            document.addEventListener('DOMContentLoaded', attachDeleteListeners);
+            document.addEventListener('livewire:navigated', attachDeleteListeners);
+        </script>
+    @endpush
 </x-layouts.app>

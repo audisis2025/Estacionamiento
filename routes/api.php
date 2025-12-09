@@ -24,7 +24,6 @@ use App\Http\Controllers\Api\FirebaseApiController;
 use App\Http\Controllers\Api\ParkingApiController;
 use App\Http\Controllers\Api\PaymentApiController;
 use App\Http\Controllers\Api\RegisterProviderApiController;
-use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\Api\ParkingInboxApiController;
 use App\Http\Controllers\Api\UserApprovedTypesApiController;
 use App\Http\Controllers\Api\UserParkingRequestApiController;
@@ -61,7 +60,7 @@ Route::prefix('parkings')->group(function ()
     Route::get('/{id}/client-types', [ParkingApiController::class, 'clientTypesByParking']);
 });
  
-Route::middleware('auth:sanctum')->put('/user/notification-token', [UserDashboardController::class, 'updateNotificationToken']);
+Route::middleware('auth:sanctum')->put('/user/notification-token', [FirebaseApiController::class, 'updateNotificationToken']);
  
 Route::middleware('auth:sanctum')->post('/firebase-notification/send/notification', [FirebaseApiController::class, 'send']);
  

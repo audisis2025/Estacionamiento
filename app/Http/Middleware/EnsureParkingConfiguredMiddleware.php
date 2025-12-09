@@ -35,7 +35,8 @@ class EnsureParkingConfiguredMiddleware
                 ->with('swal', [
                     'icon'  => 'warning',
                     'title' => 'Configura tu estacionamiento',
-                    'text'  => 'Debes dar de alta tu estacionamiento antes de registrar lectores.'
+                    'text'  => 'Debes dar de alta tu estacionamiento antes de registrar lectores.',
+                    'confirmButtonColor' => '#494949'
                 ]);
         }
 
@@ -47,7 +48,8 @@ class EnsureParkingConfiguredMiddleware
                 ->with('swal', [
                     'icon'  => 'warning',
                     'title' => 'Falta tu horario',
-                    'text'  => 'Configura el horario del estacionamiento antes de registrar lectores.'
+                    'text'  => 'Configura el horario del estacionamiento antes de registrar lectores.',
+                    'confirmButtonColor' => '#494949'
                 ]);
         }
         return $next($request);

@@ -46,7 +46,8 @@ Route::middleware(['auth','verified','ensure.active.plan'])
     {
         Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/data', [UserDashboardController::class, 'data'])->name('dashboard.data');
-    });
+    }
+);
 
 Route::middleware(['auth','ensure.active.plan'])->prefix('parking')->name('parking.')->group(function () 
 {
@@ -61,38 +62,107 @@ Route::middleware(['auth', 'ensure.active.plan', 'ensure.parking.configured'])
     ->name('parking.qr-readers.')
     ->group(function () 
     {
-        Route::get('/',            [QrReaderController::class, 'index'])->name('index');
-        Route::get('/create',      [QrReaderController::class, 'create'])->name('create');
-        Route::post('/',           [QrReaderController::class, 'store'])->name('store');
+        Route::get('/', [QrReaderController::class, 'index'])->name('index');
+        Route::get('/create', [QrReaderController::class, 'create'])->name('create');
+        Route::post('/', [QrReaderController::class, 'store'])->name('store');
         Route::get('/{reader}/edit',[QrReaderController::class, 'edit'])->name('edit');
-        Route::put('/{reader}',    [QrReaderController::class, 'update'])->name('update');
+        Route::put('/{reader}', [QrReaderController::class, 'update'])->name('update');
         Route::delete('/{reader}', [QrReaderController::class, 'destroy'])->name('destroy');
         Route::get('{reader}/scan',  [ScanController::class, 'form'])->name('scan');
         Route::post('{reader}/scan', [ScanController::class, 'ingest'])->name('scan.ingest');
-    });
+    }
+);
 
 Route::middleware(['auth', 'ensure.active.plan', 'ensure.parking.configured'])
     ->prefix('parking/client-types')
     ->name('parking.client-types.')
     ->group(function () 
     {
-        Route::get('/',                 [ClientTypeController::class, 'index'])->name('index');
-        Route::get('/create',           [ClientTypeController::class, 'create'])->name('create');
-        Route::post('/',                [ClientTypeController::class, 'store'])->name('store');
-        Route::get('/{clientType}/edit',[ClientTypeController::class, 'edit'])->name('edit');
-        Route::put('/{clientType}',     [ClientTypeController::class, 'update'])->name('update');
-        Route::delete('/{clientType}',  [ClientTypeController::class, 'destroy'])->name('destroy');
-    });
+        Route::get('/', [ClientTypeController::class, 'index'])->name('index');
+        Route::get('/create', [ClientTypeController::class, 'create'])->name('create');
+        Route::post('/', [ClientTypeController::class, 'store'])
+            ->name('store')
+            ->missing(function () 
+            {
+                return redirect()->back()->with('swal', [
+                    'icon'  => 'error',
+                    'title' => 'Ya eliminado',
+                    'text'  => 'El tipo de cliente fue eliminado previamente.',
+                    'confirmButtonColor' => '#494949'
+                ]);
+            }
+        );
+        Route::get('/{clientType}/edit',[ClientTypeController::class, 'edit'])
+            ->name('edit')
+            ->missing(function () 
+            {
+                return redirect()->back()->with('swal', [
+                    'icon'  => 'error',
+                    'title' => 'Ya eliminado',
+                    'text'  => 'El tipo de cliente fue eliminado previamente.',
+                    'confirmButtonColor' => '#494949'
+                ]);
+            }
+        );
+        Route::put('/{clientType}', [ClientTypeController::class, 'update'])
+            ->name('update')
+            ->missing(function () 
+            {
+                return redirect()->back()->with('swal', [
+                    'icon'  => 'error',
+                    'title' => 'Ya eliminado',
+                    'text'  => 'El tipo de cliente fue eliminado previamente.',
+                    'confirmButtonColor' => '#494949'
+                ]);
+            }
+        );
+        Route::delete('/{clientType}', [ClientTypeController::class, 'destroy'])
+            ->name('destroy')
+            ->missing(function () 
+            {
+                return redirect()->back()->with('swal', [
+                    'icon'  => 'error',
+                    'title' => 'Ya eliminado',
+                    'text'  => 'El tipo de cliente fue eliminado previamente.',
+                    'confirmButtonColor' => '#494949'
+                ]);
+            }
+        );
+    }
+);
 
 Route::middleware(['auth', 'ensure.active.plan', 'ensure.parking.configured'])
     ->prefix('parking/client-approvals')
     ->name('parking.client-approvals.')
     ->group(function () 
     {
-        Route::get('/',                                 [ClientTypeApprovalController::class, 'index'])->name('index');
-        Route::post('{userClientType}/approve',         [ClientTypeApprovalController::class, 'approve'])->name('approve');
-        Route::delete('{userClientType}',               [ClientTypeApprovalController::class, 'reject'])->name('reject');
-    });
+        Route::get('/', [ClientTypeApprovalController::class, 'index'])->name('index');
+        Route::post('{userClientType}/approve', [ClientTypeApprovalController::class, 'approve'])
+            ->name('approve') 
+            ->missing(function () 
+            {
+                return redirect()->back()->with('swal', [
+                    'icon'  => 'error',
+                    'title' => 'No encontrado',
+                    'text'  => 'La solicitud ya no existe o fue eliminada.',
+                    'confirmButtonColor' => '#494949'
+                ]);
+            }
+        );
+        Route::delete('{userClientType}', [ClientTypeApprovalController::class, 'reject'])
+            ->name('reject')
+            ->missing(function () 
+            {
+                return redirect()->back()->with('swal', [
+                    'icon'  => 'error',
+                    'title' => 'Ya eliminado',
+                    'text'  => 'La solicitud ya fue eliminada previamente.',
+                    'confirmButtonColor' => '#494949'
+                ]);
+            }
+        );
+    }
+);
 
 Route::middleware(['auth','ensure.active.plan','ensure.parking.configured'])
     ->prefix('parking/entries')->name('parking.entries.')
@@ -100,11 +170,13 @@ Route::middleware(['auth','ensure.active.plan','ensure.parking.configured'])
     {
         Route::get('/', [EntryController::class, 'index'])->name('index');
         Route::post('{transaction}/release', [EntryController::class, 'release'])->name('release');
-    });
+    }
+);
 
 Route::middleware(['auth','verified','ensure.active.plan','ensure.parking.configured','ensure.billing.access'])
     ->prefix('billing')->name('billing.')
     ->group(function () 
     {
         Route::get('/', [BillingController::class, 'index'])->name('index');
-    });
+    }
+);

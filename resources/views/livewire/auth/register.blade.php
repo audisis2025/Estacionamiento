@@ -179,6 +179,7 @@ new #[Layout('components.layouts.auth')] class extends Component
                         icon: data.icon,
                         title: data.title,
                         text: data.text,
+                        confirmButtonColor: '#494949'
                     }
                 );
             });

@@ -175,6 +175,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                     icon: data.icon,
                     title: data.title,
                     text: data.text,
+                    confirmButtonColor: '#494949'
                 });
             });
 
@@ -185,6 +186,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                     icon: 'success',
                     title: 'Contraseña actualizada',
                     text: data.text,
+                    confirmButtonColor: '#494949'
                 })
                 .then(() =>
                 {

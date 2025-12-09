@@ -28,7 +28,7 @@
         @include('user.client_types._form', [
             'action' => route('parking.client-types.update', $clientType),
             'method' => 'PUT',
-            'client_type' => $clientType,
+            'client_type' => $clientType
         ])
     </div>
 </x-layouts.app>

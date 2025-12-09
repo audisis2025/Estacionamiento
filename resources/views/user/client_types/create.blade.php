@@ -28,7 +28,7 @@
         @include('user.client_types._form', [
             'action' => route('parking.client-types.store'),
             'method' => 'POST',
-            'client_type' => null,
+            'client_type' => null
         ])
     </div>
 </x-layouts.app>

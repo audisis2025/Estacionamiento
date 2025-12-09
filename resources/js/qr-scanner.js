@@ -157,6 +157,7 @@ export default function initQrScanner(routeUrl, csrfTok)
                         icon  : 'error',
                         title : 'Error de red',
                         text  : 'No se pudo enviar el escaneo. Intenta nuevamente.',
+                        confirmButtonColor: '#494949'
                     });
                 } finally
                 {

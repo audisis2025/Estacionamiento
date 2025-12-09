@@ -87,13 +87,11 @@ class TestParkingSeeder extends Seeder
 
         DB::table('user_client_types')->insert([[
                 'approval' => 0,
-                'expiration_date' => null,
                 'id_user' => $user2,
                 'id_client_type'  => $proveedorId
             ],
             [
                 'approval' => 1,
-                'expiration_date' => Carbon::now()->addDays(30),
                 'id_user' => $user1,
                 'id_client_type' => $taxistaId
             ],

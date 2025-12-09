@@ -26,6 +26,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class ScanController extends Controller
@@ -34,16 +35,37 @@ class ScanController extends Controller
     {
     }
 
-    public function form(QrReader $reader): View
+    public function form(int $reader): RedirectResponse | View
     {
-        $this->ensureOwnership($reader);
+        $qrReader = QrReader::find($reader);
 
-        return view('user.qr_readers.scan', compact('reader'));
+        if (! $qrReader) 
+        {
+            return redirect()
+                ->route('parking.qr-readers.index')
+                ->with('swal', [
+                    'icon'  => 'error',
+                    'title' => 'Lector no disponible',
+                    'text'  => 'Lector eliminado.',
+                    'confirmButtonColor' => '#494949'
+                ]);
+        }
+
+        $this->ensureOwnership($qrReader);
+
+        return view('user.qr_readers.scan', ['reader' => $qrReader]);
     }
 
     public function ingest(Request $request, QrReader $reader): JsonResponse
     {
-        $this->ensureOwnership($reader);
+        $qrReader = QrReader::find($reader);
+
+        if (! $qrReader)
+        {
+            return response()->json(['ok' => false,'message' => 'El lector ya no está disponible.'],410);
+        }
+
+        $this->ensureOwnership($qrReader);
 
         $data = $request->validate(['qr' => ['required', 'string']]);
 
@@ -131,8 +153,8 @@ class ScanController extends Controller
                     $user,
                     'Parking+',
                     'El código se generó lejos del estacionamiento.',[
-                        'event'    => 'qr_error',
-                        'code'     => 'too_far',
+                        'event' => 'qr_error',
+                        'code' => 'too_far',
                         'distance' => (string) round($distanceKm, 2)
                     ]
                 );
@@ -147,7 +169,7 @@ class ScanController extends Controller
             ->latest('id')
             ->first();
 
-        if ($reader->sense === 1 && ! $openTx) 
+        if ($qrReader->sense === 1 && ! $openTx) 
         {
             $this->notifyUser(
                 $user,
@@ -159,7 +181,7 @@ class ScanController extends Controller
             return $this->fail('Este lector es de salida y el usuario no tiene entrada abierta.');
         }
 
-        if ($reader->sense === 0 && $openTx) 
+        if ($qrReader->sense === 0 && $openTx) 
         {
             $this->notifyUser(
                 $user,
@@ -208,7 +230,7 @@ class ScanController extends Controller
                     'Elige cómo deseas que se cobre',[
                         'event' => 'choose_billing_mode',
                         'parking_id' => (string) $parking->id,
-                        'qr_reader_id' => (string) $reader->id,
+                        'qr_reader_id' => (string) $qrReader->id,
                         'qr_timestamp' => $qrTime->toDateTimeString(),
                         'price_hour' => (string) ($parking->price ?? 0),
                         'price_flat' => (string) ($parking->price_flat ?? $parking->price ?? 0)
@@ -224,7 +246,7 @@ class ScanController extends Controller
                 'amount' => null,
                 'entry_date' => now(),
                 'departure_date' => null,
-                'id_qr_reader' => $reader->id,
+                'id_qr_reader' => $qrReader->id,
                 'id_user' => $user->id,
                 'billing_mode' => $billingMode
             ]);
@@ -276,7 +298,7 @@ class ScanController extends Controller
 
         try 
         {
-            DB::transaction(function () use ($user, $charge, $openTx, $reader, $parking) 
+            DB::transaction(function () use ($user, $charge, $openTx, $qrReader, $parking) 
             {
                 $affected = User::whereKey($user->id)
                     ->where(
@@ -297,7 +319,7 @@ class ScanController extends Controller
                 $openTx->update([
                     'amount' => round($charge, 2),
                     'departure_date' => now(),
-                    'id_qr_reader' => $reader->id
+                    'id_qr_reader' => $qrReader->id
                 ]);
             });
         } catch (\RuntimeException $exception) 

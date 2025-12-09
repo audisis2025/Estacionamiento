@@ -44,11 +44,11 @@
             </flux:text>
 
             <div class="mt-3 flex flex-wrap gap-2 justify-end">
-                <flux:button icon="plus" icon-variant="outline" :href="route('parking.qr-readers.create')" variant="primary" class="bg-blue-600 hover:bg-blue-700 text-white text-sm">
+                <flux:button icon="plus" icon-variant="outline" :href="route('parking.qr-readers.create')" variant="primary" class="bg-green-600 hover:bg-green-700 text-white text-sm">
                     Crear lector
                 </flux:button>
 
-                <flux:button icon="eye" icon-variant="outline" :href="route('parking.qr-readers.index')" variant="filled" class="text-sm text-black dark:text-white">
+                <flux:button icon="eye" icon-variant="outline" :href="route('parking.qr-readers.index')" variant="primary" class="bg-gray-500 hover:bg-gray-600text-sm text-white dark:text-white">
                     Ver mis lectores
                 </flux:button>
             </div>
@@ -111,35 +111,33 @@
             </div>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-4">
-            <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white dark:bg-zinc-900">
-                <flux:heading size="sm" class="mb-2 text-black dark:text-white">
-                        Ingresos
-                </flux:heading>
+        <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 p-6 bg-white dark:bg-zinc-900">
+            <flux:heading size="lg" class="mb-4 text-black dark:text-white">
+                    Ingresos
+            </flux:heading>
 
-                <div style="height:220px">
-                    <canvas id="chartRevenue"></canvas>
-                </div>
+            <div style="height:300px">
+                <canvas id="chartRevenue"></canvas>
             </div>
+        </div>
 
-            <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white dark:bg-zinc-900">
-                <flux:heading size="sm" class="mb-2 text-black dark:text-white">
-                        Usuarios normales
-                </flux:heading>
+        <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 p-6 bg-white dark:bg-zinc-900">
+            <flux:heading size="lg" class="mb-4 text-black dark:text-white">
+                    Usuarios normales
+            </flux:heading>
 
-                <div style="height:220px">
-                    <canvas id="chartUsersNormal"></canvas>
-                </div>
+            <div style="height:300px">
+                <canvas id="chartUsersNormal"></canvas>
             </div>
+        </div>
 
-            <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 bg-white dark:bg-zinc-900">
-                <flux:heading size="sm" class="mb-2 text-black dark:text-white">
-                        Usuarios dinámicos
-                </flux:heading>
+        <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 p-6 bg-white dark:bg-zinc-900">
+            <flux:heading size="lg" class="mb-4 text-black dark:text-white">
+                    Usuarios dinámicos
+            </flux:heading>
 
-                <div style="height:220px">
-                    <canvas id="chartUsersDyn"></canvas>
-                </div>
+            <div style="height:300px">
+                <canvas id="chartUsersDyn"></canvas>
             </div>
         </div>
     </div>
@@ -148,12 +146,83 @@
         <script>
             function renderDashboardCharts() 
             {
-                const dataRevenue     = @json($revenue);
+                const range = @json($range);
+                const dataRevenue = @json($revenue);
                 const dataUsersNormal = @json($users_normal);
-                const dataUsersDyn    = @json($users_dynamic);
+                const dataUsersDyn = @json($users_dynamic);
 
-                const L = (arr) => arr.map(i => i.label);
-                const V = (arr) => arr.map(i => Number(i.total || 0));
+                function generateLabels(range, data) 
+                {
+                    const labels = [];
+                    
+                    if (range === 'day') 
+                    {
+                        for (let i = 0; i < 24; i++) 
+                        {
+                            labels.push(`${i}:00`);
+                        }
+                    } else if (range === 'week') 
+                    {
+                        const days = [
+                            'Lun', 
+                            'Mar', 
+                            'Mié', 
+                            'Jue', 
+                            'Vie', 
+                            'Sáb', 
+                            'Dom'
+                        ];
+                        return days;
+                    } else if (range === 'month') 
+                    {
+                        const today = new Date();
+                        const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+                        for (let i = 1; i <= daysInMonth; i++) 
+                        {
+                            labels.push(i.toString());
+                        }
+                    }
+                    
+                    return labels;
+                }
+
+                function mapDataToLabels(range, data, allLabels) 
+                {
+                    const values = new Array(allLabels.length).fill(0);
+                    
+                    data.forEach(item => 
+                    {
+                        let index = -1;
+                        
+                        if (range === 'day') 
+                        {
+                            index = parseInt(item.label);
+                        } else if (range === 'week') 
+                        {
+                            const dateParts = item.label.split('-');
+                            const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+                            const dayOfWeek = date.getDay();
+                            index = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+                        } else if (range === 'month') 
+                        {
+                            const dateParts = item.label.split('-');
+                            const day = parseInt(dateParts[2], 10);
+                            index = day - 1;
+                        }
+                        
+                        if (index >= 0 && index < values.length) 
+                        {
+                            values[index] = Number(item.total || 0);
+                        }
+                    });
+                    
+                    return values;
+                }
+
+                const allLabels = generateLabels(range, dataRevenue);
+                const revenueValues = mapDataToLabels(range, dataRevenue, allLabels);
+                const usersNormalValues = mapDataToLabels(range, dataUsersNormal, allLabels);
+                const usersDynValues = mapDataToLabels(range, dataUsersDyn, allLabels);
 
                 const baseOptions = 
                 {
@@ -177,8 +246,10 @@
                         {
                             ticks: 
                             {
-                                maxRotation: 0,
-                                autoSkip: true
+                                maxRotation: 45,
+                                minRotation: 0,
+                                autoSkip: range === 'month',
+                                maxTicksLimit: range === 'month' ? 15 : undefined
                             }
                         },
                         y: 
@@ -192,13 +263,13 @@
                     }
                 };
 
-                const barDataset = (values) => (
+                const barDataset = (values, color) => (
                 {
                     data: values,
                     maxBarThickness: 28,
                     barPercentage: 0.9,
                     categoryPercentage: 0.9,
-                    backgroundColor: '#241178'
+                    backgroundColor: color
                 });
 
                 if (window.dashboardCharts) 
@@ -218,12 +289,8 @@
                         type: 'bar',
                         data: 
                         {
-                            labels: L(dataRevenue),
-                            datasets: [
-                            {
-                                ...barDataset(V(dataRevenue)),
-                                backgroundColor: '#42A958'
-                            }]
+                            labels: allLabels,
+                            datasets: [barDataset(revenueValues, '#42A958')]
                         },
                         options: baseOptions
                     }));
@@ -236,12 +303,8 @@
                         type: 'bar',
                         data: 
                         {
-                            labels: L(dataUsersNormal),
-                            datasets: [
-                            {
-                                ...barDataset(V(dataUsersNormal)),
-                                backgroundColor: '#241178'
-                            }]
+                            labels: allLabels,
+                            datasets: [barDataset(usersNormalValues, '#241178')]
                         },
                         options: baseOptions
                     }));
@@ -254,12 +317,8 @@
                         type: 'bar',
                         data: 
                         {
-                            labels: L(dataUsersDyn),
-                            datasets: [
-                            {
-                                ...barDataset(V(dataUsersDyn)),
-                                backgroundColor: '#DE6601'
-                            }]
+                            labels: allLabels,
+                            datasets: [barDataset(usersDynValues, '#DE6601')]
                         },
                         options: baseOptions
                     }));
@@ -267,7 +326,6 @@
             }
 
             document.addEventListener('DOMContentLoaded', renderDashboardCharts);
-
             document.addEventListener('livewire:navigated', renderDashboardCharts);
         </script>
     @endpush
