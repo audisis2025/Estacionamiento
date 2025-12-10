@@ -70,6 +70,7 @@ Route::middleware(['auth', 'ensure.active.plan', 'ensure.parking.configured'])
         Route::delete('/{reader}', [QrReaderController::class, 'destroy'])->name('destroy');
         Route::get('{reader}/scan',  [ScanController::class, 'form'])->name('scan');
         Route::post('{reader}/scan', [ScanController::class, 'ingest'])->name('scan.ingest');
+        Route::post('{reader}/simulate', [ScanController::class, 'simulate'])->name('scan.simulate');
     }
 );
 

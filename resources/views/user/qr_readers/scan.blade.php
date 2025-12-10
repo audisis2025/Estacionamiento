@@ -75,28 +75,238 @@
             </form>
         </div>
 
+         <div class="mt-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4">
+            <flux:heading level="3" size="md" class="text-sm !font-black mb-2 text-black dark:text-white">
+                Prueba manual por teléfono
+            </flux:heading>
+
+          <div class="flex flex-col sm:flex-row gap-3 items-center">
+            <div class="w-full">
+                <flux:label for="manual-phone" class="text-xs font-medium text-black dark:text-white">
+                    Número de teléfono
+                </flux:label>
+
+                <div class="flex items-start justify-between gap-3 mt-1">
+                    <flux:input
+                        id="manual-phone"
+                        type="text"
+                        placeholder="Ej. 5550001111"
+                        class="text-xs md:text-sm w-48 sm:w-64"
+                    />
+                    <flux:button
+                        id="manual-test-btn"
+                        type="button"
+                        variant="primary"
+                        icon="check"
+                        icon-variant="outline"
+                        class="bg-green-600 hover:bg-green-700 text-white text-sm"
+                    >
+                        Confirmar
+                    </flux:button>
+                </div>
+            </div>
+        </div>
+
         <div class="hidden rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4">
             <flux:heading level="3" size="md" class="text-sm !font-black mb-3 text-black dark:text-white">
                 Log de actividad
             </flux:heading>
 
-            <pre
-                id="result"
-                class="text-xs bg-zinc-900 text-white p-3 rounded min-h-[120px] overflow-x-auto"
-            >{}</pre>
+            <pre id="result" class="text-xs bg-zinc-900 text-white p-3 rounded min-h-[120px] overflow-x-auto">{}</pre>
         </div>
     </div>
 
     @push('js')
         <script>
-            document.addEventListener("DOMContentLoaded", () => 
+            document.addEventListener("DOMContentLoaded", () =>
             {
-                window.initQrScanner(@json(route('parking.qr-readers.scan.ingest', $reader)),@json(csrf_token()));
+                window.initQrScanner(@json(route('parking.qr-readers.scan.ingest', $reader)), @json(csrf_token()));
             });
 
-            document.addEventListener("livewire:navigated", () => 
+            document.addEventListener("livewire:navigated", () =>
             {
-                window.initQrScanner(@json(route('parking.qr-readers.scan.ingest', $reader)),@json(csrf_token()));
+                window.initQrScanner(@json(route('parking.qr-readers.scan.ingest', $reader)), @json(csrf_token()));
+            });
+
+            document.addEventListener('DOMContentLoaded', () =>
+            {
+                const btn   = document.getElementById('manual-test-btn');
+                const input = document.getElementById('manual-phone');
+
+                if (!btn || !input) return;
+
+                btn.addEventListener('click', async () =>
+                {
+                    const phone = input.value.trim();
+
+                    if (!phone)
+                    {
+                        Swal.fire(
+                        {
+                            title: 'Teléfono requerido',
+                            text: 'Ingresa un número de teléfono para la prueba.',
+                            icon: 'warning',
+                            confirmButtonColor: '#494949'
+                        });
+                        return;
+                    }
+
+                    try
+                    {
+                        const fd = new FormData();
+                        fd.append('phone', phone);
+
+                        const res = await fetch(
+                            @json(route('parking.qr-readers.scan.simulate', $reader)),
+                            {
+                                method : 'POST',
+                                headers : 
+                                {
+                                    'X-CSRF-TOKEN': @json(csrf_token()) 
+                                },
+                                body : fd,
+                                credentials : 'same-origin'
+                            }
+                        );
+
+                        const json = await res.json().catch(() => ({}));
+
+                        if (!res.ok || !json.ok)
+                        {
+                            Swal.fire(
+                            {
+                                title: 'No se pudo generar el QR',
+                                text: json.message ?? 'Revisa el número de teléfono.',
+                                icon: 'error',
+                                confirmButtonColor: '#494949'
+                            });
+                            return;
+                        }
+
+                        if (json.needs_billing_mode)
+                        {
+                            const result = await Swal.fire(
+                            {
+                                title: 'Selecciona el modo de cobro',
+                                text: 'Elige cómo se cobrará esta estancia.',
+                                icon: 'question',
+                                showDenyButton: true,
+                                showCancelButton: true,
+                                confirmButtonText: `Tiempo libre ($${json.price_flat})`,
+                                denyButtonText: `Por hora ($${json.price_hour}/hora)`,
+                                cancelButtonText: 'Cancelar',
+                                confirmButtonColor: '#42A958',
+                                denyButtonColor: '#494949',
+                                cancelButtonColor: '#EE0000',
+                            });
+
+                            let mode = null;
+
+                            if (result.isConfirmed)
+                            {
+                                mode = 'flat';
+                            } else if (result.isDenied)
+                            {
+                                mode = 'hour';
+                            }
+
+                            if (!mode)
+                            {
+                                return;
+                            }
+
+                            await processBillingMode(mode, phone);
+                            return;
+                        }
+
+                        if (window.qrManualSubmit)
+                        {
+                            window.qrManualSubmit(json.payload);
+                        }
+                        else
+                        {
+                            Swal.fire(
+                            {
+                                title: 'Inicialización pendiente',
+                                text: 'El lector aún no está listo. Recarga la página.',
+                                icon: 'error',
+                                confirmButtonColor: '#42A958',
+                                confirmButtonText: 'Entendido'
+                            });
+                        }
+                    } catch (e)
+                    {
+                        Swal.fire(
+                        {
+                            title: 'Error de red',
+                            text: 'No se pudo contactar al servidor.',
+                            icon: 'error',
+                            confirmButtonColor: '#42A958',
+                            confirmButtonText: 'Entendido'
+                        });
+                    }
+                });
+
+                async function processBillingMode(mode, phone)
+                {
+                    Swal.fire(
+                    {
+                        title: 'Procesando...',
+                        text: 'Generando entrada manual',
+                        allowOutsideClick: false,
+                        didOpen: () => 
+                        {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    const fd2 = new FormData();
+                    fd2.append('phone', phone);
+                    fd2.append('billing_mode', mode);
+
+                    const res2 = await fetch(
+                        @json(route('parking.qr-readers.scan.simulate', $reader)),
+                        {
+                            method : 'POST',
+                            headers : 
+                            { 
+                                'X-CSRF-TOKEN': @json(csrf_token()) 
+                            },
+                            body : fd2,
+                            credentials : 'same-origin'
+                        }
+                    );
+
+                    const json2 = await res2.json().catch(() => ({}));
+
+                    Swal.close();
+
+                    if (res2.ok && json2.ok && json2.payload)
+                    {
+                        if (window.qrManualSubmit)
+                        {
+                            window.qrManualSubmit(json2.payload);
+                        } else
+                        {
+                            Swal.fire(
+                            {
+                                title: 'Inicialización pendiente',
+                                text: 'El lector aún no está listo. Recarga la página.',
+                                icon: 'error',
+                                confirmButtonColor: '#42A958',
+                            });
+                        }
+                    } else
+                    {
+                        Swal.fire(
+                        {
+                            title: 'Error al procesar',
+                            text: json2.message ?? 'No se pudo generar la entrada.',
+                            icon: 'error',
+                            confirmButtonColor: '#42A958',
+                        });
+                    }
+                }
             });
         </script>
     @endpush

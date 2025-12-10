@@ -125,12 +125,12 @@
 
                                             <flux:button
                                                 size="sm"
-                                                icon="trash"
+                                                icon="x-circle"
                                                 icon-variant="outline"
-                                                variant="danger"
+                                                variant="primary"
                                                 as="button"
                                                 type="submit"
-                                                class="text-xs md:text-sm"
+                                                class="text-xs md:text-sm bg-red-600 hover:bg-red-700 text-white"
                                             >
                                                 Rechazar
                                             </flux:button>
@@ -207,10 +207,10 @@
                                         size="sm"
                                         icon="x-circle"
                                         icon-variant="outline"
-                                        variant="danger"
+                                        variant="primary"
                                         as="button"
                                         type="submit"
-                                        class="text-xs md:text-sm"
+                                        class="text-xs md:text-sm bg-red-600 hover:bg-red-700 text-white"
                                     >
                                         Cancelar beneficio
                                     </flux:button>

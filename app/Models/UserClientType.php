@@ -29,12 +29,11 @@ class UserClientType extends Model
 
     protected $fillable = [
         'approval',
-        'expiration_date', 
         'id_user',
         'id_client_type'
     ];
 
-    protected $casts = ['approval' => 'integer', 'expiration_date' => 'date'];
+    protected $casts = ['approval' => 'integer'];
 
     public function user(): BelongsTo
     {

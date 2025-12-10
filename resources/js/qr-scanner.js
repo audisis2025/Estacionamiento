@@ -84,6 +84,8 @@ export default function initQrScanner(routeUrl, csrfTok)
                 busy = true;
                 remember(clean);
 
+                // window.qrManualSubmit = submitScan;
+
                 if (result)
                 {
                     result.textContent = 'Procesando...';
@@ -97,7 +99,10 @@ export default function initQrScanner(routeUrl, csrfTok)
                     const res = await fetch(routeUrl,
                     {
                         method      : 'POST',
-                        headers     : { 'X-CSRF-TOKEN': csrfTok },
+                        headers     : 
+                        { 
+                            'X-CSRF-TOKEN': csrfTok 
+                        },
                         body        : fd,
                         credentials : 'same-origin'
                     });
@@ -164,6 +169,8 @@ export default function initQrScanner(routeUrl, csrfTok)
                     setTimeout(() => busy = false, BUSY_COOLDOWN);
                 }
             }
+
+            window.qrManualSubmit = submitScan;
 
             function flush()
             {

@@ -67,8 +67,7 @@ class ParkingController extends Controller
                     'text' => 'El estacionamiento y su horario se guardaron correctamente.',
                     'confirmButtonColor' => '#494949'
                 ]);
-        } 
-        catch (ValidationException $e) 
+        } catch (ValidationException $e) 
         {
             $first = collect($e->errors())->flatten()->first() ?? 'Error de validación.';
 
@@ -232,13 +231,15 @@ class ParkingController extends Controller
 
         foreach ($rows as $dayId => $row)
         {
-            if (! is_numeric($dayId)) {
+            if (! is_numeric($dayId)) 
+            {
                 continue;
             }
 
             $dayId = (int) $dayId;
 
-            if (! Day::find($dayId)) {
+            if (! Day::find($dayId)) 
+            {
                 continue;
             }
 

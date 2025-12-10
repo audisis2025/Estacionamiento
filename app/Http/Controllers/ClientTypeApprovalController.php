@@ -41,11 +41,23 @@ class ClientTypeApprovalController extends Controller
             ->with($relations)
             ->where('approval', 1);
 
-        if ($phone !== '') {
-            $filterUser = function ($q) use ($phone) {
-                $q->where('phone_number', 'like', "%{$phone}%")
-                  ->orWhere('name', 'like', "%{$phone}%")
-                  ->orWhere('email', 'like', "%{$phone}%");
+        if ($phone !== '') 
+		{
+            $filterUser = function ($q) use ($phone) 
+			{
+                $q->where(
+					'phone_number', 
+					'like', 
+					"%{$phone}%"
+				)->orWhere(
+					'name', 
+					'like',
+					 "%{$phone}%"
+				)->orWhere(
+					'email', 
+					'like', 
+					"%{$phone}%"
+				);
             };
 
             $pendingQuery->whereHas('user', $filterUser);
@@ -72,7 +84,6 @@ class ClientTypeApprovalController extends Controller
     {
         $parking = Auth::user()->parking;
         
-        // Buscar el registro - evita 404 automático
         $userClientType = UserClientType::with('clientType')->find($id);
         
         if (!$userClientType) {
@@ -84,8 +95,8 @@ class ClientTypeApprovalController extends Controller
             ]);
         }
         
-        // Verificar propiedad
-        if (!$parking || !$userClientType->clientType || $userClientType->clientType->id_parking !== $parking->id) {
+        if (!$parking || !$userClientType->clientType || $userClientType->clientType->id_parking !== $parking->id) 
+		{
             return back()->with('swal', [
                 'icon'  => 'error',
                 'title' => 'No autorizado',
@@ -108,11 +119,10 @@ class ClientTypeApprovalController extends Controller
     {
         $parking = Auth::user()->parking;
         
-        // Buscar el registro - devuelve null si no existe (evita el 404 automático)
         $userClientType = UserClientType::with('clientType')->find($id);
         
-        // Verificar si existe
-        if (!$userClientType) {
+        if (!$userClientType) 
+		{
             return back()->with('swal', [
                 'icon'  => 'warning',
                 'title' => 'Ya eliminado',
@@ -121,8 +131,8 @@ class ClientTypeApprovalController extends Controller
             ]);
         }
         
-        // Verificar propiedad
-        if (!$parking || !$userClientType->clientType || $userClientType->clientType->id_parking !== $parking->id) {
+        if (!$parking || !$userClientType->clientType || $userClientType->clientType->id_parking !== $parking->id) 
+		{
             return back()->with('swal', [
                 'icon'  => 'error',
                 'title' => 'No autorizado',
@@ -131,7 +141,6 @@ class ClientTypeApprovalController extends Controller
             ]);
         }
         
-        // Eliminar
         $userClientType->delete();
         
         return back()->with('swal', [

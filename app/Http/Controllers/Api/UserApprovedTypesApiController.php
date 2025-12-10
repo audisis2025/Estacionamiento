@@ -22,7 +22,7 @@ class UserApprovedTypesApiController extends Controller
                 'parking_id'      => $item->clientType->id_parking,
                 'parking_name'    => $item->clientType->parking->name,
                 'type_name'       => $item->clientType->type_name,
-                'expiration_date' => optional($item->expiration_date)->format('Y-m-d'),
+                // 'expiration_date' => optional($item->expiration_date)->format('Y-m-d'),
             ];
         });
  
