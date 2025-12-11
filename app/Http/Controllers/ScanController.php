@@ -18,6 +18,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ManualExitToken;
 use App\Models\QrReader;
 use App\Models\Transaction;
 use App\Models\User;
@@ -27,6 +28,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class ScanController extends Controller
@@ -65,7 +67,22 @@ class ScanController extends Controller
 
         $payload = json_decode($raw, true);
 
-        if (! is_array($payload) || ! isset($payload['id'], $payload['fechaHora']))
+        // if (! is_array($payload) || ! isset($payload['id'], $payload['fechaHora']))
+        // {
+        //     return $this->fail('QR inválido.');
+        // }
+
+        if (! is_array($payload)) 
+        {
+            return $this->fail('QR inválido.');
+        }
+
+        if (($payload['type'] ?? null) === 'manual_exit' && ! empty($payload['token'] ?? null))
+        {
+            return $this->handleManualExitToken($payload['token'], $qrReader);
+        }
+
+        if (! isset($payload['id'], $payload['fechaHora']))
         {
             return $this->fail('QR inválido.');
         }
@@ -500,11 +517,15 @@ class ScanController extends Controller
 
     private function normalizeQrInput(string $input): string
     {
-        $trimmed = trim($input);
+        $normalized = trim($input);
 
-        if (str_starts_with($trimmed, '{') && str_ends_with($trimmed, '}')) 
+        if (function_exists('mb_convert_encoding')) 
         {
-            return $trimmed;
+            $normalized = mb_convert_encoding(
+                $normalized,
+                'UTF-8',
+                'UTF-8, ISO-8859-1, Windows-1252'
+            );
         }
 
         $map = [
@@ -516,14 +537,27 @@ class ScanController extends Controller
             'ñ' => ':',
             '’' => '-',
             '´' => '-',
+            '‘' => '-',
             "'" => '-',
             '“' => '"',
             '”' => '"'
         ];
 
-        $normalized = strtr($input, $map);
+        $normalized = strtr($normalized, $map);
 
-        return trim($normalized);
+        $normalized = trim($normalized);
+
+        if (! str_starts_with($normalized, '{')) 
+        {
+            $normalized = '{' . $normalized;
+        }
+
+        if (! str_ends_with($normalized, '}')) 
+        {
+            $normalized .= '}';
+        }
+
+        return $normalized;
     }
 
     public function simulate(Request $request, QrReader $reader): JsonResponse
@@ -582,5 +616,87 @@ class ScanController extends Controller
         }
 
         return response()->json(['ok' => true, 'payload' => json_encode($payload)]);
+    }
+
+    protected function handleManualExitToken(string $token, QrReader $qrReader): JsonResponse
+    {
+        $parking = auth()->user()->parking;
+
+        if (! $parking) 
+        {
+            return $this->fail('No se encontró el estacionamiento asociado.', 403);
+        }
+
+        try
+        {
+            $result = null;
+
+            DB::transaction(function () use ($token, $parking, $qrReader, &$result)
+            {
+                $record = ManualExitToken::where('token', $token)
+                    ->where('id_parking', $parking->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $record) 
+                {
+                    $result = $this->fail('QR de salida inválido o no pertenece a este estacionamiento.', 404);
+                    return;
+                }
+
+                if (! is_null($record->used_at))
+                {
+                    $result = $this->fail('Este QR de salida ya fue utilizado.', 410);
+                    return;
+                }
+
+                $created = $record->created_at ?? null;
+
+                if (! $created)
+                {
+                    $result = $this->fail('No se pudo validar la fecha de generación del QR.', 422);
+                    return;
+                }
+
+                if ($created->lt(now()->subMinutes(15)))
+                {
+                    $result = $this->fail('Este QR de salida ha expirado. Debes generar uno nuevo.');
+                    return;
+                }
+
+                $tx = Transaction::whereKey($record->transaction_id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $tx) 
+                {
+                    $result = $this->fail('La estancia asociada al QR no existe.', 404);
+                    return;
+                }
+
+                if (! is_null($tx->departure_date))
+                {
+                    $result = $this->fail('La estancia asociada ya tiene una salida registrada.', 409);
+                    $record->update(['used_at' => now()]);
+                    return;
+                }
+
+                $tx->update(['amount' => 0.0, 'departure_date' => now()]);
+
+                $record->update(['used_at' => now()]);
+
+                $result = $this->ok('Salida liberada (pago en efectivo).',
+                [
+                    'event'          => 'exit',
+                    'transaction_id' => $tx->id,
+                    'manual_exit'    => true
+                ]);
+            });
+
+            return $result ?? $this->fail('No se pudo procesar el QR de salida.', 500);
+        } catch (\Throwable $e)
+        {
+            return $this->fail('Ocurrió un error al procesar el QR de salida.', 500);
+        }
     }
 }

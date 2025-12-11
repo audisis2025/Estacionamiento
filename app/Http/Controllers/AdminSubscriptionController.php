@@ -182,7 +182,7 @@ class AdminSubscriptionController extends Controller
 
         $newEndDate = Carbon::today()->addDays($days);
 
-        $user->update(['end_date' => $newEndDate]);
+        $user->update(['end_date' => $plan->id != 4 ? $newEndDate : null]);
 
         return back()->with('swal', [
             'icon' => 'success',

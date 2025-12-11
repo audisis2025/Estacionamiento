@@ -67,6 +67,15 @@ new #[Layout('components.layouts.auth')] class extends Component
             ]);
         }
 
+        if (!$user->isAdmin() && $user->id_role !== 2) 
+        {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'Esta cuenta solo puede iniciar sesión desde la app móvil.',
+            ]);
+        }
+
         if (Features::canManageTwoFactorAuthentication() && $user->hasEnabledTwoFactorAuthentication()) 
         {
             Session::put(['login.id' => $user->getKey(),'login.remember' => $this->remember]);
@@ -83,8 +92,7 @@ new #[Layout('components.layouts.auth')] class extends Component
 
         if ($user->isAdmin()) 
         {
-            $this->redirectIntended(
-                default: route('admin.dashboard', absolute: false), navigate: true);
+            $this->redirectIntended(default: route('admin.dashboard', absolute: false), navigate: true);
         } else 
         {
             $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);

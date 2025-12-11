@@ -170,7 +170,8 @@ Route::middleware(['auth','ensure.active.plan','ensure.parking.configured'])
     ->group(function () 
     {
         Route::get('/', [EntryController::class, 'index'])->name('index');
-        Route::post('{transaction}/release', [EntryController::class, 'release'])->name('release');
+        Route::post('{transaction}/manual-exit-qr', [EntryController::class, 'generateManualExitQr'])
+            ->name('manual-exit-qr');
     }
 );
 

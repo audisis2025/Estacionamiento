@@ -53,12 +53,36 @@ export default function initQrScanner(routeUrl, csrfTok)
 
             function sanitize(s)
             {
-                return (s || '')
+                if (!s) 
+                {
+                    return '';
+                }
+
+                let out = s
                     .replace(/\r?\n/g, '')
                     .replace(/\r/g, '')
-                    .replace(/[\u201C\u201D]/g, '"')
                     .trim();
+
+                const map = 
+                {
+                    '¨': '{',
+                    '*': '}',
+                    '[': '"',
+                    ']': '"',
+                    'Ñ': ':',
+                    'ñ': ':',
+                    '’': '-',
+                    '´': '-',
+                    '‘': '-',
+                    '“': '"',
+                    '”': '"',
+                };
+
+                out = out.split('').map(ch => map[ch] ?? ch).join('');
+
+                return out.trim();
             }
+
 
             function sameAsLastNow(txt)
             {
@@ -174,18 +198,19 @@ export default function initQrScanner(routeUrl, csrfTok)
 
             function flush()
             {
-                if (! buf)
+                if (!buf)
                 {
                     return;
                 }
 
-                const payload = buf.trim();
+                const payload = sanitize(buf);
                 buf = '';
 
-                if (payload.startsWith('{') && payload.endsWith('}'))
+                if (payload.length < 10)
                 {
-                    submitScan(payload);
+                    return;
                 }
+                submitScan(payload);
             }
 
             function onKeydown(e)

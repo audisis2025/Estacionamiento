@@ -222,8 +222,7 @@
                         if (window.qrManualSubmit)
                         {
                             window.qrManualSubmit(json.payload);
-                        }
-                        else
+                        } else
                         {
                             Swal.fire(
                             {
