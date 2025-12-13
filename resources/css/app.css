@@ -1,3 +1,19 @@
+/*
+* Nombre de la clase         : app.css
+* Descripción de la clase    : Archivo de CSS para gestionar el estilo de la aplicación.
+* Fecha de creación          : 
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0 
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
+*/
+
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
 
@@ -8,7 +24,8 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme {
+@theme 
+{
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
     --color-zinc-50: #fafafa;
@@ -26,38 +43,52 @@
     --color-accent: var(--color-neutral-800);
     --color-accent-content: var(--color-neutral-800);
     --color-accent-foreground: var(--color-white);
+    --color-custom-blue: #241178;
+    --color-custom-blue-dark: #1a0d5a;
+    --color-custom-green: #42A958;
+    --color-custom-green-dark: #272800;
+    --color-custom-red: #EE0000;
+    --color-custom-orange: #DE6601;
+    --color-custom-gray: #494949;
 }
 
-@layer theme {
-    .dark {
+@layer theme 
+{
+    .dark 
+    {
         --color-accent: var(--color-white);
         --color-accent-content: var(--color-white);
         --color-accent-foreground: var(--color-neutral-800);
     }
 }
 
-@layer base {
+@layer base 
+{
 
     *,
     ::after,
     ::before,
     ::backdrop,
-    ::file-selector-button {
+    ::file-selector-button 
+    {
         border-color: var(--color-gray-200, currentColor);
     }
 }
 
-[data-flux-field]:not(ui-radio, ui-checkbox) {
+[data-flux-field]:not(ui-radio, ui-checkbox) 
+{
     @apply grid gap-2;
 }
 
-[data-flux-label] {
+[data-flux-label] 
+{
     @apply  !mb-0 !leading-tight;
 }
 
 input:focus[data-flux-control],
 textarea:focus[data-flux-control],
-select:focus[data-flux-control] {
+select:focus[data-flux-control] 
+{
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 

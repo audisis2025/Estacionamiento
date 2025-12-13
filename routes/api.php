@@ -27,7 +27,6 @@ use App\Http\Controllers\Api\RegisterProviderApiController;
 use App\Http\Controllers\Api\ParkingInboxApiController;
 use App\Http\Controllers\Api\UserApprovedTypesApiController;
 use App\Http\Controllers\Api\UserParkingRequestApiController;
-use App\Http\Controllers\Api\ForgotPasswordApiController;
 use App\Http\Controllers\Api\PasswordResetApiController;
  
 Route::prefix('auth')->group(function () 
@@ -76,12 +75,6 @@ Route::middleware('auth:sanctum')->group(function ()
 });
  
 Route::middleware('auth:sanctum')->get('/user/approved-types', [UserApprovedTypesApiController::class, 'index']);
-
-Route::post(
-    '/auth/forgot-password',
-    [ForgotPasswordApiController::class, 'send']
-);
-
 
 Route::post('/password/request-code', [PasswordResetApiController::class, 'requestCode']);
 Route::post('/password/verify-code', [PasswordResetApiController::class, 'verifyCode']);

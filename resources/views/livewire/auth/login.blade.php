@@ -1,4 +1,19 @@
 <?php
+/*
+* Nombre de la clase         : login.blade.php
+* Descripción de la clase    : Vista de inicio de sesión para usuarios.
+* Fecha de creación          : 03/10/2025
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 04/10/2025
+* Autorizó                   : Angel Dávila
+* Versión                    : 1.1
+* Fecha de mantenimiento     : 15/11/2025
+* Folio de mantenimiento     :
+* Tipo de mantenimiento      : Correctivo
+* Descripción del mantenimiento : Implementación de mensajes de alerta con SweetAlert2.
+* Responsable                : Elian Pérez
+* Revisor                    : Angel Dávila
+*/
 
 use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
@@ -12,8 +27,10 @@ use Laravel\Fortify\Features;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
+use Carbon\Carbon;
 
-new #[Layout('components.layouts.auth')] class extends Component {
+new #[Layout('components.layouts.auth')] class extends Component 
+{
     #[Validate('required|string|email')]
     public string $email = '';
 
@@ -22,22 +39,46 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
     public bool $remember = false;
 
-    /**
-     * Handle an incoming authentication request.
-     */
     public function login(): void
     {
         $this->validate();
-
         $this->ensureIsNotRateLimited();
 
-        $user = $this->validateCredentials();
+        $now = Carbon::now();
 
-        if (Features::canManageTwoFactorAuthentication() && $user->hasEnabledTwoFactorAuthentication()) {
-            Session::put([
-                'login.id' => $user->getKey(),
-                'login.remember' => $this->remember,
+        $affected = User::query()
+            ->whereNotNull('id_plan')
+            ->where('id_plan', '!=', 4)
+            ->whereNotNull('end_date')
+            ->where('end_date', '<', $now)
+            ->update([
+                'id_plan'  => null,
+                'end_date' => null,
             ]);
+
+        $user = $this->validateCredentials();
+        
+        if (! $user->is_active) 
+        {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'Tu cuenta ha sido bloqueada. Contacta al administrador: admgenineral@gmail.com',
+            ]);
+        }
+
+        if (!$user->isAdmin() && $user->id_role !== 2) 
+        {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'Esta cuenta solo puede iniciar sesión desde la app móvil.',
+            ]);
+        }
+
+        if (Features::canManageTwoFactorAuthentication() && $user->hasEnabledTwoFactorAuthentication()) 
+        {
+            Session::put(['login.id' => $user->getKey(),'login.remember' => $this->remember]);
 
             $this->redirect(route('two-factor.login'), navigate: true);
 
@@ -49,33 +90,33 @@ new #[Layout('components.layouts.auth')] class extends Component {
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        if ($user->isAdmin()) 
+        {
+            $this->redirectIntended(default: route('admin.dashboard', absolute: false), navigate: true);
+        } else 
+        {
+            $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        }
     }
 
-    /**
-     * Validate the user's credentials.
-     */
     protected function validateCredentials(): User
     {
-        $user = Auth::getProvider()->retrieveByCredentials(['email' => $this->email, 'password' => $this->password]);
+        $user = Auth::getProvider()->retrieveByCredentials(['email' => $this->email,'password' => $this->password,]);
 
-        if (! $user || ! Auth::getProvider()->validateCredentials($user, ['password' => $this->password])) {
+        if (!$user || !Auth::getProvider()->validateCredentials($user, ['password' => $this->password])) 
+        {
             RateLimiter::hit($this->throttleKey());
 
-            throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
-            ]);
+            throw ValidationException::withMessages(['email' => __('auth.failed'),]);
         }
 
         return $user;
     }
 
-    /**
-     * Ensure the authentication request is not rate limited.
-     */
     protected function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) 
+        {
             return;
         }
 
@@ -83,74 +124,93 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
-        throw ValidationException::withMessages([
-            'email' => __('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
-        ]);
+        throw ValidationException::withMessages(['email' => __('auth.throttle', ['seconds' => $seconds,'minutes' => ceil($seconds / 60),]),]);
     }
 
-    /**
-     * Get the authentication rate limiting throttle key.
-     */
+    public function exception($e, $stopPropagation): void
+    {
+        if ($e instanceof ValidationException) 
+        {
+            $first = collect($e->errors())->flatten()->first();
+
+            $this->dispatch('show-swal', icon: 'error', title: 'Error', text: $first);
+
+            $this->resetErrorBag();
+
+            $stopPropagation();
+        }
+    }
+
     protected function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->email).'|'.request()->ip());
+        return Str::transliterate(Str::lower($this->email) . '|' . request()->ip());
+    }
+
+    public function mount(): void
+    {
+        if (session()->has('swal')) {
+            $data = session('swal');
+            $this->dispatch('show-swal', 
+                icon: $data['icon'] ?? 'info',
+                title: $data['title'] ?? 'Mensaje',
+                text: $data['text'] ?? ''
+            );
+        }
     }
 }; ?>
 
-<div class="flex flex-col gap-6">
-    <x-auth-header :title="__('Log in to your account')" :description="__('Enter your email and password below to log in')" />
 
-    <!-- Session Status -->
+<div class="flex flex-col gap-6">
+    <x-auth-header :title="__('Ingresar a tu cuenta')" :description="__('Ingresa tu correo electrónico y contraseña a continuación para iniciar sesión')" />
+
     <x-auth-session-status class="text-center" :status="session('status')" />
 
     <form method="POST" wire:submit="login" class="flex flex-col gap-6">
-        <!-- Email Address -->
-        <flux:input
-            wire:model="email"
-            :label="__('Email address')"
-            type="email"
-            required
-            autofocus
-            autocomplete="email"
-            placeholder="email@example.com"
-        />
+        <flux:input wire:model="email" :label="__('Correo electrónico')" type="email" required autofocus
+            autocomplete="email" placeholder="email@gmail.com" />
 
-        <!-- Password -->
         <div class="relative">
-            <flux:input
-                wire:model="password"
-                :label="__('Password')"
-                type="password"
-                required
-                autocomplete="current-password"
-                :placeholder="__('Password')"
-                viewable
-            />
+            <flux:input wire:model="password" :label="__('Contraseña')" type="password" required
+                autocomplete="current-password" :placeholder="__('Contraseña')" viewable />
 
             @if (Route::has('password.request'))
-                <flux:link class="absolute top-0 text-sm end-0" :href="route('password.request')" wire:navigate>
-                    {{ __('Forgot your password?') }}
+                <flux:link class="absolute top-0 text-sm end-0 text-custom-blue hover:text-custom-blue-dark" :href="route('password.request')" wire:navigate>
+                    {{ __('¿Olvidaste tu contraseña?') }}
                 </flux:link>
             @endif
         </div>
 
-        <!-- Remember Me -->
-        <flux:checkbox wire:model="remember" :label="__('Remember me')" />
+        <flux:checkbox wire:model="remember" :label="__('Recordarme')" />
 
         <div class="flex items-center justify-end">
-            <flux:button variant="primary" type="submit" class="w-full" data-test="login-button">
-                {{ __('Log in') }}
+            <flux:button icon="user-circle" icon-variant="outline" variant="primary" type="submit"
+                class="w-full bg-black hover:bg-custom-gray text-white" data-test="login-button">
+                {{ __('Iniciar sesión') }}
             </flux:button>
         </div>
     </form>
 
     @if (Route::has('register'))
-        <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
-            <span>{{ __('Don\'t have an account?') }}</span>
-            <flux:link :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:link>
+        <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-black/60 dark:text-white/60">
+            <span>{{ __('¿No tienes una cuenta?') }}</span>
+            <flux:link :href="route('register')" wire:navigate class="text-custom-blue hover:text-custom-blue-dark">
+                {{ __('Regístrate') }}
+            </flux:link>
         </div>
     @endif
+
+    @script
+        <script>
+            $wire.on('show-swal', (data) => 
+            {
+                Swal.fire(
+                {
+                    icon: data.icon,
+                    title: data.title,
+                    text: data.text,
+                    confirmButtonColor: '#494949'
+                });
+            });
+        </script>
+    @endscript
 </div>
