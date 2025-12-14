@@ -9,6 +9,8 @@ use App\Models\Plan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use Carbon\Carbon;
+
 class AuthApiController extends Controller
 {
     public function register(Request $request)
@@ -105,6 +107,9 @@ class AuthApiController extends Controller
             ], 423);
         }
 
+        // 🔥 CALCULAR SI EL PLAN ESTÁ ACTIVO
+        $isActive = $this->checkPlanActive($user);
+
         return response()->json([
             'user' => [
                 'id'              => $user->id,
@@ -112,10 +117,19 @@ class AuthApiController extends Controller
                 'email'           => $user->email,
                 'role_id'         => $user->id_role,
                 'role_name'       => $user->role?->name,
-                'has_active_plan' => $user->hasActivePlan(),
+                'has_active_plan' => $isActive,
                 'plan_id'         => $user->plan?->id,
                 'plan_name'       => $user->plan?->name,
-                'end_date'        => optional($user->end_date)->format('Y-m-d'),
+                'end_date'        => $user->end_date ? $user->end_date->format('Y-m-d') : null,
+                
+                // 🔥 AGREGAR INFO DEL PLAN COMPLETA
+                'plan'            => $user->plan ? [
+                    'id'            => $user->plan->id,
+                    'name'          => $user->plan->name,
+                    'price'         => $user->plan->price,
+                    'duration_days' => $user->plan->duration_days,
+                    'description'   => $user->plan->description,
+                ] : null,
             ],
         ]);
     }
@@ -124,5 +138,27 @@ class AuthApiController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'logged_out']);
+    }
+
+    // 🔥 NUEVO: Método para verificar si el plan está activo
+    private function checkPlanActive($user): bool
+    {
+        // Sin plan = inactivo
+        if (!$user->id_plan) {
+            return false;
+        }
+
+        // Plan básico (id 4) = siempre activo
+        if ($user->id_plan == 4) {
+            return true;
+        }
+
+        // Para otros planes, verificar end_date
+        if (!$user->end_date) {
+            return false;
+        }
+
+        // Verificar que no haya expirado
+        return $user->end_date->isToday() || $user->end_date->isFuture();
     }
 }

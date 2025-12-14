@@ -1,19 +1,4 @@
 <?php
-/*
-* Nombre de la clase         : api.php
-* Descripción de la clase    : Archivo de rutas de la API que define los endpoints y su lógica.
-* Fecha de creación          : 
-* Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
-* Autorizó                   : Angel Davila
-* Versión                    : 1.0 
-* Fecha de mantenimiento     : 
-* Folio de mantenimiento     : 
-* Tipo de mantenimiento      : 
-* Descripción del mantenimiento : 
-* Responsable                : 
-* Revisor                    : 
-*/
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\PlanApiController;
@@ -50,7 +35,6 @@ Route::middleware('auth:sanctum')->group(function ()
     Route::post('/user/recharge', [BalanceApiController::class, 'store']);
 });
  
- 
 Route::middleware('auth:sanctum')->get('/user/transactions', [PaymentApiController::class, 'history']);
  
 Route::middleware('auth:sanctum')->get('/parkings/nearby', [ParkingApiController::class, 'nearby']);
@@ -67,14 +51,18 @@ Route::middleware('auth:sanctum')->post('/firebase-notification/send/notificatio
  
 Route::middleware('auth:sanctum')->post('/entries/confirm', [EntryApiController::class, 'confirmEntry']);
  
+// ✅ RUTAS INBOX CORREGIDAS
 Route::middleware('auth:sanctum')->group(function () 
 {
-    Route::get('/user/dynamic-parkings',[UserParkingRequestApiController::class, 'index']);
-    Route::get('/user/dynamic-parkings', [ParkingInboxApiController::class, 'getInboxParkings']);
+    // ✅ Listar todos los parkings con info de solicitudes
+    Route::get('/user/parkings', [UserParkingRequestApiController::class, 'index']);
+    
+    // ✅ Enviar solicitud de acceso
     Route::post('/user/parkings/{parkingId}/request', [ParkingInboxApiController::class, 'sendRequest']);
+    
+    // ✅ Listar accesos aprobados del usuario
+    Route::get('/user/approved-types', [UserApprovedTypesApiController::class, 'index']);
 });
- 
-Route::middleware('auth:sanctum')->get('/user/approved-types', [UserApprovedTypesApiController::class, 'index']);
 
 Route::post('/password/request-code', [PasswordResetApiController::class, 'requestCode']);
 Route::post('/password/verify-code', [PasswordResetApiController::class, 'verifyCode']);
