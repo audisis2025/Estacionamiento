@@ -1,6 +1,7 @@
 <?php
  
 namespace App\Http\Controllers\Api;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -9,7 +10,6 @@ use App\Models\Plan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
-use Carbon\Carbon;
 
 class AuthApiController extends Controller
 {
@@ -32,18 +32,21 @@ class AuthApiController extends Controller
             'phone_number' => $data['phone_number'],
             'id_role'      => $role->id,
             'id_plan'      => $plan->id,
+            'is_active'    => true,
         ]);
 
         return response()->json([
             'message' => 'registered',
             'user' => [
-                'id'        => $user->id,
-                'name'      => $user->name,
-                'email'     => $user->email,
-                'role_id'   => $role->id,
-                'role_name' => 'usuario',
-                'plan_id'   => $plan->id,
-                'plan_name' => $plan->name,
+                'id'              => $user->id,
+                'name'            => $user->name,
+                'email'           => $user->email,
+                'role_id'         => $role->id,
+                'role_name'       => 'usuario',
+                'plan_id'         => $plan->id,
+                'plan_name'       => $plan->name,
+                'is_active'       => $user->is_active,
+                'has_active_plan' => true, // Plan básico siempre activo
             ],
         ], 201);
     }
@@ -61,14 +64,16 @@ class AuthApiController extends Controller
 
         $user = Auth::user();
 
+        // Verificar si el usuario está bloqueado (is_active = false)
         if (!$user->is_active) {
             Auth::logout();
             return response()->json([
                 'message' => 'user_blocked',
-                'error'   => 'Tu cuenta ha sido bloqueada.',
+                'error'   => 'Tu cuenta ha sido bloqueada. Contacta al administrador.',
             ], 423);
         }
 
+        // Verificar que sea un usuario normal (no admin o parking admin)
         if ($user->id_role !== null && !$user->role?->isUser()) {
             Auth::logout();
             return response()->json([
@@ -82,8 +87,8 @@ class AuthApiController extends Controller
         )->plainTextToken;
 
         return response()->json([
-            'message' => 'authenticated',
-            'token'   => $token,
+            'message'    => 'authenticated',
+            'token'      => $token,
             'token_type' => 'Bearer',
             'user' => [
                 'id'              => $user->id,
@@ -101,29 +106,30 @@ class AuthApiController extends Controller
     {
         $user = $request->user()->load('plan', 'role');
 
+        // Verificar si el usuario está bloqueado
         if (!$user->is_active) {
             return response()->json([
                 'message' => 'user_blocked',
+                'error'   => 'Tu cuenta ha sido bloqueada. Contacta al administrador.',
             ], 423);
         }
-
-        // 🔥 CALCULAR SI EL PLAN ESTÁ ACTIVO
-        $isActive = $this->checkPlanActive($user);
 
         return response()->json([
             'user' => [
                 'id'              => $user->id,
                 'name'            => $user->name,
                 'email'           => $user->email,
+                'phone_number'    => $user->phone_number,
                 'role_id'         => $user->id_role,
                 'role_name'       => $user->role?->name,
-                'has_active_plan' => $isActive,
+                'is_active'       => $user->is_active,
+                'has_active_plan' => $user->hasActivePlan(),
                 'plan_id'         => $user->plan?->id,
                 'plan_name'       => $user->plan?->name,
-                'end_date'        => $user->end_date ? $user->end_date->format('Y-m-d') : null,
-                
-                // 🔥 AGREGAR INFO DEL PLAN COMPLETA
-                'plan'            => $user->plan ? [
+                'end_date'        => $user->end_date?->format('Y-m-d'),
+                'amount'          => $user->amount,
+
+                'plan' => $user->plan ? [
                     'id'            => $user->plan->id,
                     'name'          => $user->plan->name,
                     'price'         => $user->plan->price,
@@ -138,27 +144,5 @@ class AuthApiController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'logged_out']);
-    }
-
-    // 🔥 NUEVO: Método para verificar si el plan está activo
-    private function checkPlanActive($user): bool
-    {
-        // Sin plan = inactivo
-        if (!$user->id_plan) {
-            return false;
-        }
-
-        // Plan básico (id 4) = siempre activo
-        if ($user->id_plan == 4) {
-            return true;
-        }
-
-        // Para otros planes, verificar end_date
-        if (!$user->end_date) {
-            return false;
-        }
-
-        // Verificar que no haya expirado
-        return $user->end_date->isToday() || $user->end_date->isFuture();
     }
 }
