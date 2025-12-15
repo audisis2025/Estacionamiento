@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\RegisterProviderApiController;
 use App\Http\Controllers\Api\ParkingInboxApiController;
 use App\Http\Controllers\Api\UserApprovedTypesApiController;
 use App\Http\Controllers\Api\UserParkingRequestApiController;
+use App\Http\Controllers\Api\PasswordResetApiController;
  
 Route::prefix('auth')->group(function () 
 {
@@ -49,7 +50,6 @@ Route::middleware('auth:sanctum')->group(function ()
     Route::post('/user/recharge', [BalanceApiController::class, 'store']);
 });
  
- 
 Route::middleware('auth:sanctum')->get('/user/transactions', [PaymentApiController::class, 'history']);
  
 Route::middleware('auth:sanctum')->get('/parkings/nearby', [ParkingApiController::class, 'nearby']);
@@ -68,9 +68,13 @@ Route::middleware('auth:sanctum')->post('/entries/confirm', [EntryApiController:
  
 Route::middleware('auth:sanctum')->group(function () 
 {
-    Route::get('/user/dynamic-parkings',[UserParkingRequestApiController::class, 'index']);
- 
+    Route::get('/user/parkings', [UserParkingRequestApiController::class, 'index']);
+    
     Route::post('/user/parkings/{parkingId}/request', [ParkingInboxApiController::class, 'sendRequest']);
+    
+    Route::get('/user/approved-types', [UserApprovedTypesApiController::class, 'index']);
 });
- 
-Route::middleware('auth:sanctum')->get('/user/approved-types', [UserApprovedTypesApiController::class, 'index']);
+
+Route::post('/password/request-code', [PasswordResetApiController::class, 'requestCode']);
+Route::post('/password/verify-code', [PasswordResetApiController::class, 'verifyCode']);
+Route::post('/password/reset-with-code', [PasswordResetApiController::class, 'resetWithCode']);

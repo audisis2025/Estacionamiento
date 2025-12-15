@@ -1,19 +1,19 @@
 <?php
 /*
-* Nombre de la clase         : ClientTypeApprovalController.php
-* Descripción de la clase    : Controlador que maneja el estado activo o inactivo de los usuarios desde el 
-                               panel de administración.
-* Fecha de creación          : 08/12/2025
-* Elaboró                    : Elian Pérez
-* Fecha de liberación        : 08/12/2025
-* Autorizó                   : Angel Davila
-* Versión                    : 1.0
-* Fecha de mantenimiento     : 
-* Folio de mantenimiento     : 
-* Tipo de mantenimiento      : 
-* Descripción del mantenimiento : 
-* Responsable                : 
-* Revisor                    : 
+Nombre de la clase         : ClientTypeApprovalController.php
+Descripción de la clase    : Controlador que maneja el estado activo o inactivo de los usuarios desde el 
+                             panel de administración.
+Fecha de creación          : 08/12/2025
+Elaboró                    : Elian Pérez
+Fecha de liberación        : 08/12/2025
+Autorizó                   : Angel Davila
+Versión                    : 1.0
+Fecha de mantenimiento     :
+Folio de mantenimiento     :
+Tipo de mantenimiento      :
+Descripción del mantenimiento :
+Responsable                :
+Revisor                    :
 */
 namespace App\Http\Controllers;
 

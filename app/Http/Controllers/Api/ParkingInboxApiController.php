@@ -1,7 +1,7 @@
 <?php
- 
+
 namespace App\Http\Controllers\Api;
- 
+
 use App\Http\Controllers\Controller;
 use App\Models\Parking;
 use App\Models\UserClientType;
@@ -24,34 +24,33 @@ class ParkingInboxApiController extends Controller
         if (!$parking) {
             return response()->json(['error' => 'Estacionamiento no encontrado'], 404);
         }
- 
-        // Validar que el tipo dinámico pertenezca al estacionamiento
+
+        // Verificar que el tipo pertenezca al estacionamiento
         if (!$parking->clientTypes->where('id', $clientTypeId)->count()) {
             return response()->json(['error' => 'Tipo de cliente inválido'], 422);
         }
- 
-        // Verificar solicitudes existentes del usuario
+
+        // Verificar si YA tiene solicitud pendiente o aprobada
         $existing = UserClientType::where('id_user', $user->id)
             ->whereHas('clientType', function ($q) use ($parkingId) {
                 $q->where('id_parking', $parkingId);
             })
-            ->whereIn('approval', [0, 1]) // pendiente o aceptado
+            ->whereIn('approval', [0, 1]) // 0 = pendiente, 1 = aceptada
             ->first();
- 
+
         if ($existing) {
             return response()->json([
                 'error' => 'Ya tienes una solicitud pendiente o aprobada en este estacionamiento'
             ], 409);
         }
- 
-        // Crear solicitud
+
+        // Crear solicitud nueva
         $record = UserClientType::create([
-            'id_user'         => $user->id,
-            'id_client_type'  => $clientTypeId,
-            'approval'        => 0,      // pendiente
-            'expiration_date' => null,   // null al solicitar
+            'id_user'        => $user->id,
+            'id_client_type' => $clientTypeId,
+            'approval'       => 0, // pendiente
         ]);
- 
+
         return response()->json([
             'status'  => 'success',
             'message' => 'Solicitud enviada correctamente',
