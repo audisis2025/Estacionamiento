@@ -1,5 +1,20 @@
 <?php
-
+/*
+* Nombre de la clase         : ParkingInboxApiController.php
+* Descripción de la clase    : Controlador para administrar la bandeja de entrada de los usuarios en relación a 
+                               los estacionamientos.
+* Fecha de creación          : 27/11/2025
+* Elaboró                    : Jonathan Diaz
+* Fecha de liberación        : 27/11/2025
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento :
+* Responsable                : 
+* Revisor                    : 
+*/
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -13,15 +28,17 @@ class UserParkingRequestApiController extends Controller
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (!$user) 
+        {
             return response()->json(['error' => 'Usuario no autenticado'], 401);
         }
 
-        $parkings = Parking::with('clientTypes')->get()->map(function ($parking) use ($user) {
+        $parkings = Parking::with('clientTypes')->get()->map(function ($parking) use ($user) 
+        {
 
-            // Solicitud existente del usuario para este estacionamiento
             $existing = UserClientType::where('id_user', $user->id)
-                ->whereHas('clientType', function ($q) use ($parking) {
+                ->whereHas('clientType', function ($q) use ($parking) 
+                {
                     $q->where('id_parking', $parking->id);
                 })
                 ->first();
@@ -32,24 +49,15 @@ class UserParkingRequestApiController extends Controller
             return [
                 'id'    => $parking->id,
                 'name'  => $parking->name,
-
-                'client_types' => $parking->clientTypes->map(function ($t) {
-                    return [
-                        'id'   => $t->id,
-                        'type_name' => $t->type_name,
-                    ];
+                'client_types' => $parking->clientTypes->map(function ($t) 
+                {
+                    return ['id' => $t->id, 'type_name' => $t->type_name];
                 }),
-
-                // 🔥 Estos campos son los que Flutter necesita
                 'has_pending'  => $hasPending,
-                'has_approved' => $hasApproved,
+                'has_approved' => $hasApproved
             ];
         });
 
-        return response()->json([
-            'status'   => 'success',
-            'parkings' => $parkings
-        ]);
+        return response()->json(['status' => 'success', 'parkings' => $parkings]);
     }
-
 }

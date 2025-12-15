@@ -1,5 +1,19 @@
 <?php
-
+/*
+* Nombre de la clase         : PasswordResetCodeMail.php
+* Descripción de la clase    : Mailable para enviar el código de recuperación de contraseña al usuario.
+* Fecha de creación          : 14/12/2025
+* Elaboró                    : Jonathan Diaz
+* Fecha de liberación        : 14/12/2025
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento :
+* Responsable                : 
+* Revisor                    : 
+*/
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
@@ -13,39 +27,21 @@ class PasswordResetCodeMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
     public function __construct(public string $code)
     {
-        //
+
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
-        return new Envelope(
-            subject: 'Código de Recuperación de Contraseña',
-        );
+        return new Envelope(subject: 'Código de Recuperación de Contraseña');
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
-        return new Content(
-            view: 'emails.password-reset-code',
-        );
+        return new Content(view: 'emails.password-reset-code');
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
     public function attachments(): array
     {
         return [];

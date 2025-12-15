@@ -1,5 +1,20 @@
 <?php
-
+/*
+* Nombre de la clase         : ParkingInboxApiController.php
+* Descripción de la clase    : Controlador para administrar la bandeja de entrada de los usuarios en relación a 
+                               los estacionamientos.
+* Fecha de creación          : 27/11/2025
+* Elaboró                    : Jonathan Diaz
+* Fecha de liberación        : 27/11/2025
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento :
+* Responsable                : 
+* Revisor                    : 
+*/
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -13,42 +28,38 @@ class ParkingInboxApiController extends Controller
     {
         $user = $request->user();
  
-        $request->validate([
-            'client_type_id' => 'required|integer|exists:client_types,id'
-        ]);
+        $request->validate(['client_type_id' => 'required|integer|exists:client_types,id']);
  
         $clientTypeId = $request->client_type_id;
  
-        // Validar estacionamiento
         $parking = Parking::with('clientTypes')->find($parkingId);
-        if (!$parking) {
+        if (!$parking) 
+        {
             return response()->json(['error' => 'Estacionamiento no encontrado'], 404);
         }
 
-        // Verificar que el tipo pertenezca al estacionamiento
-        if (!$parking->clientTypes->where('id', $clientTypeId)->count()) {
+        if (!$parking->clientTypes->where('id', $clientTypeId)->count()) 
+        {
             return response()->json(['error' => 'Tipo de cliente inválido'], 422);
         }
 
-        // Verificar si YA tiene solicitud pendiente o aprobada
         $existing = UserClientType::where('id_user', $user->id)
-            ->whereHas('clientType', function ($q) use ($parkingId) {
+            ->whereHas('clientType', function ($q) use ($parkingId) 
+            {
                 $q->where('id_parking', $parkingId);
             })
-            ->whereIn('approval', [0, 1]) // 0 = pendiente, 1 = aceptada
+            ->whereIn('approval', [0, 1])
             ->first();
 
-        if ($existing) {
-            return response()->json([
-                'error' => 'Ya tienes una solicitud pendiente o aprobada en este estacionamiento'
-            ], 409);
+        if ($existing) 
+        {
+            return response()->json(['error' => 'Ya tienes una solicitud pendiente o aprobada en este estacionamiento'], 409);
         }
 
-        // Crear solicitud nueva
         $record = UserClientType::create([
-            'id_user'        => $user->id,
+            'id_user' => $user->id,
             'id_client_type' => $clientTypeId,
-            'approval'       => 0, // pendiente
+            'approval' => 0
         ]);
 
         return response()->json([

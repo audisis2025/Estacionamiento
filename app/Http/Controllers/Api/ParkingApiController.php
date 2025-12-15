@@ -1,5 +1,19 @@
 <?php
- 
+/*
+* Nombre de la clase         : EntryApiController.php
+* Descripción de la clase    : Controlador para administrar las entradas de los usuarios.
+* Fecha de creación          : 06/11/2025
+* Elaboró                    : Jonathan Diaz
+* Fecha de liberación        : 06/11/2025
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento :
+* Responsable                : 
+* Revisor                    : 
+*/
 namespace App\Http\Controllers\Api;
  
 use App\Http\Controllers\Controller;
@@ -13,7 +27,8 @@ class ParkingApiController extends Controller
         $lat = $request->query('lat');
         $lng = $request->query('lng');
  
-        if (!$lat || !$lng) {
+        if (!$lat || !$lng) 
+        {
             return response()->json(['error' => 'Coordenadas no enviadas'], 422);
         }
  
@@ -21,17 +36,15 @@ class ParkingApiController extends Controller
  
         $parkings = Parking::whereBetween('latitude_coordinate', [$lat - $radius, $lat + $radius])
             ->whereBetween('longitude_coordinate', [$lng - $radius, $lng + $radius])
-            ->with([
-                'schedules:id,opening_time,closing_time,id_day,id_parking',
-            ])
+            ->with(['schedules:id,opening_time,closing_time,id_day,id_parking'])
             ->get([
                 'id',
                 'name',
                 'latitude_coordinate',
                 'longitude_coordinate',
                 'type',
-                'price',       // price_hour o price (si 1 o 2)
-                'price_flat',  // fijo
+                'price',
+                'price_flat'
             ]);
  
         return response()->json(['parkings' => $parkings]);
@@ -40,7 +53,8 @@ class ParkingApiController extends Controller
  
     public function withDynamicClients()
     {
-        $parkings = Parking::whereHas('clientTypes', function ($q) {
+        $parkings = Parking::whereHas('clientTypes', function ($q) 
+        {
             $q->whereHas('userClientTypes');
         })->withCount('clientTypes')
             ->get(['id', 'name']);
@@ -53,9 +67,6 @@ class ParkingApiController extends Controller
         $parking = Parking::with(['clientTypes:id,typename,id_parking'])
             ->findOrFail($id);
  
-        return response()->json([
-            'parking' => $parking->name,
-            'client_types' => $parking->clientTypes,
-        ]);
+        return response()->json(['parking' => $parking->name, 'client_types' => $parking->clientTypes]);
     }
 }
