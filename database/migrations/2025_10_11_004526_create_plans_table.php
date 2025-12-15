@@ -2,9 +2,9 @@
 /*
 * Nombre de la clase         : 2025_10_11_004526_create_plans_table.php
 * Descripción de la clase    : Migración para crear la tabla de planes.
-* Fecha de creación          : 
+* Fecha de creación          : 11/10/2025
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
+* Fecha de liberación        : 11/10/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0 
 * Fecha de mantenimiento     : 

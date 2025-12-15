@@ -2,9 +2,9 @@
 /*
 * Nombre de la clase         : api.php
 * Descripción de la clase    : Archivo de rutas de la API que define los endpoints y su lógica.
-* Fecha de creación          : 
+* Fecha de creación          : 24/10/2025
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
+* Fecha de liberación        : 24/10/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0 
 * Fecha de mantenimiento     : 

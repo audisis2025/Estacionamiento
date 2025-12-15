@@ -1,5 +1,20 @@
 <?php
-
+/*
+* Nombre de la clase         : RedirectAuthenticatedUsersMiddleware.php
+* Descripción de la clase    : Middleware para redirigir usuarios autenticados 
+                               según su rol (administrador o usuario estándar).
+* Fecha de creación          : 08/12/2025
+* Elaboró                    : Elian Pérez
+* Fecha de liberación        : 08/12/2025
+* Autorizó                   : Angel Davila
+* Versión                    : 1.0 
+* Fecha de mantenimiento     : 
+* Folio de mantenimiento     : 
+* Tipo de mantenimiento      : 
+* Descripción del mantenimiento : 
+* Responsable                : 
+* Revisor                    : 
+*/
 namespace App\Http\Middleware;
 
 use Closure;

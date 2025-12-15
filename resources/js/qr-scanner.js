@@ -1,9 +1,9 @@
 /*
 * Nombre de la clase         : qr-escanner.js
 * Descripción de la clase    : Archivo de JavaScript para gestionar la lectura de códigos QR.
-* Fecha de creación          : 
+* Fecha de creación          : 16/11/2025
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
+* Fecha de liberación        : 16/11/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0 
 * Fecha de mantenimiento     : 

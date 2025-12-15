@@ -2,9 +2,9 @@
 /*
 * Nombre de la clase         : UserFactoty.php
 * Descripción de la clase    : Factoty para el modelo User modificado
-* Fecha de creación          : 
+* Fecha de creación          : 06/10/2025
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
+* Fecha de liberación        : 06/10/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0 
 * Fecha de mantenimiento     : 

@@ -3,9 +3,9 @@
 * Nombre de la clase         : app.php
 * Descripción de la clase    : Archivo de configuración principal de la aplicación Laravel, 
                                que establece rutas, middleware y manejo de excepciones.
-* Fecha de creación          : 
+* Fecha de creación          : 06/10/2025
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
+* Fecha de liberación        : 06/10/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 2.0 
 * Fecha de mantenimiento     : 08/12/2025

@@ -6,6 +6,12 @@
 * Fecha de liberación          : 04/11/2025
 * Autorizó                     : Angel Davila
 * Version                      : 1.0
+* Fecha de mantenimiento       : 
+* Folio de mantenimiento       : 
+* Tipo de mantenimiento        :
+* Descripción del mantenimiento: 
+* Responsable                  : 
+* Revisor                      : 
 --}}
 <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="300.000000pt" height="285.000000pt"
     viewBox="0 0 300.000000 285.000000" preserveAspectRatio="xMidYMid meet">

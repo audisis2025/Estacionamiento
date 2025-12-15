@@ -5,7 +5,7 @@
 *                              y permitir activar/desactivar cuentas de usuario.
 * Fecha de creación          : 08/12/2025
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
+* Fecha de liberación        : 08/12/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0
 * Fecha de mantenimiento     : 

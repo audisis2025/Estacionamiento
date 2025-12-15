@@ -19,6 +19,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AdminUserStatusController extends Controller
 {
@@ -36,6 +37,16 @@ class AdminUserStatusController extends Controller
 
         $user->update([ 'is_active' => ! (bool) $user->is_active]);
 
+        if ($user->id_role === 3 || $user->id_role === null)
+        {
+            if (! $user->is_active)
+            {
+                PersonalAccessToken::where('tokenable_type', User::class)
+                ->where('tokenable_id', $user->id)
+                ->delete();
+            }
+        }
+        
         return back()->with('swal', [
             'icon'  => 'success',
             'title' => $user->is_active ? 'Usuario activado' : 'Usuario bloqueado',

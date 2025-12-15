@@ -3,9 +3,9 @@
 * Nombre de la clase         : DatabaseSeeder.php
 * Descripción de la clase    : Seeder para crear datos iniciales en la base de datos, 
                                incluyendo roles, días, planes y un usuario administrador.
-* Fecha de creación          : 
+* Fecha de creación          : 06/10/2025
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
+* Fecha de liberación        : 06/10/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0 
 * Fecha de mantenimiento     : 

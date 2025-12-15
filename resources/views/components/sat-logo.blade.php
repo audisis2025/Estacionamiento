@@ -6,6 +6,12 @@
 * Fecha de liberación          : 04/11/2025
 * Autorizó                     : Angel Davila
 * Version                      : 1.0
+* Fecha de mantenimiento       : 
+* Folio de mantenimiento       : 
+* Tipo de mantenimiento        :
+* Descripción del mantenimiento: 
+* Responsable                  : 
+* Revisor                      : 
 --}}
 @props(['class' => 'h-8 w-auto'])
 

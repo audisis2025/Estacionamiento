@@ -1,9 +1,9 @@
 /*
 * Nombre de la clase         : plans-checkout.js
 * Descripción de la clase    : Archivo de JavaScript para gestionar la selección de planes y la integración con PayPal
-* Fecha de creación          : 
+* Fecha de creación          : 27/11/2025
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
+* Fecha de liberación        : 27/11/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0 
 * Fecha de mantenimiento     : 

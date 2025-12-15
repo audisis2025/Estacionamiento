@@ -2,9 +2,9 @@
 /*
 * Nombre de la clase         : validation.php
 * Descripción de la clase    : Archivo de traducción que contiene los mensajes de validación para la aplicación.
-* Fecha de creación          : 
+* Fecha de creación          : 03/11/2025
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
+* Fecha de liberación        : 03/11/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0 
 * Fecha de mantenimiento     : 
@@ -169,12 +169,7 @@ return [
     'uppercase'              => 'El campo :attribute debe estar en mayúscula.',
     'url'                    => 'El campo :attribute debe ser una URL válida.',
     'uuid'                   => 'El campo :attribute debe ser un UUID válido.',
-    //Se agregaron mensajes personalizados
-    'custom' => [
-        'password' => [
-            'confirmed' => 'Las contraseñas no coinciden.',
-        ],
-    ],
+    'custom' => ['password' => ['confirmed' => 'Las contraseñas no coinciden.']],
 
     'attributes' => [
         'password' => 'contraseña',

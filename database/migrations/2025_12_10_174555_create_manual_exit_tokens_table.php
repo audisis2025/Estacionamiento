@@ -5,7 +5,7 @@
 *                              que almacena los tokens de salida manual.
 * Fecha de creación          : 10/12/2025
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
+* Fecha de liberación        : 10/12/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0
 * Fecha de mantenimiento     : 

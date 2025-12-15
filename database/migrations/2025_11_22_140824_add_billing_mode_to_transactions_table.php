@@ -2,9 +2,9 @@
 /*
 * Nombre de la clase         : 2025_11_22_140824_add_billing_mode_to_transactions_table.php
 * Descripción de la clase    : Migración para agregar la columna de modo de facturación a la tabla de transacciones.
-* Fecha de creación          : 
+* Fecha de creación          : 22/11/2025
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
+* Fecha de liberación        : 22/11/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0 
 * Fecha de mantenimiento     : 

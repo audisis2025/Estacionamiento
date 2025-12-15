@@ -6,6 +6,12 @@
 * Fecha de liberación          : 04/11/2025
 * Autorizó                     : Angel Davila
 * Version                      : 1.0
+* Fecha de mantenimiento       : 
+* Folio de mantenimiento       : 
+* Tipo de mantenimiento        :
+* Descripción del mantenimiento: 
+* Responsable                  : 
+* Revisor                      : 
 --}}
 <div class="flex aspect-square size-12 items-center justify-center rounded-md text-accent-foreground">
     <x-app-logo-icon class="size-9 fill-current text-white" />

@@ -4,9 +4,9 @@
 * Descripción de la clase    : Define las rutas web relacionadas con las funcionalidades del usuario,
                                incluyendo la gestión de estacionamientos, lectores QR, tipos de clientes, 
                                entradas y facturación.
-* Fecha de creación          : 
+* Fecha de creación          : 13/11/2025
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
+* Fecha de liberación        : 13/11/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0 
 * Fecha de mantenimiento     : 

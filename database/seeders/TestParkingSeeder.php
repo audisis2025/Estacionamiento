@@ -2,9 +2,9 @@
 /*
 * Nombre de la clase         : TestParkingSeeder.php
 * Descripción de la clase    : Seeder para crear datos iniciales en la tabla de estacionamientos.
-* Fecha de creación          : 
+* Fecha de creación          : 04/11/2025
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
+* Fecha de liberación        : 04/11/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0 
 * Fecha de mantenimiento     : 
@@ -16,8 +16,6 @@
 */
 namespace Database\Seeders;
 
-use Carbon\Carbon;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;

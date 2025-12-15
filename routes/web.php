@@ -4,9 +4,9 @@
 * Descripción de la clase    : Archivo de rutas web de Laravel que define las rutas principales de la aplicación, 
                                incluyendo la página de inicio, configuración del usuario 
                                y términos de servicio.
-* Fecha de creación          : 
+* Fecha de creación          : 06/10/2025
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
+* Fecha de liberación        : 06/10/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0 
 * Fecha de mantenimiento     : 

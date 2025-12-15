@@ -3,9 +3,9 @@
 * Nombre de la clase         : 2025_10_11_004837_modify_users_table_add_parking_fields.php
 * Descripción de la clase    : Migración para modificar la tabla de usuarios y agregar campos relacionados 
                                con el estacionamiento.
-* Fecha de creación          : 
+* Fecha de creación          : 11/10/2025
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
+* Fecha de liberación        : 11/10/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0 
 * Fecha de mantenimiento     : 

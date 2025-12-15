@@ -2,9 +2,9 @@
 /*
 * Nombre de la clase         : admin.php
 * Descripción de la clase    : Archivo de rutas para la sección de administración de la aplicación.
-* Fecha de creación          : 
+* Fecha de creación          : 24/10/2025
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
+* Fecha de liberación        : 24/10/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0 
 * Fecha de mantenimiento     : 

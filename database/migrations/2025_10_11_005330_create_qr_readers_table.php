@@ -2,9 +2,9 @@
 /*
 * Nombre de la clase         : 2025_10_11_005330_create_qr_readers_table.php
 * Descripción de la clase    : Migración para crear la tabla de lectores de QR.
-* Fecha de creación          : 
+* Fecha de creación          : 11/10/2025
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 
+* Fecha de liberación        : 11/10/2025
 * Autorizó                   : Angel Davila
 * Versión                    : 1.0 
 * Fecha de mantenimiento     : 
