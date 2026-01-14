@@ -7,8 +7,8 @@
 * Autorizó                     : Angel Davila
 * Version                      : 1.0
 * Fecha de mantenimiento       : 27/11/2025
-* Folio de mantenimiento       : 
-* Tipo de mantenimiento        :
+* Folio de mantenimiento       : L0014
+* Tipo de mantenimiento        : Perfectivo
 * Descripción del mantenimiento: Se actualizaron los terminos y condiciones
 * Responsable                  : Elian Pérez
 * Revisor                      : Angel Davila

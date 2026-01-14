@@ -5,10 +5,10 @@
 * Elaboró                      : Elian Pérez
 * Fecha de liberación          : 06/11/2025
 * Autorizó                     : Angel Davila
-* Version                      : 3.0
+* Version                      : 2.0
 * Fecha de mantenimiento       : 09/12/2025
-* Folio de mantenimiento       : 
-* Tipo de mantenimiento        : Correctivo
+* Folio de mantenimiento       : L0017
+* Tipo de mantenimiento        : Adaptativo
 * Descripción del mantenimiento: Descuento sin fecha de expiración y cancelación manual.
 * Responsable                  : Elian Pérez
 * Revisor                      : Angel Davila

@@ -5,9 +5,9 @@
 * Elaboró                      : Elian Pérez
 * Fecha de liberación          : 04/11/2025
 * Autorizó                     : Angel Davila
-* Version                      : 1.0
+* Version                      : 1.1
 * Fecha de mantenimiento       : 16/11/2025
-* Folio de mantenimiento       : 
+* Folio de mantenimiento       : L0010
 * Tipo de mantenimiento        : Correctivo
 * Descripción del mantenimiento: Se realizaron ajustes en la validación del formulario.
 * Responsable                  : Elian Pérez

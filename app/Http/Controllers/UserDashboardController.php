@@ -2,16 +2,17 @@
 /*
 * Nombre de la clase         : UserDashboardController.php
 * Descripción de la clase    : Controlador que muestra las métricas y estadísticas del dashboard para el usuario autenticado.
-* Fecha de creación          : 05/11/2025
+* Fecha de creación          : 05/11/2026
 * Elaboró                    : Elian Pérez
-* Fecha de liberación        : 05/11/2025
+* Fecha de liberación        : 05/11/2026
 * Autorizó                   : Angel Davila
-* Versión                    : 1.0
-* Fecha de mantenimiento     :
-* Folio de mantenimiento     :
-* Descripción del mantenimiento :
-* Responsable                :
-* Revisor                    :
+* Versión                    : 2.0
+* Fecha de mantenimiento     : 07/01/2026
+* Folio de mantenimiento     : L0021
+* Tipo de mantenimiento      : Correctivo
+* Descripción del mantenimiento : Se modifico las consultas para que los ingresos fueran en base a la fecha almacenada en departure_date
+* Responsable                : Elian Pérez
+* Revisor                    : Angel Davila
 */
 
 namespace App\Http\Controllers;
@@ -39,20 +40,20 @@ class UserDashboardController extends Controller
         {
             $from = (clone $now)->startOfWeek();
             $to = (clone $now)->endOfWeek();
-            $group = "DATE(entry_date)";
-            $label = "DATE_FORMAT(entry_date, '%Y-%m-%d')";
+            $group = "DATE(departure_date)";
+            $label = "DATE_FORMAT(departure_date, '%Y-%m-%d')";
         } elseif ($range === 'month')
         {
             $from = (clone $now)->startOfMonth();
             $to = (clone $now)->endOfMonth();
-            $group = "DATE(entry_date)";
-            $label = "DATE_FORMAT(entry_date, '%Y-%m-%d')";
+            $group = "DATE(departure_date)";
+            $label = "DATE_FORMAT(departure_date, '%Y-%m-%d')";
         } else
         {
             $from = (clone $now)->startOfDay();
             $to = (clone $now)->endOfDay();
-            $group = 'HOUR(entry_date)';
-            $label = 'HOUR(entry_date)';
+            $group = "HOUR(departure_date)";
+            $label = "HOUR(departure_date)";
         }
 
         $parking = $user->parking;
@@ -92,7 +93,8 @@ class UserDashboardController extends Controller
         $revenue = DB::table('transactions')
             ->selectRaw("$label AS label, SUM(amount) AS total")
             ->whereIn('id_qr_reader', $readerIds)
-            ->whereBetween('entry_date', [$from, $to])
+            ->whereNotNull('departure_date')
+            ->whereBetween('departure_date', [$from, $to])
             ->groupBy('label')
             ->orderBy('label')
             ->get();
@@ -106,7 +108,7 @@ class UserDashboardController extends Controller
             )
             ->selectRaw("$label AS label, COUNT(DISTINCT t.id_user) AS total")
             ->whereIn('t.id_qr_reader', $readerIds)
-            ->whereBetween('t.entry_date', [$from, $to])
+            ->whereBetween('t.departure_date', [$from, $to])
             ->where('u.id_role', 3)
             ->groupBy('label')
             ->orderBy('label')
@@ -119,58 +121,71 @@ class UserDashboardController extends Controller
                 '=', 
                 't.id_user'
             )
-            ->join(
+            ->leftJoin(
                 'user_client_types as uct', 
-                'uct.id_user',
+                'uct.id_user', 
                 '=', 
                 'u.id'
             )
             ->selectRaw("$label AS label, COUNT(DISTINCT t.id_user) AS total")
             ->whereIn('t.id_qr_reader', $readerIds)
-            ->whereBetween('t.entry_date', [$from, $to])
+            ->whereNotNull('t.departure_date')
+            ->whereBetween('t.departure_date', [$from, $to])
             ->whereNull('u.id_role')
+            ->where(function ($q) 
+            {
+                $q->whereNull('u.id_plan')
+                ->orWhereNotNull('uct.id'); 
+            })
             ->groupBy('label')
             ->orderBy('label')
             ->get();
 
-        $kpis = [
-            'revenue' => DB::table('transactions')
-                ->whereIn('id_qr_reader', $readerIds)
-                ->whereBetween('entry_date', [$from, $to])
-                ->sum('amount'),
+        $kpis['revenue'] = (float) DB::table('transactions')
+            ->whereIn('id_qr_reader', $readerIds)
+            ->whereNotNull('departure_date')
+            ->whereBetween('departure_date', [$from, $to])
+            ->sum('amount');
 
-            'users_normal' => (int) DB::table('transactions as t')
-                ->join(
-                    'users as u', 
-                    'u.id', 
-                    '=', 
-                    't.id_user'
-                )
-                ->whereIn('t.id_qr_reader', $readerIds)
-                ->whereBetween('t.entry_date', [$from, $to])
-                ->where('u.id_role', 3)
-                ->distinct('t.id_user')
-                ->count('t.id_user'),
+        $kpis['users_normal'] = (int) DB::table('transactions as t')
+            ->join(
+                'users as u', 
+                'u.id', 
+                '=', 
+                't.id_user'
+            )
+            ->whereIn('t.id_qr_reader', $readerIds)
+            ->whereNotNull('t.departure_date')
+            ->whereBetween('t.departure_date', [$from, $to])
+            ->where('u.id_role', 3)
+            ->distinct('t.id_user')
+            ->count('t.id_user');
 
-            'users_dynamic' => (int) DB::table('transactions as t')
-                ->join(
-                    'users as u', 
-                    'u.id', 
-                    '=', 
-                    't.id_user'
-                )
-                ->join(
-                    'user_client_types as uct', 
-                    'uct.id_user', 
-                    '=', 
-                    'u.id'
-                )
-                ->whereIn('t.id_qr_reader', $readerIds)
-                ->whereBetween('t.entry_date', [$from, $to])
-                ->whereNull('u.id_role')
-                ->distinct('t.id_user')
-                ->count('t.id_user')
-        ];
+        $kpis['users_dynamic'] = (int) DB::table('transactions as t')
+            ->join(
+                'users as u', 
+                'u.id', 
+                '=', 
+                't.id_user'
+            )
+            ->leftJoin(
+                'user_client_types as uct', 
+                'uct.id_user', 
+                '=', 
+                'u.id'
+            )
+            ->whereIn('t.id_qr_reader', $readerIds)
+            ->whereNotNull('t.departure_date')
+            ->whereBetween('t.departure_date', [$from, $to])
+            ->whereNull('u.id_role')
+            ->where(function ($q) 
+            {
+                $q->whereNull('u.id_plan')
+                ->orWhereNotNull('uct.id');
+            })
+            ->distinct('t.id_user')
+            ->count('t.id_user');
+
 
         return view('user.dashboard', [
             'range' => $range,

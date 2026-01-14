@@ -6,10 +6,17 @@
 * Elaboró                    : Elian Pérez
 * Fecha de liberación        : 04/10/2025
 * Autorizó                   : Angel Dávila
-* Versión                    : 1.1
+* Versión                    : 2.0
 * Fecha de mantenimiento     : 15/11/2025
-* Folio de mantenimiento     : 
+* Folio de mantenimiento     : L0004
+* Tipo de mantenimiento      : Perfectivo
 * Descripción del mantenimiento : Implementación de mensajes de alerta con SweetAlert2.
+* Responsable                : Elian Pérez
+* Revisor                    : Angel Dávila
+* Fecha de mantenimiento     : 07/01/2026
+* Folio de mantenimiento     : L0023
+* Tipo de mantenimiento      : Correctivo
+* Descripción del mantenimiento : Se agregó una validación en los campos name y email
 * Responsable                : Elian Pérez
 * Revisor                    : Angel Dávila
 */
@@ -36,11 +43,40 @@ new #[Layout('components.layouts.auth')] class extends Component
     public function register(): void
     {
         $validated = $this->validate([
-            'name'          => ['required', 'string', 'max:255'],
-            'email'         => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
-            'password'      => ['required', 'string', 'confirmed', Rules\Password::defaults()],
-            'phone_number' => ['required', 'numeric', 'digits:10', 'unique:users,phone_number'],
-            'terms'         => ['accepted'],
+            'name' => [
+                'required', 
+                'string', 
+                'min:8', 
+                'max:255',
+                'regex:/^[\p{L}]+(?:\s+[\p{L}]+)+$/u'
+            ],
+            'email' => [
+                'required', 
+                'string', 
+                'lowercase', 
+                'regex:/^[A-Z0-9][A-Z0-9._%+\-]*[A-Z0-9]@[A-Z0-9]+([.\-][A-Z0-9]+)*\.(com|mx|test)$/i',
+                'not_regex:/\.(com|mx|test)\.(com|mx|test)$/i',
+                'max:255', 
+                'unique:users,email'
+            ],
+            'phone_number' => [
+                'required', 
+                'numeric', 
+                'digits:10', 
+                'unique:users,phone_number'
+            ],
+            'password' => [
+                'required', 
+                'string', 
+                'confirmed', 
+                Rules\Password::defaults()
+            ],
+            'terms' => ['accepted']
+        ], 
+        [
+            'email.regex' => 'Ingresa un correo electrónico válido.',
+            'not_regex' => 'Ingresa un correo electrónico válido.',
+            'name.regex' => 'El nombre solo puede contener letras y espacios (sin números ni símbolos).'
         ]);
 
         $validated['password'] = Hash::make($validated['password']);

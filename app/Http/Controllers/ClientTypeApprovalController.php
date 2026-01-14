@@ -8,7 +8,7 @@
 * Autorizó                   : Angel Davila
 * Versión                    : 1.1
 * Fecha de mantenimiento     : 09/12/2025
-* Folio de mantenimiento     : 
+* Folio de mantenimiento     : L0016
 * Tipo de mantenimiento      : Correctivo
 * Descripción del mantenimiento : Corrección de race condition en eliminación
 * Responsable                : Elian Pérez

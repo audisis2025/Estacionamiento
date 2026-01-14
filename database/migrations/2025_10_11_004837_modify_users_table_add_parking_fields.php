@@ -52,7 +52,8 @@ return new class extends Migration
                 'amount',
                 'phone_number',
                 'id_plan',
-                'id_role'
+                'id_role',
+                'notification_token'
             ]);
         });
     }

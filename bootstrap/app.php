@@ -9,16 +9,20 @@
 * Autorizó                   : Angel Davila
 * Versión                    : 2.0 
 * Fecha de mantenimiento     : 08/12/2025
-* Folio de mantenimiento     : 
-* Tipo de mantenimiento      : Correctivo
+* Folio de mantenimiento     : L0015
+* Tipo de mantenimiento      : Perfectivo
 * Descripción del mantenimiento : Agregado middleware para redirección automática según rol
 * Responsable                : Elian Pérez
 * Revisor                    : Angel Davila
 */
+
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -32,17 +36,38 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->group(base_path('routes/admin.php'));
         }
     )
-    ->withMiddleware(function (Middleware $middleware) 
+    ->withMiddleware(function (Middleware $middleware)
     {
         $middleware->web(append: [ \App\Http\Middleware\RedirectAuthenticatedUsersMiddleware::class]);
-        
+       
         $middleware->alias([
             'ensure.active.plan' => \App\Http\Middleware\EnsureActivePlanMiddleware::class,
             'ensure.parking.configured'=> \App\Http\Middleware\EnsureParkingConfiguredMiddleware::class,
             'ensure.billing.access' => \App\Http\Middleware\EnsureBillingAccessMiddleware::class
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions) 
+    ->withExceptions(function (Exceptions $exceptions)
     {
-        //
+        $exceptions->render(function (Throwable $e, $request)
+        {
+            if ($request->is('api/*'))
+            {
+                if ($e instanceof ValidationException)
+                {
+                    $errorList = collect($e->errors())->flatten()->all();
+                    return response()->json(['message' => $errorList, "statusCode" => 422], 422);
+                }
+                if ($e instanceof AuthenticationException)
+                {
+                    return response()->json(['message' => 'Token inválido o no proporcionado', 'statusCode' => 401], 401);
+                }
+                if ($e instanceof HttpExceptionInterface)
+                {
+                    return response()->json(['message' => $e->getMessage(), "statusCode" => $e->getStatusCode()], $e->getStatusCode());
+                }
+                return response()->json(['message' => $e->getMessage(), "statusCode" => 500], 500);
+            }
+            return null;
+        });
     })->create();
+ 

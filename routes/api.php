@@ -6,75 +6,56 @@
 * Elaboró                    : Elian Pérez
 * Fecha de liberación        : 24/10/2025
 * Autorizó                   : Angel Davila
-* Versión                    : 1.0 
-* Fecha de mantenimiento     : 
-* Folio de mantenimiento     : 
-* Tipo de mantenimiento      : 
-* Descripción del mantenimiento : 
-* Responsable                : 
-* Revisor                    : 
+* Versión                    : 2.0
+* Fecha de mantenimiento     : 12/01/2026
+* Folio de mantenimiento     : L0033
+* Tipo de mantenimiento      : Correctivo
+* Descripción del mantenimiento : Agregacion y corrección de las rutas del api
+* Responsable                : Jonathan Diaz
+* Revisor                    : Angel Davila
 */
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthApiController;
+use App\Http\Controllers\Api\EntryApiController;
 use App\Http\Controllers\Api\PlanApiController;
 use App\Http\Controllers\Api\PayPalApiController;
-use App\Http\Controllers\Api\BalanceApiController;
-use App\Http\Controllers\Api\EntryApiController;
 use App\Http\Controllers\Api\FirebaseApiController;
 use App\Http\Controllers\Api\ParkingApiController;
 use App\Http\Controllers\Api\PaymentApiController;
-use App\Http\Controllers\Api\RegisterProviderApiController;
-use App\Http\Controllers\Api\ParkingInboxApiController;
-use App\Http\Controllers\Api\UserApprovedTypesApiController;
-use App\Http\Controllers\Api\UserParkingRequestApiController;
 use App\Http\Controllers\Api\PasswordResetApiController;
- 
-Route::prefix('auth')->group(function () 
+use App\Http\Controllers\Api\QrApiController;
+use App\Http\Controllers\Api\UserDynamicInboxApiController;
+
+Route::middleware(['auth:sanctum'])->group(function ()
 {
-    Route::post('/register', [AuthApiController::class, 'register'])->middleware('throttle:6,1');
-    Route::post('/login', [AuthApiController::class, 'login'])->middleware('throttle:10,1');
-    Route::post('/logout', [AuthApiController::class, 'logout'])->middleware('auth:sanctum');
-    Route::get('/me', [AuthApiController::class, 'me'])->middleware('auth:sanctum');
+   
+    Route::post('/logout', [AuthApiController::class, 'logout']);
+    Route::get('/me', [AuthApiController::class, 'me']);
  
-    Route::post('/register-provider', [RegisterProviderApiController::class, 'registerProvider']);
+    Route::post('/qr/generate',[QrApiController::class, 'generateQr']);
+ 
+    Route::get('/user/transactions', [PaymentApiController::class, 'history']);
+ 
+    Route::get('/parkings/nearby', [ParkingApiController::class, 'nearby']);
+ 
+    Route::put('/user/notification-token', [FirebaseApiController::class, 'updateNotificationToken']);
+    Route::post('/firebase-notification/send/notification', [FirebaseApiController::class, 'send']);
+ 
+    Route::post('/paypal/create', [PayPalApiController::class, 'create']);
+    Route::post('/paypal/capture/{orderId}', [PayPalApiController::class, 'capture']);
+    Route::post('/entries/confirm', [EntryApiController::class, 'confirmEntry']);
+
+    Route::post('parkings/{parkingId}/dynamic-inbox/request', [UserDynamicInboxApiController::class, 'sendRequest']);
+    Route::get('dynamic-inbox/pending', [UserDynamicInboxApiController::class, 'userPending']);
+    Route::get('dynamic-inbox/approved', [UserDynamicInboxApiController::class, 'userApproved']);
 });
+ 
+Route::post('/register', [AuthApiController::class, 'register'])->middleware('throttle:6,1');
+Route::post('/dynamic-register',[AuthApiController::class, 'dynamicRegister'])->middleware('throttle:6,1');
+Route::post('/login', [AuthApiController::class, 'login'])->middleware('throttle:10,1');
  
 Route::get('/plans', [PlanApiController::class, 'index']);
 Route::get('/plans/{plan}', [PlanApiController::class, 'show']);
  
-Route::middleware('auth:sanctum')->post('/paypal/success', [PayPalApiController::class, 'store']);
- 
-Route::middleware('auth:sanctum')->group(function () 
-{
-    Route::get('/user/balance', [BalanceApiController::class, 'index']);
-    Route::post('/user/recharge', [BalanceApiController::class, 'store']);
-});
- 
-Route::middleware('auth:sanctum')->get('/user/transactions', [PaymentApiController::class, 'history']);
- 
-Route::middleware('auth:sanctum')->get('/parkings/nearby', [ParkingApiController::class, 'nearby']);
- 
-Route::prefix('parkings')->group(function () 
-{
-    Route::get('/with-dynamic-clients', [ParkingApiController::class, 'withDynamicClients']);
-    Route::get('/{id}/client-types', [ParkingApiController::class, 'clientTypesByParking']);
-});
- 
-Route::middleware('auth:sanctum')->put('/user/notification-token', [FirebaseApiController::class, 'updateNotificationToken']);
- 
-Route::middleware('auth:sanctum')->post('/firebase-notification/send/notification', [FirebaseApiController::class, 'send']);
- 
-Route::middleware('auth:sanctum')->post('/entries/confirm', [EntryApiController::class, 'confirmEntry']);
- 
-Route::middleware('auth:sanctum')->group(function () 
-{
-    Route::get('/user/parkings', [UserParkingRequestApiController::class, 'index']);
-    
-    Route::post('/user/parkings/{parkingId}/request', [ParkingInboxApiController::class, 'sendRequest']);
-    
-    Route::get('/user/approved-types', [UserApprovedTypesApiController::class, 'index']);
-});
-
 Route::post('/password/request-code', [PasswordResetApiController::class, 'requestCode']);
-Route::post('/password/verify-code', [PasswordResetApiController::class, 'verifyCode']);
 Route::post('/password/reset-with-code', [PasswordResetApiController::class, 'resetWithCode']);

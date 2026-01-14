@@ -7,13 +7,13 @@
 * Elaboró                    : Elian Pérez
 * Fecha de liberación        : 06/11/2025
 * Autorizó                   : Angel Davila
-* Versión                    : 1.0
-* Fecha de mantenimiento     : 
-* Folio de mantenimiento     : 
-* Tipo de mantenimiento      : 
-* Descripción del mantenimiento : 
-* Responsable                : 
-* Revisor                    : 
+* Versión                    : 2.0
+* Fecha de mantenimiento     : 07/01/2026
+* Folio de mantenimiento     : L0024
+* Tipo de mantenimiento      : Correctivo
+* Descripción del mantenimiento : Se validó que al escanear el qr el estacionamiento se encontrara abierto
+* Responsable                : Elian Pérez
+* Revisor                    : Angel Davila
 */
 
 namespace App\Http\Controllers;
@@ -42,6 +42,67 @@ class ScanController extends Controller
         $this->ensureOwnership($reader);
 
         return view('user.qr_readers.scan', ['reader' => $reader]);
+    }
+
+    private function detectClockInconsistency(int $maxSkewSeconds = 120): ?array
+    {
+        $serverUtc = Carbon::now('UTC');
+
+        $trustedUtc = $this->getTrustedUtcFromHttpDate();
+        if (! $trustedUtc) 
+        {
+            return null;
+        }
+
+        $skew = $serverUtc->diffInSeconds($trustedUtc, false);
+        $abs  = abs($skew);
+
+        if ($abs > $maxSkewSeconds) 
+        {
+            return [
+                'ok' => false,
+                'abs_skew' => $abs,
+                'skew_signed' => $skew,
+                'server_utc' => $serverUtc->toDateTimeString(),
+                'trusted_utc' => $trustedUtc->toDateTimeString(),
+                'server_mx' => $serverUtc->copy()->setTimezone('America/Mexico_City')->toDateTimeString(),
+                'trusted_mx' => $trustedUtc->copy()->setTimezone('America/Mexico_City')->toDateTimeString(),
+            ];
+        }
+        return null;
+    }
+
+    private function getTrustedUtcFromHttpDate(): ?Carbon
+    {
+        $urls = ['https://www.cloudflare.com','https://www.google.com'];
+
+        foreach ($urls as $url) 
+        {
+            try 
+            {
+                $headers = @get_headers($url, true);
+                if (! $headers) 
+                {
+                    continue;
+                }
+
+                $date = $headers['Date'] ?? $headers['date'] ?? null;
+                if (is_array($date)) 
+                {
+                    $date = end($date);
+                }
+
+                if (! is_string($date) || trim($date) === '') 
+                {
+                    continue;
+                }
+                return Carbon::parse($date, 'UTC')->setTimezone('UTC');
+            } catch (\Throwable) 
+            {
+                continue;
+            }
+        }
+        return null;
     }
 
     public function ingest(Request $request, QrReader $reader): JsonResponse
@@ -89,6 +150,13 @@ class ScanController extends Controller
 
         $user = User::find($payload['id']);
 
+        $clockIssue = $this->detectClockInconsistency(120); 
+        if ($clockIssue) 
+        {
+            Log::warning('Clock skew detected', $clockIssue);
+            return $this->fail('Inconsistencia de hora detectada en el servidor. Contacta al administrador.',503);
+        }
+
         try
         {
             $qrTime = Carbon::parse($payload['fechaHora']);
@@ -102,6 +170,20 @@ class ScanController extends Controller
             );
 
             return $this->fail('Fecha/hora inválida en el QR.');
+        }
+
+        $parking = auth()->user()->parking;
+
+        if (! $parking || ! $parking->isOpen())
+        {
+            $this->notifyUser(
+                $user,
+                'Parking+',
+                'El estacionamiento está cerrado. No se permiten entradas/salidas en este momento.',
+                ['event' => 'parking_closed', 'code' => 'parking_closed']
+            );
+
+            return $this->fail('El estacionamiento está cerrado. No se permiten entradas/salidas en este momento.', 403);
         }
 
         if ($qrTime->diffInSeconds(now()) > 15)
@@ -158,8 +240,8 @@ class ScanController extends Controller
                     'Parking+',
                     'El código se generó lejos del estacionamiento.',
                     [
-                        'event'    => 'qr_error',
-                        'code'     => 'too_far',
+                        'event' => 'qr_error',
+                        'code' => 'too_far',
                         'distance' => (string) round($distanceKm, 2)
                     ]
                 );
@@ -218,6 +300,7 @@ class ScanController extends Controller
 
             if ($lastTx && $lastTx->departure_date && $lastTx->departure_date->diffInSeconds(now()) < 5)
             {
+                return $this->fail('Inconsistencia de la hora entre firebase y el servidor');
                 return $this->silent('post_exit_bounce');
             }
 

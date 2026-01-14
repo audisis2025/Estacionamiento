@@ -7,14 +7,14 @@
 * Autorizó                     : Angel Davila
 * Version                      : 2.0
 * Fecha de mantenimiento       : 03/11/2025
-* Folio de mantenimiento       :
-* Tipo de mantenimiento        : Correctivo
+* Folio de mantenimiento       : L0001
+* Tipo de mantenimiento        : Perfectivo
 * Descripción del mantenimiento: Se agregaron las opciones del usuario al menu lateral.
 * Responsable                  : Elian Pérez
 * Revisor                      : Angel Dávila
 * Fecha de mantenimiento       : 16/11/2025
-* Folio de mantenimiento       : 
-* Tipo de mantenimiento        : Correctivo
+* Folio de mantenimiento       : L0005
+* Tipo de mantenimiento        : Perfectivo
 * Descripción del mantenimiento: Se implementaron cambios según el manual de programación.
 * Responsable                  : Elian Pérez
 * Revisor                      : Angel Dávila   

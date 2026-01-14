@@ -72,7 +72,7 @@ class TestParkingSeeder extends Seeder
             'email' => 'juan@correo.com',
             'phone_number' => '5550001111',
             'password' => Hash::make('12345678'),
-            'amount' => 50
+            'amount' => 1000
         ]);
 
         $user2 = DB::table('users')->insertGetId([
@@ -80,7 +80,7 @@ class TestParkingSeeder extends Seeder
             'email' => 'pedro@correo.com',
             'phone_number' => '5550002222',
             'password' => Hash::make('12345678'),
-            'amount' => 0
+            'amount' => 1000
         ]);
 
         DB::table('user_client_types')->insert([[

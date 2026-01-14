@@ -7,13 +7,13 @@
 * Elaboró                    : Elian Pérez
 * Fecha de liberación        : 02/11/2025
 * Autorizó                   : Angel Davila
-* Versión                    : 1.0 
-* Fecha de mantenimiento     : 
-* Folio de mantenimiento     : 
-* Tipo de mantenimiento      : 
-* Descripción del mantenimiento : 
-* Responsable                : 
-* Revisor                    : 
+* Versión                    : 2.0
+* Fecha de mantenimiento     : 07/01/2026
+* Folio de mantenimiento     : L0022
+* Tipo de mantenimiento      : Correctivo
+* Descripción del mantenimiento : Se implementó un método para saber si el estacionamiento se encuentra abierto
+* Responsable                : Elian Pérez
+* Revisor                    : Angel Davila
 */
 namespace App\Models;
 
@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Carbon;
 
 class Parking extends Model
 {
@@ -96,6 +97,7 @@ class Parking extends Model
             'id'
         );
     }
+
     public function transactions()
     {
         return $this->hasManyThrough(
@@ -106,5 +108,30 @@ class Parking extends Model
             'id',
             'id'
         );
+    }
+
+    public function isOpen(?Carbon $now = null): bool
+    {
+        $now = $now ?: now();
+
+        $dayId = (int) $now->dayOfWeekIso;
+
+        $schedule = $this->schedules()
+            ->where('id_day', $dayId)
+            ->first();
+
+        if (! $schedule || ! $schedule->opening_time || ! $schedule->closing_time) 
+        {
+            return false;
+        }
+
+        $openAt = Carbon::parse($now->toDateString().' '.$schedule->opening_time);
+        $closeAt = Carbon::parse($now->toDateString().' '.$schedule->closing_time);
+
+        if ($closeAt->lessThanOrEqualTo($openAt)) 
+        {
+            return $now->greaterThanOrEqualTo($openAt) || $now->lessThanOrEqualTo($closeAt);
+        }
+        return $now->betweenIncluded($openAt, $closeAt);
     }
 }

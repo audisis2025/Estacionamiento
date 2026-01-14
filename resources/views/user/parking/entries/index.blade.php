@@ -7,7 +7,7 @@
 * Autorizó                     : Angel Davila
 * Version                      : 1.1
 * Fecha de mantenimiento       : 10/12/2025
-* Folio de mantenimiento       : 
+* Folio de mantenimiento       : L0018
 * Tipo de mantenimiento        : Perfectivo
 * Descripción del mantenimiento: Se agregó QR especial de salida y búsqueda en vivo por teléfono.
 * Responsable                  : Elian Pérez

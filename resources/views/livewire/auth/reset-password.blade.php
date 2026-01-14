@@ -8,8 +8,8 @@
 * Autorizó                   : Angel Dávila
 * Versión                    : 1.1
 * Fecha de mantenimiento     : 16/11/2025
-* Folio de mantenimiento     :
-* Tipo de mantenimiento      : Correctivo
+* Folio de mantenimiento     : L0008
+* Tipo de mantenimiento      : Perfectivo
 * Descripción del mantenimiento : Implementación de mensajes de alerta con SweetAlert2.
 * Responsable                : Elian Pérez
 * Revisor                    : Angel Dávila

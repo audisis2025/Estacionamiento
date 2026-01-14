@@ -170,14 +170,16 @@ class ParkingController extends Controller
                     'required_if:type,1,2',
                     'nullable',
                     'numeric',
-                    'min:1'
+                    'min:1',
+                    'max:1000'
                 ],
                 'price_flat' => 
                 [
                     'required_if:type,0,2',
                     'nullable',
                     'numeric',
-                    'min:1'
+                    'min:1',
+                    'max:1000'
                 ],
             ], [
                 'required' => 'El campo :attribute es obligatorio.',

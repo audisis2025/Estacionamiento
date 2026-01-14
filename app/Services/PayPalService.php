@@ -25,60 +25,65 @@ class PayPalService
     protected string $clientId;
     protected string $secret;
     protected string $currency;
-
+ 
     public function __construct()
     {
         $isSandbox = config('paypal.mode') === 'sandbox';
         $this->base = $isSandbox ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
-
+ 
         $this->clientId = config('paypal.client_id');
         $this->secret   = config('paypal.client_secret');
         $this->currency = config('paypal.currency', 'MXN');
     }
-
+ 
     protected function getAccessToken(): array
     {
-        try 
+        try
         {
             $resp = Http::asForm()
                 ->withBasicAuth($this->clientId, $this->secret)
                 ->post("{$this->base}/v1/oauth2/token", ['grant_type' => 'client_credentials']);
-
-            if (!$resp->successful()) 
+ 
+            if (!$resp->successful())
             {
                 Log::error('PayPal token error', ['status' => $resp->status()]);
             }
-
+ 
             return [$resp->status(), $resp->json()];
-        } catch (\Exception $e) 
+        } catch (\Exception $e)
         {
             Log::error('PayPal token exception', ['error' => $e->getMessage()]);
             return [500, ['error' => $e->getMessage()]];
         }
     }
-
+ 
     public function createOrder(float $amount, string $reference): array
     {
         [$statusToken, $tokenBody] = $this->getAccessToken();
-        if ($statusToken !== 200 || empty($tokenBody['access_token'])) 
+        if ($statusToken !== 200 || empty($tokenBody['access_token']))
         {
             return ['status' => $statusToken, 'body' => $tokenBody];
         }
-
+ 
         $payload = [
             'intent' => 'CAPTURE',
             'purchase_units' => [[
                 'reference_id' => $reference,
                 'amount' => [ 'currency_code' => $this->currency, 'value' => number_format(
                     $amount,
-                    2, 
+                    2,
                     '.',
                     ''
                 )]
-            ]]
+            ]],
+            'application_context' => [
+                'return_url' => 'https://samplesite.com/return',
+                'cancel_url' => 'https://samplesite.com/cancel',
+                'user_action' => 'PAY_NOW',
+            ],
         ];
-
-        try 
+ 
+        try
         {
             $resp = Http::withToken($tokenBody['access_token'])
                 ->withHeaders([
@@ -87,32 +92,32 @@ class PayPalService
                     'Prefer' => 'return=representation'
                 ])
                 ->post("{$this->base}/v2/checkout/orders", $payload);
-
-            if (!$resp->successful()) 
+ 
+            if (!$resp->successful())
             {
                 Log::error('PayPal createOrder failed', [ 'status' => $resp->status(),'debug_id' => $resp->json()['debug_id'] ?? null]);
             }
-
+ 
             return ['status' => $resp->status(), 'body' => $resp->json()];
-        } catch (\Exception $e) 
+        } catch (\Exception $e)
         {
             Log::error('PayPal createOrder exception', ['error' => $e->getMessage()]);
             return ['status' => 500, 'body' => ['error' => $e->getMessage()]];
         }
     }
-
+ 
     public function captureOrder(string $orderId): array
     {
         [$statusToken, $tokenBody] = $this->getAccessToken();
-        if ($statusToken !== 200 || empty($tokenBody['access_token'])) 
+        if ($statusToken !== 200 || empty($tokenBody['access_token']))
         {
             return ['status' => $statusToken, 'body' => $tokenBody];
         }
-
-        try 
+ 
+        try
         {
             $ch = curl_init("{$this->base}/v2/checkout/orders/{$orderId}/capture");
-            
+           
             curl_setopt_array($ch, [
                 CURLOPT_POST => true,
                 CURLOPT_RETURNTRANSFER => true,
@@ -125,21 +130,21 @@ class PayPalService
                 ],
                 CURLOPT_POSTFIELDS => ''
             ]);
-
+ 
             $response = curl_exec($ch);
             $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $curlError = curl_error($ch);
             curl_close($ch);
-
-            if ($curlError) 
+ 
+            if ($curlError)
             {
                 Log::error('PayPal cURL error', ['orderId' => $orderId]);
                 return ['status' => 500, 'body' => ['error' => 'Connection error']];
             }
-
+ 
             $responseBody = json_decode($response, true) ?: [];
-    
-            if ($statusCode !== 201) 
+   
+            if ($statusCode !== 201)
             {
                 Log::error('PayPal capture failed', [
                     'orderId' => $orderId,
@@ -147,36 +152,36 @@ class PayPalService
                     'debug_id' => $responseBody['debug_id'] ?? null
                 ]);
             }
-
+ 
             return ['status' => $statusCode, 'body' => $responseBody];
-        } catch (\Exception $e) 
+        } catch (\Exception $e)
         {
             Log::error('PayPal capture exception', ['orderId' => $orderId]);
             return ['status' => 500, 'body' => ['error' => 'Internal error']];
         }
     }
-
+ 
     public function getOrder(string $orderId): array
     {
         [$statusToken, $tokenBody] = $this->getAccessToken();
-        if ($statusToken !== 200 || empty($tokenBody['access_token'])) 
+        if ($statusToken !== 200 || empty($tokenBody['access_token']))
         {
             return ['status' => $statusToken, 'body' => $tokenBody];
         }
-
-        try 
+ 
+        try
         {
             $resp = Http::withToken($tokenBody['access_token'])
                 ->withHeaders(['Accept' => 'application/json'])
                 ->get("{$this->base}/v2/checkout/orders/{$orderId}");
-
-            if (!$resp->successful()) 
+ 
+            if (!$resp->successful())
             {
                 Log::error('PayPal getOrder failed', ['orderId' => $orderId,'status' => $resp->status()]);
             }
-
+ 
             return ['status' => $resp->status(), 'body' => $resp->json()];
-        } catch (\Exception $e) 
+        } catch (\Exception $e)
         {
             Log::error('PayPal getOrder exception', ['orderId' => $orderId]);
             return ['status' => 500, 'body' => ['error' => 'Internal error']];

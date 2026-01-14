@@ -7,8 +7,8 @@
 * Autorizó                     : Angel Davila
 * Version                      : 1.1
 * Fecha de mantenimiento       : 17/11/2025
-* Folio de mantenimiento       :
-* Tipo de mantenimiento        : Correctivo
+* Folio de mantenimiento       : L0012
+* Tipo de mantenimiento        : Perfectivo
 * Descripción del mantenimiento: Actualización de la interfaz
 * Responsable                  : Elian Pérez
 * Revisor                      : Angel Davila
